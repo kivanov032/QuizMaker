@@ -67,5 +67,5 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
 =======
 # QuizMaker
-Веб-приложение по создание викторин (МИЭТ, ПИУС)
+Веб-приложение по созданию викторин (МИЭТ, ПИУС)
 >>>>>>> 64df5485227f5bc5718eb3b05dfb63278e09804f
