@@ -18,7 +18,7 @@ class CreateQuizController extends Controller
 
         // Возвращаем ответ клиенту
         return response()->json([
-            'message' => 'Вопросы успешно получены!',
+            'message' => 'Вопросы успешно получены! ',
             'data' => $questions,
         ], 200);
     }
