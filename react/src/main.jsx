@@ -3,12 +3,12 @@ import { RouterProvider } from 'react-router-dom';
 import router from './router.jsx';
 import './index.css'
 import {StrictMode} from "react";
-import {ContextProvider} from "./context/ContextProvider.jsx";
+import { QuestionProvider } from './context/QuestionContext.jsx';
 
 createRoot(document.getElementById('root')).render(
     <StrictMode>
-        <ContextProvider>
+        <QuestionProvider>
             <RouterProvider router={router} />
-        </ContextProvider>
+        </QuestionProvider>
     </StrictMode>
 );

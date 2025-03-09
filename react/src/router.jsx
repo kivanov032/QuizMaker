@@ -1,52 +1,20 @@
-import {createBrowserRouter, Navigate} from "react-router-dom";
-import Login from "./views/Login.jsx";
-import Signup from "./views/Signup.jsx";
-import Users from "./views/Users.jsx";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import NotFound from "./views/NotFound.jsx";
-import DefaultLayout from "./components/DefaultLayout.jsx";
-import GuestLayout from "./components/GuestLayout.jsx";
-import Dashboard from "./views/Dashboard.jsx";
-import UserForm from "./views/UserForm.jsx";
+import CreatorQuestion from "./views/CreatorQuestion.jsx";
+import CreatorLayout from "./components/CreatorLayout.jsx";
 
-
-const router =createBrowserRouter([
+const router = createBrowserRouter([
     {
         path: '/',
-        element: <DefaultLayout />,
+        element: <CreatorLayout />,
         children: [
             {
                 path: '/',
-                element: <Navigate to="/users"/>
+                element: <Navigate to="/createQuestion/1" /> // Перенаправляем на первый вопрос
             },
             {
-                path: '/users',
-                element: <Users />
-            },
-            {
-                path: '/dashboard',
-                element: <Dashboard />
-            },
-            {
-                path: '/users/new',
-                element: <UserForm key="userCreate" />
-            },
-            {
-                path: '/users/:id',
-                element: <UserForm key="userUpdate" />
-            }
-        ]
-    },
-    {
-        path: '/',
-        element: <GuestLayout />,
-        children: [
-            {
-                path: '/login',
-                element: <Login />
-            },
-            {
-                path: '/signup',
-                element: <Signup />
+                path: '/createQuestion/:id', // Добавляем параметр id
+                element: <CreatorQuestion />
             },
         ]
     },
@@ -54,8 +22,6 @@ const router =createBrowserRouter([
         path: '*',
         element: <NotFound />
     },
-
-
-])
+]);
 
 export default router;
