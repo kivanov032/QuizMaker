@@ -12,6 +12,9 @@ export default function CreatorQuestion() {
     const [answers, setAnswers] = useState(['', '', '', '']);
     const [correctAnswerIndex, setCorrectAnswerIndex] = useState(null);
 
+    const maxQuestionLength = 350;
+    const maxAnswerLength = 150;
+
     useEffect(() => {
         const currentQuestion = getQuestion(parseInt(id));
         if (currentQuestion) {
@@ -138,9 +141,15 @@ export default function CreatorQuestion() {
                         placeholder="Введите вопрос"
                         value={question}
                         onChange={handleQuestionChange}
+                        maxLength={maxQuestionLength}
                         style={{ flex: 1 }}
                     />
                 </div>
+                {question.length >= maxQuestionLength && (
+                    <div style={{ color: 'red', marginTop: '5px' }}>
+                        Достигнут максимум символов ({maxQuestionLength} символов).
+                    </div>
+                )}
                 {answers.map((answer, index) => (
                     <div key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
                         <input
@@ -155,8 +164,14 @@ export default function CreatorQuestion() {
                             placeholder={`Вариант ответа ${index + 1}`}
                             value={answer}
                             onChange={(e) => handleAnswerChange(index, e.target.value)}
+                            maxLength={maxAnswerLength}
                             style={{ flex: 1, marginRight: '10px' }}
                         />
+                        {answer.length >= maxAnswerLength && (
+                            <div style={{ color: 'red', marginTop: '5px' }}>
+                                Достигнут максимум символов ({maxAnswerLength} символов).
+                            </div>
+                        )}
                         <button onClick={() => removeAnswerField(index)}>-</button>
                     </div>
                 ))}
