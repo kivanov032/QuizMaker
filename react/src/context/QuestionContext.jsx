@@ -7,23 +7,15 @@ export const QuestionContext = createContext();
 export const QuestionProvider = ({ children }) => {
     const [questions, setQuestions] = useState([]);
 
-    /**
-     * Обновляет существующий вопрос или добавляет новый.
-     * @param {number} id - Уникальный идентификатор вопроса.
-     * @param {string} question - Текст вопроса.
-     * @param {Array<string>} answers - Массив возможных ответов.
-     * @param {number} correctAnswerIndex - Индекс правильного ответа в массиве ответов.
-     */
     const updateQuestion = (id, question, answers, correctAnswerIndex) => {
         const existingQuestionIndex = questions.findIndex(q => q.id === id);
+        const updatedQuestions = [...questions];
+        updatedQuestions[existingQuestionIndex] = { id, question, answers, correctAnswerIndex };
+        setQuestions(updatedQuestions);
+    };
 
-        if (existingQuestionIndex !== -1) {
-            const updatedQuestions = [...questions];
-            updatedQuestions[existingQuestionIndex] = { id, question, answers, correctAnswerIndex };
-            setQuestions(updatedQuestions);
-        } else {
-            setQuestions([...questions, { id, question, answers, correctAnswerIndex }]);
-        }
+    const addQuestion = (newQuestion) => {
+        setQuestions(prevQuestions => [...prevQuestions, newQuestion]);
     };
 
     /**
@@ -35,19 +27,23 @@ export const QuestionProvider = ({ children }) => {
         return questions.find(q => q.id === id);
     };
 
-    /**
-     * Удаляет вопрос по его уникальному идентификатору.
-     * @param {number} id - Уникальный идентификатор вопроса.
-     */
+
     const deleteQuestion = (id) => {
-        setQuestions(questions.filter(q => q.id !== id).map((q, index) => ({
-            ...q,
-            id: index + 1 // Индексы обновляются после удаления
-        })));
+        setQuestions(prevQuestions => {
+            // Фильтруем вопросы, удаляя тот, который соответствует данному id
+            const updatedQuestions = prevQuestions.filter(q => q.id !== id);
+
+            // Обновляем идентификаторы оставшихся вопросов
+            return updatedQuestions.map((q, index) => ({
+                ...q,
+                id: index + 1 // Присваиваем новый идентификатор на основе индекса
+            }));
+        });
     };
 
+
     return (
-        <QuestionContext.Provider value={{ questions, updateQuestion, getQuestion, deleteQuestion }}>
+        <QuestionContext.Provider value={{questions, updateQuestion, getQuestion, deleteQuestion, addQuestion}}>
             {children}
         </QuestionContext.Provider>
     );
