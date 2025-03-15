@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Quiz;
+use App\Models\QuizQuestion;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class CreatorQuizController extends Controller
@@ -14,33 +16,32 @@ class CreatorQuizController extends Controller
         // Получаем данные из запроса
         $data = $request->all();
         $questions = $data['questions']; // Массив вопросов
-        $quizName = $data['quizName'];   // Название викторины
+        $quizName = $data['quizName'] ?? ''; //// Название викторины; если quizName отсутствует или null, используем пустую строку
 
-        Log::info("Полученные данные:", $data); // Логирование данных
-
+        Log::info("Полученные данные в метод searchQuizErrors:", $data); // Логирование данных
 
         $questions = $this->cleanEmptyFields($questions); //Обращение фактически пустых строк в null
         $cosmetic_errors = $this->checkDataForCosmeticErrors($questions); //Формирование списка косметических ошибок
         $questions = $this->trimQuestions($questions); //'Trim' полей вопросов
         $minor_errors = $this->checkDataForMinorErrors($questions); //Формирование списка несущественных ошибок
 
-        Log::info("questions 1:", $questions); // Логирование данных
+        //Log::info("questions 1:", $questions); // Логирование данных
 
         $questions = $this->filterQuestions($questions); // Фильтрация страничек вопросов
 
-        Log::info("questions 2:", $questions); // Логирование данных
+        //Log::info("questions 2:", $questions); // Логирование данных
 
         $questions = $this->filterAnswers($questions); // Фильтрация вариантов ответов вопросов
 
-        Log::info("questions 3:", $questions); // Логирование данных
-
-        $critical_errors = $this->checkDataForCriticalErrors($questions); //Формирование списка критических ошибок
-
-        Log::info("questions:", $questions); // Логирование данных
+        //Log::info("questions 3:", $questions); // Логирование данных
 
         $logical_errors = $this->checkDataForLogicalErrors($questions); //Формирование списка критических ошибок
 
-        Log::info("logical_errors:", $logical_errors); // Логирование данных
+        //Log::info("questions 4:", $questions); // Логирование данных
+
+        $critical_errors = $this->checkDataForCriticalErrors($questions); //Формирование списка критических ошибок
+
+        //Log::info("logical_errors:", $logical_errors); // Логирование данных
 
         $name_quiz_errors = $this->checkNameQuizForErrors($quizName); //Формирование списка ошибок названия викторины
 
@@ -51,10 +52,137 @@ class CreatorQuizController extends Controller
             'minor_errors' => $minor_errors,
             'critical_errors' => $critical_errors,
             'logical_errors' => $logical_errors,
-            'name_quiz_errors' => $name_quiz_errors,
-            'questions' => $questions,
+            'name_quiz_errors' => $name_quiz_errors
         ], 200);
     }
+
+    public function fixQuizErrors(Request $request): \Illuminate\Http\JsonResponse
+    {
+        // Получаем данные из запроса
+        $data = $request->all();
+        $questions = $data['questions']; // Массив вопросов
+        $quizName = $data['quizName'];   // Название викторины
+
+        // Флаги для различных типов ошибок
+        $cosmetic_errors_flag = $data['cosmetic_errors_flag'];
+        $minor_errors_flag = $data['minor_errors_flag'];
+        $logical_errors_flag = $data['logical_errors_flag'];
+        $quiz_name_cosmetic_errors_flag = $data['quiz_name_cosmetic_errors_flag'];
+        $create_quiz_flag = $data['create_quiz_flag'];
+
+        // Логирование данных
+        Log::info("Полученные данные в метод fixQuizErrors:", $data);
+
+        // Очистка пустых полей
+        $questions = $this->cleanEmptyFields($questions);
+
+        // Обработка ошибок в вопросах
+        if ($cosmetic_errors_flag) {
+            $questions = $this->trimQuestions($questions);
+        }
+        if ($minor_errors_flag) {
+            $questions = $this->filterQuestions($questions);
+            $questions = $this->filterAnswers($questions);
+        }
+        if ($logical_errors_flag) {
+            $questions = $this->fixLogicalErrors($questions);
+        }
+
+        // Обработка ошибок в названии викторины
+        if ($quiz_name_cosmetic_errors_flag) {
+            $quizName = trim($quizName);
+        }
+
+        // Проверка на создание викторины
+        if (!$create_quiz_flag) {
+            // Вызов метода для поиска ошибок
+            $requestForErrors = new Request([
+                'questions' => $questions,
+                'quizName' => $quizName,
+            ]);
+
+            $errorResponse = $this->searchQuizErrors($requestForErrors);
+            $errorsData = json_decode($errorResponse->getContent(), true);
+
+            // Возвращаем ответ клиенту
+            return response()->json([
+                'questions' => $questions,
+                'quizName' => $quizName,
+                'cosmetic_errors' => $errorsData['cosmetic_errors'],
+                'minor_errors' => $errorsData['minor_errors'],
+                'critical_errors' => $errorsData['critical_errors'],
+                'logical_errors' => $errorsData['logical_errors'],
+                'name_quiz_errors' => $errorsData['name_quiz_errors'],
+            ], 200);
+        } else {
+            // Вызов метода для создания викторины
+            $requestForBD = new Request([
+                'questions' => $questions,
+                'quizName' => $quizName,
+            ]);
+
+            $responseBD = $this->createQuizWithQuestions($requestForBD);
+            $responseBDMessage = json_decode($responseBD->getContent(), true);
+
+            // Возвращаем ответ клиенту
+            return response()->json([
+                'message' => $responseBDMessage['message']
+            ], 200);
+        }
+    }
+
+
+    public function createQuizWithQuestions(Request $request): \Illuminate\Http\JsonResponse
+    {
+        // Получаем данные из запроса
+        $data = $request->all();
+        $questions = $data['questions']; // Массив вопросов
+        $quizName = $data['quizName'];   // Название викторины
+
+        // Валидация входящих данных
+        $request->validate([
+            'quizName' => 'required',
+            'questions' => 'required|array',
+            'questions.*.question' => 'required',
+            'questions.*.answers' => 'required|array',
+            'questions.*.correctAnswerIndex' => 'required|integer',
+        ]);
+
+        // Начало транзакции
+        DB::transaction(function () use ($quizName, $questions) {
+            // Создание викторины
+            $quiz = Quiz::create([
+                'name_quiz' => $quizName,
+                'is_ready' => true,
+                'id_user' => null,
+            ]);
+
+            // Создание вопросов викторины
+            foreach ($questions as $question) {
+                // Получаем текст вопроса
+                $textQuestion = $question['question'];
+
+                // Получаем правильный ответ
+                $correctOption = $question['answers'][$question['correctAnswerIndex']];
+
+                // Получаем неправильные ответы (все остальные)
+                $wrongOptions = array_filter($question['answers'], function($answer) use ($correctOption) {
+                    return $answer !== $correctOption;
+                });
+
+                // Создание записи вопроса
+                QuizQuestion::create([
+                    'text_question' => $textQuestion,
+                    'correct_option' => $correctOption,
+                    'wrong_option' => json_encode(array_values($wrongOptions)), // Преобразуем в JSON
+                    'id_quiz' => $quiz->id_quiz,
+                ]);
+            }
+        });
+
+        return response()->json(['message' => 'Викторина и вопросы успешно созданы!'], 201);
+    }
+
 
     /**
      * Проверяет и очищает поля, содержащие только пробелы, символы новой строки и табуляции.
@@ -297,53 +425,6 @@ class CreatorQuizController extends Controller
         }, $questions);
     }
 
-
-    /**
-     * Проверяет массив вопросов на наличие ошибок (валидация вопросов).
-     *
-     * @param array $questions Массив вопросов.
-     * @return array Возвращает массив с ошибками для каждого вопроса.
-     */
-    private function checkDataForCriticalErrors(array $questions): array
-    {
-        $result = [];
-
-        foreach ($questions as $question) {
-            $errors = [];
-
-            // Проверка на null для question
-            if (is_null($question['question'])) {
-                $errors[] = ["id_error" => 1, "text_error" => "Вопрос не должен быть null"];
-            }
-
-            // Проверка на количество ответов
-            if (count($question['answers']) < 2) {
-                $errors[] = ["id_error" => 2, "text_error" => "Должно быть как минимум 2 ответа"];
-            }
-
-            // Проверка на null для correctAnswerIndex
-            if (is_null($question['correctAnswerIndex'])) {
-                $errors[] = ["id_error" => 3, "text_error" => "Индекс правильного ответа не может быть null"];
-            }
-
-            if (!is_null($question['correctAnswerIndex'])) {
-                if (is_null($question['answers'][$question['correctAnswerIndex']])) {
-                    $errors[] = ["id_error" => 4, "text_error" => "Правильный ответ не может быть null"];
-                }
-            }
-
-            // Добавляем ошибки в результат, если они есть
-            if (!empty($errors)) {
-                $result[] = [
-                    "id_question" => $question['id'],
-                    "errors" => $errors
-                ];
-            }
-        }
-
-        return $result;
-    }
-
     /**
      * Находит логические ошибки в массиве вопросов и ответов.
      *
@@ -417,6 +498,117 @@ class CreatorQuizController extends Controller
         return $formattedErrors;
     }
 
+    /**
+     * Исправляет логические ошибки в массиве вопросов и ответов.
+     *
+     * @param array $questions Массив вопросов.
+     *
+     * @return array Исправленный массив вопросов.
+     */
+    private function fixLogicalErrors(array $questions): array
+    {
+        $uniqueQuestions = [];
+        $questionTexts = [];
+
+        // Удаление дублирующихся вопросов
+        foreach ($questions as $question) {
+            $questionText = $question['question'];
+
+            if (!in_array($questionText, $questionTexts)) {
+                $questionTexts[] = $questionText;
+                $uniqueQuestions[] = $question; // Сохраняем уникальный вопрос
+            }
+        }
+
+        // Удаление дублирующихся ответов и пересчет индексов
+        foreach ($uniqueQuestions as &$question) {
+            $answerTexts = [];
+            $uniqueAnswers = [];
+            $correctAnswerIndex = $question['correctAnswerIndex'];
+
+            foreach ($question['answers'] as $index => $answerText) {
+                if (!in_array($answerText, $answerTexts)) {
+                    $answerTexts[] = $answerText;
+                    $uniqueAnswers[] = $answerText;
+                }
+            }
+
+            // Обновляем массив ответов
+            $question['answers'] = $uniqueAnswers;
+
+            // Проверяем правильный индекс
+            if ($correctAnswerIndex !== null) { // Проверяем, что индекс не равен null
+                $correctAnswer = $question['answers'][$correctAnswerIndex] ?? null; // Получаем правильный ответ
+
+                // Находим новый индекс правильного ответа
+                $newIndex = array_search($correctAnswer, $uniqueAnswers);
+
+                // Если правильный ответ найден, обновляем индекс
+                if ($newIndex !== false) {
+                    $question['correctAnswerIndex'] = $newIndex;
+                } else {
+                    $question['correctAnswerIndex'] = 0; // Если не найден, устанавливаем на 0
+                }
+            }
+        }
+
+        // Пересчет индексов вопросов
+        foreach ($uniqueQuestions as $key => &$question) {
+            $question['id'] = $key + 1; // Обновляем id, начиная с 1
+        }
+
+        return $uniqueQuestions;
+    }
+
+
+
+
+    /**
+     * Проверяет массив вопросов на наличие критических ошибок.
+     *
+     * @param array $questions Массив вопросов.
+     * @return array Возвращает массив с ошибками для каждого вопроса.
+     */
+    private function checkDataForCriticalErrors(array $questions): array
+    {
+        $result = [];
+
+        foreach ($questions as $question) {
+            $errors = [];
+
+            // Проверка на null для question
+            if (is_null($question['question'])) {
+                $errors[] = ["id_error" => 1, "text_error" => "Вопрос не должен быть null"];
+            }
+
+            // Проверка на количество ответов
+            if (count($question['answers']) < 2) {
+                $errors[] = ["id_error" => 2, "text_error" => "Должно быть как минимум 2 ответа"];
+            }
+
+            // Проверка на null для correctAnswerIndex
+            if (is_null($question['correctAnswerIndex'])) {
+                $errors[] = ["id_error" => 3, "text_error" => "Индекс правильного ответа не может быть null"];
+            }
+
+            if (!is_null($question['correctAnswerIndex'])) {
+                if (is_null($question['answers'][$question['correctAnswerIndex']])) {
+                    $errors[] = ["id_error" => 4, "text_error" => "Правильный ответ не может быть null"];
+                }
+            }
+
+            // Добавляем ошибки в результат, если они есть
+            if (!empty($errors)) {
+                $result[] = [
+                    "id_question" => $question['id'],
+                    "errors" => $errors
+                ];
+            }
+        }
+
+        return $result;
+    }
+
 
     /**
      * Проверяет название викторины на наличие ошибок.
@@ -454,30 +646,6 @@ class CreatorQuizController extends Controller
     }
 
 
-    /**
-     * Перенумеровывает индекс вопросов в массиве
-     *
-     * @param array $questions Массив вопросов
-     * @return array Массив вопросов с новой индексацией
-     */
-    public function renumberQuestions(array $questions): array
-    {
-        $renumberedQuestions = [];
-        $index = 1; // Начинаем с 1
-
-        foreach ($questions as $question) {
-            // Добавляем новый вопрос с обновленным id
-            $renumberedQuestions[] = [
-                'id' => $index,
-                'question' => $question['question'] ?? null,
-                'answers' => $question['answers'] ?? [],
-                'correctAnswerIndex' => $question['correctAnswerIndex'] ?? null,
-            ];
-            $index++; // Увеличиваем индекс
-        }
-
-        return $renumberedQuestions;
-    }
 
     // Публичный метод для заменя фактически пустых полей на null
     public function getCleanEmptyFields(array $questions): array
@@ -527,18 +695,16 @@ class CreatorQuizController extends Controller
         return $this->checkDataForLogicalErrors($questions);
     }
 
+    // Тест на исправление логических ошибок
+    public function getFixLogicalErrors(array $questions): array
+    {
+        return $this->fixLogicalErrors($questions);
+    }
+
     // Тест на поиск ошибок названия викторины
     public function getCheckNameQuizForErrors(string $quizName): array
     {
         return $this->checkNameQuizForErrors($quizName);
     }
 
-
 }
-
-
-// Записываем данные в базу данных
-//        $quiz = Quiz::create([
-//            'name_quiz' => 'Викторина №2',
-//            'id_user' => null,
-//        ]);

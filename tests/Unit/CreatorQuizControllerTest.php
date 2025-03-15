@@ -396,7 +396,40 @@ class CreatorQuizControllerTest extends TestCase
         $name_quiz_errors4 = $this->controller->getCheckNameQuizForErrors($quizName4);
 
         $this->assertEquals($expectedErrors4, $name_quiz_errors4);
+
+        // Тест 5: Название викторины пустое
+        $quizName5 = "";
+        $expectedErrors5 = [
+            "critical_error" => "В названии викторины должно быть хотя бы 5 символов."
+        ];
+        $name_quiz_errors5 = $this->controller->getCheckNameQuizForErrors($quizName5);
+
+        $this->assertEquals($expectedErrors5, $name_quiz_errors5);
     }
+
+    // Тест на исправление логических ошибок
+    public function testFixLogicalErrors()
+    {
+        $questions = [
+            ["id" => 1, "question" => "1", "answers" => ["1", "1", "1"], "correctAnswerIndex" => 2],
+            ["id" => 2, "question" => "Какой язык программирования вы изучаете?", "answers" => ["PHP", "PHP"], "correctAnswerIndex" => 1],
+            ["id" => 3, "question" => "Какой язык программирования вы изучаете?", "answers" => ["JavaScript"], "correctAnswerIndex" => 0],
+            ["id" => 4, "question" => "Какой язык программирования вы изучаете?1", "answers" => ["JavaScript", "JavaScript", "JavaScript"], "correctAnswerIndex" => null],
+        ];
+
+        $expectedErrors = [
+            ["id" => 1, "question" => "1", "answers" => ["1"], "correctAnswerIndex" => 0],
+            ["id" => 2, "question" => "Какой язык программирования вы изучаете?", "answers" => ["PHP"], "correctAnswerIndex" => 0],
+            ["id" => 3, "question" => "Какой язык программирования вы изучаете?1", "answers" => ["JavaScript"], "correctAnswerIndex" => null],
+        ];
+
+        $newQuestions = $this->controller->getFixLogicalErrors($questions);
+
+        $this->assertCount(3, $newQuestions);
+        $this->assertEquals($expectedErrors, $newQuestions);
+    }
+
+
 
 
 }
