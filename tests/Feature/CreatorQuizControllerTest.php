@@ -4,7 +4,7 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 
-class CreateQuizControllerTest extends TestCase
+class CreatorQuizControllerTest extends TestCase
 {
     public function testQuestionsReturnsEditedQuestionsAndErrors1()
     {
@@ -99,4 +99,11 @@ class CreateQuizControllerTest extends TestCase
     }
 
 }
+
+
+
+
+
+
+
 

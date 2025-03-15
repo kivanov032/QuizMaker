@@ -1,9 +1,9 @@
 <?php
 
-use App\Http\Controllers\Api\CreateQuizController;
+use App\Http\Controllers\Api\CreatorQuizController;
 use Illuminate\Support\Facades\Route;
 
-Route::post('/questions', [CreateQuizController::class, 'questions']);
+Route::post('/searchQuizErrors', [CreatorQuizController::class, 'searchQuizErrors']);
 
 
 /*

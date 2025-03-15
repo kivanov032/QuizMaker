@@ -1,7 +1,7 @@
-import React, { useContext, useEffect, useState, useRef } from 'react';
+import { useContext, useEffect, useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { QuestionContext } from '../context/QuestionContext';
-import { sendQuestions } from "../senderQuiz.jsx";
+import { sendQuestions } from "../SenderQuiz.jsx";
 
 export default function CreatorQuestion() {
     const { id } = useParams();
@@ -11,32 +11,35 @@ export default function CreatorQuestion() {
     const [question, setQuestion] = useState('');
     const [answers, setAnswers] = useState(['', '', '', '']);
     const [correctAnswerIndex, setCorrectAnswerIndex] = useState(null);
-    const isFirstRender = useRef(true);
+    const isFirstRender = useRef(true); //Можно убрать, но не желательно
 
     const maxQuestionLength = 350;
     const maxAnswerLength = 150;
 
     useEffect(() => {
+        console.log("Я в начале пути")
         if (isFirstRender.current) {
             if (questions.length === 0) {
                 addQuestion({ id: 1, question: '', answers: ['', '', '', ''], correctAnswerIndex: null });
+                console.log("Я тута")
             }
             isFirstRender.current = false;
         }
-    }, [questions.length, addQuestion]);
+    }, [questions.length]);
 
     useEffect(() => {
         const currentQuestion = getQuestion(parseInt(id));
+        console.log("Я здесь")
         if (currentQuestion) {
-            setQuestion(currentQuestion.question || '');
-            setAnswers(currentQuestion.answers || ['', '', '', '']);
-            setCorrectAnswerIndex(currentQuestion.correctAnswerIndex !== undefined ? currentQuestion.correctAnswerIndex : null);
-        } else {
+            setQuestion(currentQuestion.question);
+            setAnswers(currentQuestion.answers);
+            setCorrectAnswerIndex(currentQuestion.correctAnswerIndex);
+        }else { //Можно убрать, но не желательно
             setQuestion('');
             setAnswers(['', '', '', '']);
             setCorrectAnswerIndex(null);
         }
-    }, [id, getQuestion]);
+    }, [id]);
 
 
     const handleQuestionChange = (value) => {
@@ -49,7 +52,7 @@ export default function CreatorQuestion() {
         setAnswers(newAnswers);
     };
 
-    const handleCorrectAnswerChange = (index) => {
+    const handleCorrectAnswerIndexChange = (index) => {
         setCorrectAnswerIndex(index);
     };
 
@@ -76,6 +79,8 @@ export default function CreatorQuestion() {
         }
         if (parseInt(id) > 1) {
             navigate(`/createQuestion/${parseInt(id) - 1}`);
+        } else{
+            alert("Это первый вопрос.");
         }
     };
 
@@ -134,6 +139,9 @@ export default function CreatorQuestion() {
 
 
     const handleFinishButtonClick = async () => {
+
+        console.log("Я в handleFinishButtonClick");
+
         const updatedQuestions = [...questions];
         const currentQuestion = getQuestion(parseInt(id));
         if (currentQuestion) {
@@ -180,7 +188,7 @@ export default function CreatorQuestion() {
                                 type="radio"
                                 name="answer"
                                 checked={correctAnswerIndex === index}
-                                onChange={() => handleCorrectAnswerChange(index)}
+                                onChange={() => handleCorrectAnswerIndexChange(index)}
                                 style={{ marginRight: '10px' }}
                             />
                             <input

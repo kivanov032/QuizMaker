@@ -7,7 +7,14 @@ export const sendQuestions = async (questions) => {
         console.log("Я в sendQuestions");
         console.log("Полученные вопросы:", questions);
 
-        const response = await axios.post(`${BASE_URL}/api/questions`, questions);
+        const quizName = "  \nПрограммирование \n   на PHP \t ";
+
+        const response = await axios.post(`${BASE_URL}/api/searchQuizErrors`, {
+            questions: questions,
+            quizName: quizName
+        });
+
+        console.log("Полученный ответ от сервера:", response.data);
         return response.data;
     } catch (error) {
         console.error('Ошибка при отправке вопросов:', error);
