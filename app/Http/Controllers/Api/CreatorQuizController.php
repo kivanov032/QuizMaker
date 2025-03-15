@@ -18,29 +18,28 @@ class CreatorQuizController extends Controller
 
         Log::info("Полученные данные:", $data); // Логирование данных
 
-
         $questions = $this->cleanEmptyFields($questions); //Обращение фактически пустых строк в null
         $cosmetic_errors = $this->checkDataForCosmeticErrors($questions); //Формирование списка косметических ошибок
         $questions = $this->trimQuestions($questions); //'Trim' полей вопросов
         $minor_errors = $this->checkDataForMinorErrors($questions); //Формирование списка несущественных ошибок
 
-        Log::info("questions 1:", $questions); // Логирование данных
+        //Log::info("questions 1:", $questions); // Логирование данных
 
         $questions = $this->filterQuestions($questions); // Фильтрация страничек вопросов
 
-        Log::info("questions 2:", $questions); // Логирование данных
+        //Log::info("questions 2:", $questions); // Логирование данных
 
         $questions = $this->filterAnswers($questions); // Фильтрация вариантов ответов вопросов
 
-        Log::info("questions 3:", $questions); // Логирование данных
+        //Log::info("questions 3:", $questions); // Логирование данных
 
         $critical_errors = $this->checkDataForCriticalErrors($questions); //Формирование списка критических ошибок
 
-        Log::info("questions:", $questions); // Логирование данных
+        //Log::info("questions:", $questions); // Логирование данных
 
         $logical_errors = $this->checkDataForLogicalErrors($questions); //Формирование списка критических ошибок
 
-        Log::info("logical_errors:", $logical_errors); // Логирование данных
+        //Log::info("logical_errors:", $logical_errors); // Логирование данных
 
         $name_quiz_errors = $this->checkNameQuizForErrors($quizName); //Формирование списка ошибок названия викторины
 
@@ -51,8 +50,7 @@ class CreatorQuizController extends Controller
             'minor_errors' => $minor_errors,
             'critical_errors' => $critical_errors,
             'logical_errors' => $logical_errors,
-            'name_quiz_errors' => $name_quiz_errors,
-            'questions' => $questions,
+            'name_quiz_errors' => $name_quiz_errors
         ], 200);
     }
 

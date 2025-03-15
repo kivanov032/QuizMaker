@@ -1,7 +1,6 @@
 import { useContext, useEffect, useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { QuestionContext } from '../context/QuestionContext';
-import { sendQuestions } from "../SenderQuiz.jsx";
 
 export default function CreatorQuestion() {
     const { id } = useParams();
@@ -11,17 +10,15 @@ export default function CreatorQuestion() {
     const [question, setQuestion] = useState('');
     const [answers, setAnswers] = useState(['', '', '', '']);
     const [correctAnswerIndex, setCorrectAnswerIndex] = useState(null);
-    const isFirstRender = useRef(true); //Можно убрать, но не желательно
+    const isFirstRender = useRef(true);
 
     const maxQuestionLength = 350;
     const maxAnswerLength = 150;
 
     useEffect(() => {
-        console.log("Я в начале пути")
         if (isFirstRender.current) {
             if (questions.length === 0) {
                 addQuestion({ id: 1, question: '', answers: ['', '', '', ''], correctAnswerIndex: null });
-                console.log("Я тута")
             }
             isFirstRender.current = false;
         }
@@ -29,36 +26,52 @@ export default function CreatorQuestion() {
 
     useEffect(() => {
         const currentQuestion = getQuestion(parseInt(id));
-        console.log("Я здесь")
         if (currentQuestion) {
             setQuestion(currentQuestion.question);
             setAnswers(currentQuestion.answers);
             setCorrectAnswerIndex(currentQuestion.correctAnswerIndex);
-        }else { //Можно убрать, но не желательно
+        } else {
             setQuestion('');
             setAnswers(['', '', '', '']);
             setCorrectAnswerIndex(null);
         }
-    }, [id]);
+    }, [questions, id]);
 
 
     const handleQuestionChange = (value) => {
         setQuestion(value);
+        const currentQuestion = getQuestion(parseInt(id));
+        if (currentQuestion) {
+            updateQuestion(currentQuestion.id, value, answers, correctAnswerIndex);
+        }
     };
 
     const handleAnswerChange = (index, value) => {
         const newAnswers = [...answers];
         newAnswers[index] = value;
         setAnswers(newAnswers);
+        const currentQuestion = getQuestion(parseInt(id));
+        if (currentQuestion) {
+            updateQuestion(currentQuestion.id, question, newAnswers, correctAnswerIndex);
+        }
     };
 
     const handleCorrectAnswerIndexChange = (index) => {
         setCorrectAnswerIndex(index);
+        const currentQuestion = getQuestion(parseInt(id));
+        if (currentQuestion) {
+            updateQuestion(currentQuestion.id, question, answers, index);
+        }
     };
 
     const addAnswerField = () => {
         if (answers.length < 6) {
-            setAnswers([...answers, '']);
+            const newAnswers = [...answers, ''];
+            setAnswers(newAnswers);
+            const currentQuestion = getQuestion(parseInt(id));
+            if (currentQuestion) {
+                updateQuestion(currentQuestion.id, question, newAnswers, correctAnswerIndex);
+            }
         }
     };
 
@@ -70,27 +83,30 @@ export default function CreatorQuestion() {
             setCorrectAnswerIndex(correctAnswerIndex - 1);
         }
         setAnswers(newAnswers);
+        const currentQuestion = getQuestion(parseInt(id));
+        if (currentQuestion) {
+            updateQuestion(currentQuestion.id, question, newAnswers, correctAnswerIndex);
+        }
     };
 
     const handlePreviousQuestion = () => {
-        const currentQuestion = getQuestion(parseInt(id));
-        if (currentQuestion) {
-            updateQuestion(currentQuestion.id, question, answers, correctAnswerIndex);
-        }
+        // const currentQuestion = getQuestion(parseInt(id));
+        // if (currentQuestion) {
+        //     updateQuestion(currentQuestion.id, question, answers, correctAnswerIndex);
+        // }
         if (parseInt(id) > 1) {
             navigate(`/createQuestion/${parseInt(id) - 1}`);
-        } else{
+        } else {
             alert("Это первый вопрос.");
         }
     };
 
     const handleNextQuestion = () => {
-        const currentQuestion = getQuestion(parseInt(id));
-        if (currentQuestion) {
-            updateQuestion(currentQuestion.id, question, answers, correctAnswerIndex);
-        }
-        const updatedQuestionsCount = questions.length;
-        if (parseInt(id) < updatedQuestionsCount) {
+        // const currentQuestion = getQuestion(parseInt(id));
+        // if (currentQuestion) {
+        //     updateQuestion(currentQuestion.id, question, answers, correctAnswerIndex);
+        // }
+        if (parseInt(id) < questions.length) {
             navigate(`/createQuestion/${parseInt(id) + 1}`);
         } else {
             alert("Это последний вопрос. Переход невозможен.");
@@ -98,25 +114,23 @@ export default function CreatorQuestion() {
     };
 
     const handleDeleteQuestion = () => {
-        if (questions.length <= 1) {
-            alert("Нельзя удалить единственный вопрос.");
-            return;
-        }
-
         const currentQuestion = getQuestion(parseInt(id));
+        console.log(currentQuestion);
         if (currentQuestion) {
             deleteQuestion(currentQuestion.id);
 
             // Переход на предыдущий вопрос, если он существует
-            if (parseInt(id) > 1) {
-                navigate(`/createQuestion/${parseInt(id) - 1}`);
-            } else if (questions.length > 1) {
-                navigate(`/createQuestion/1`);
+            const newId = parseInt(id) > 1 ? parseInt(id) - 1 : (questions.length > 1 ? 1 : null);
+
+            if (newId) {
+                navigate(`/createQuestion/${newId}`);
             } else {
                 navigate('/someOtherPage');
             }
         }
     };
+
+
 
     const handleAddNewQuestion = () => {
         const currentQuestion = getQuestion(parseInt(id));
@@ -124,46 +138,18 @@ export default function CreatorQuestion() {
             updateQuestion(currentQuestion.id, question, answers, correctAnswerIndex);
         }
 
-        // Сброс локального состояния
         setQuestion('');
         setAnswers(['', '', '', '']);
         setCorrectAnswerIndex(null);
 
-        // Добавление нового вопроса
         const newQuestionId = questions.length + 1;
         addQuestion({ id: newQuestionId, question: '', answers: ['', '', '', ''], correctAnswerIndex: null });
 
-        // Переход на новую страницу
         navigate(`/createQuestion/${newQuestionId}`);
     };
 
-
-    const handleFinishButtonClick = async () => {
-
-        console.log("Я в handleFinishButtonClick");
-
-        const updatedQuestions = [...questions];
-        const currentQuestion = getQuestion(parseInt(id));
-        if (currentQuestion) {
-            updatedQuestions[currentQuestion.id - 1] = {
-                id: currentQuestion.id,
-                question,
-                answers,
-                correctAnswerIndex
-            };
-
-            try {
-                await sendQuestions(updatedQuestions);
-            } catch (error) {
-                console.error('Ошибка:', error);
-            }
-        }
-    };
-
-
     return (
-        <div style={{ maxWidth: '400px', margin: '0 auto' }}>
-            <h1 style={{ marginBottom: '10px' }}>Создать вопрос:</h1>
+        <div style={{ maxWidth: '500px', margin: '0 auto' }}>
             <div style={{ border: '1px solid #ccc', padding: '10px', borderRadius: '5px', marginBottom: '20px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
                     <span style={{ marginRight: '10px' }}>№ {parseInt(id)}:</span>
@@ -216,17 +202,18 @@ export default function CreatorQuestion() {
                 <button className="btn btn-block" onClick={handlePreviousQuestion}>Предыдущий вопрос</button>
                 <button className="btn btn-block" onClick={handleNextQuestion}>Следующий вопрос</button>
             </div>
-            <button className="btn btn-danger" onClick={handleDeleteQuestion} style={{ marginTop: '20px' }}>
-                Удалить вопрос
-            </button>
-            <button className="btn btn-success" onClick={handleFinishButtonClick} style={{ marginTop: '20px' }}>
-                Завершить
-            </button>
-            {(parseInt(id) === questions.length) && (
-                <button className="btn btn-primary" onClick={handleAddNewQuestion} style={{ marginTop: '20px' }}>
-                    + Вопрос
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px' }}>
+                <button className="btn" onClick={handleDeleteQuestion}
+                        style={{ visibility: questions.length > 1 ? 'visible' : 'hidden' }}>
+                    Удалить вопрос
                 </button>
-            )}
+                <button className="btn" onClick={handleAddNewQuestion}
+                    style={{ visibility: (questions.length === parseInt(id)) ? 'visible' : 'hidden' }}>
+                    Добавить вопрос
+                </button>
+            </div>
+
         </div>
     );
 }

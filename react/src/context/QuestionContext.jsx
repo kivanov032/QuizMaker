@@ -27,27 +27,17 @@ export const QuestionProvider = ({ children }) => {
 
     const deleteQuestion = (id) => {
         console.log("Удаляем вопрос с id:", id);
-        console.log("Вопросы до удаления:", questions);
+        const updatedQuestions = questions.filter(q => q.id !== id);
 
-        // Логируем идентификаторы всех вопросов
-        if (questions) {
-            questions.forEach(q => console.log("id вопроса:", q.id));
-        }
-
-        const updatedQuestions = questions?.filter(q => q.id !== id).map((q, index) => ({
+        // Обновляем идентификаторы
+        const reindexedQuestions = updatedQuestions.map((q, index) => ({
             ...q,
-            id: index + 1
+            id: index + 1 // Переопределяем идентификаторы
         }));
 
-        console.log("Вопросы после удаления:", updatedQuestions);
-        setQuestions(updatedQuestions);
-
-        if (updatedQuestions?.length === questions?.length) {
-            console.warn("Вопрос не был удален. Проверьте id:", id);
-        } else {
-            console.log("Вопрос успешно удален. Новое количество вопросов:", updatedQuestions?.length);
-        }
+        setQuestions(reindexedQuestions);
     };
+
 
     return (
         <QuestionContext.Provider value={{ questions, updateQuestion, getQuestion, deleteQuestion, addQuestion }}>
@@ -55,6 +45,3 @@ export const QuestionProvider = ({ children }) => {
         </QuestionContext.Provider>
     );
 };
-
-
-
