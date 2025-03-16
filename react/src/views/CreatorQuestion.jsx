@@ -209,7 +209,7 @@ export default function CreatorQuestion() {
                     Удалить вопрос
                 </button>
                 <button className="btn" onClick={handleAddNewQuestion}
-                    style={{ visibility: (questions.length === parseInt(id)) ? 'visible' : 'hidden' }}>
+                        style={{ visibility: (questions.length === parseInt(id)) ? 'visible' : 'hidden' }}>
                     Добавить вопрос
                 </button>
             </div>

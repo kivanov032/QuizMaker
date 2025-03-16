@@ -1,13 +1,19 @@
 import React, { useState, useContext } from 'react';
-import { Outlet } from "react-router-dom";
+import {Navigate, Outlet} from "react-router-dom";
 import { QuestionContext } from '../context/QuestionContext';
 import { sendQuestions } from "../SenderQuiz.jsx";
+import {useStateContext} from "../context/ContextProvider.jsx";
 
 export default function CreatorLayout() {
     const { questions } = useContext(QuestionContext);
     const [quizName, setQuizName] = useState('');
     const [quizErrors, setQuizErrors] = useState(null);
+    const {token} = useStateContext();
     const maxNameQuizLength = 200;
+
+    if (!token) {
+        return <Navigate to="/login" />
+    }
 
     const handleFinish = async () => {
         try {

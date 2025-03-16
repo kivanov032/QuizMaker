@@ -253,3 +253,124 @@ input {
 /*        transform: translateY(0);*/
 /*    }*/
 /*}*/
+
+.header {
+    background-color: white;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 60px; /* Высота шапки */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+}
+
+
+.header-left {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.header-right {
+    font-size: 16px;
+    color: gray;
+}
+
+.main-content {
+    margin-top: 60px; /* Делаем отступ равный высоте шапки */
+    padding: 20px; /* Просто, чтобы контент не прилипал к краям */
+}
+
+.clickable {
+    cursor: pointer;
+    color: #007bff;
+    font-weight: bold;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.clickable:hover {
+    color: #0056b3;
+}
+
+/* Отступ между User info и Logout */
+.logout {
+    margin-left: 20px;
+}
+
+/* Контейнер, чтобы форма была по центру */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f4f4f4;
+}
+
+/* Форма (белая рамка) */
+.login-box {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 300px;
+}
+
+/* Заголовок */
+.login-title {
+    margin-bottom: 15px;
+    font-size: 22px;
+}
+
+/* Поля ввода */
+.login-input {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Кнопка */
+.login-button {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    margin-top: 10px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.login-button:hover {
+    background-color: #0056b3;
+}
+
+/* Текст под кнопкой */
+.register-text {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #666;
+}
+
+/* Ссылка на регистрацию */
+.register-link {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+    margin-left: 5px;
+}
+
+.register-link:hover {
+    text-decoration: underline;
+}
+
+
+
