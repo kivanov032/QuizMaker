@@ -37,6 +37,21 @@ export default function CreatorLayout() {
         syntaxQuestionErrors: false,
     });
 
+    useEffect(() => {
+        if (quizErrors) {
+            const hasCriticalQuizErrors = quizErrors?.name_quiz_errors?.critical_error || false;
+            const hasCriticalQuestionErrors = quizErrors?.critical_errors?.length > 0;
+            setExpandedSections(prev => ({
+                ...prev,
+                quizErrors: hasCriticalQuizErrors || (quizErrors?.name_quiz_errors && Object.keys(quizErrors.name_quiz_errors).length > 0),
+                questionErrors: hasCriticalQuestionErrors || (quizErrors?.critical_errors?.length > 0 || quizErrors?.cosmetic_errors?.length > 0 ||
+                    quizErrors?.logical_errors?.length > 0 || quizErrors?.minor_errors?.length > 0),
+                criticalQuizErrors: hasCriticalQuizErrors,
+                criticalQuestionErrors: hasCriticalQuestionErrors,
+            }));
+        }
+    }, [quizErrors]);
+
     if (!token) {
         return <Navigate to="/login" />;
     }
@@ -63,6 +78,8 @@ export default function CreatorLayout() {
                 criticalQuizErrors: response?.name_quiz_errors?.critical_error,
                 criticalQuestionErrors: response?.critical_errors?.length > 0,
             }));
+            //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            // Здесь должно быть всплывающее окно
         } catch (error) {
             console.error('Ошибка при отправке вопросов:', error);
         }
@@ -73,14 +90,20 @@ export default function CreatorLayout() {
             const response = await sendQuestionsToSearchError(quizName, questions);
             setQuizErrors(response);
             console.log("Данные от сервера успешно сохранены:", response);
-            setExpandedSections(prev => ({
-                ...prev,
-                quizErrors: response?.name_quiz_errors && Object.keys(response.name_quiz_errors).length > 0,
-                questionErrors: (response?.critical_errors?.length > 0 || response?.cosmetic_errors?.length > 0 ||
-                    response?.logical_errors?.length > 0 || response?.minor_errors?.length > 0),
-                criticalQuizErrors: response?.name_quiz_errors?.critical_error,
-                criticalQuestionErrors: response?.critical_errors?.length > 0,
-            }));
+
+            const hasCriticalQuizErrors = response?.name_quiz_errors?.critical_error || false;
+            const hasCriticalQuestionErrors = response?.critical_errors?.length > 0;
+
+            setExpandedSections({
+                quizErrors: hasCriticalQuizErrors || (response?.name_quiz_errors && Object.keys(response.name_quiz_errors).length > 0),
+                questionErrors: hasCriticalQuestionErrors || (response?.critical_errors?.length > 0),
+                criticalQuizErrors: hasCriticalQuizErrors,
+                syntaxQuizErrors: false,
+                criticalQuestionErrors: hasCriticalQuestionErrors,
+                logicQuestionErrors: false,
+                minorQuestionErrors: false,
+                syntaxQuestionErrors: false,
+            });
         } catch (error) {
             console.error('Ошибка при отправке вопросов:', error);
         }
@@ -92,16 +115,23 @@ export default function CreatorLayout() {
             setQuizName(response.quizName);
             setQuestions(response.questions);
             setQuizErrors(response.errors);
-            navigate(`/createQuestion/1}`);
+            navigate(`/createQuestion/1`);
             console.log("Данные от сервера успешно сохранены:", response);
-            setExpandedSections(prev => ({
-                ...prev,
-                quizErrors: response?.name_quiz_errors && Object.keys(response.name_quiz_errors).length > 0,
-                questionErrors: (response?.critical_errors?.length > 0 || response?.cosmetic_errors?.length > 0 ||
+
+            const hasCriticalQuizErrors = response?.name_quiz_errors?.critical_error || false;
+            const hasCriticalQuestionErrors = response?.critical_errors?.length > 0;
+
+            setExpandedSections({
+                quizErrors: hasCriticalQuizErrors || (response?.name_quiz_errors && Object.keys(response.name_quiz_errors).length > 0),
+                questionErrors: hasCriticalQuestionErrors || (response?.critical_errors?.length > 0 || response?.cosmetic_errors?.length > 0 ||
                     response?.logical_errors?.length > 0 || response?.minor_errors?.length > 0),
-                criticalQuizErrors: response?.name_quiz_errors?.critical_error,
-                criticalQuestionErrors: response?.critical_errors?.length > 0,
-            }));
+                criticalQuizErrors: hasCriticalQuizErrors,
+                syntaxQuizErrors: false,
+                criticalQuestionErrors: hasCriticalQuestionErrors,
+                logicQuestionErrors: false,
+                minorQuestionErrors: false,
+                syntaxQuestionErrors: false,
+            });
         } catch (error) {
             console.error('Ошибка при отправке вопросов:', error);
         }
@@ -140,7 +170,7 @@ export default function CreatorLayout() {
                             <div className="error-subsections">
                                 {quizErrors.name_quiz_errors.critical_error && (
                                     <div className="error-subsection">
-                                        <h4 className="subsection-title">
+                                        <h4 onClick={() => toggleSection('criticalQuizErrors')} className="subsection-title">
                                             Критические {expandedSections.criticalQuizErrors ? '▼' : '▶'}
                                         </h4>
                                         {expandedSections.criticalQuizErrors && (
@@ -180,17 +210,17 @@ export default function CreatorLayout() {
                                 {/* Критические */}
                                 {quizErrors.critical_errors && quizErrors.critical_errors.length > 0 && (
                                     <div className="error-subsection">
-                                        <h4 className="subsection-title">
+                                        <h4 onClick={() => toggleSection('criticalQuestionErrors')} className="subsection-title">
                                             Критические {expandedSections.criticalQuestionErrors ? '▼' : '▶'}
                                         </h4>
                                         {expandedSections.criticalQuestionErrors && quizErrors.critical_errors.map((questionError, index) => (
                                             questionError.errors.map((error, errorIndex) => (
                                                 <div key={`${index}-${errorIndex}`} className="error-item">
-                                                    <span style={{ color: 'red' }}>
-                                                        - <Link to={`/createQuestion/${questionError.id_question}`} style={{ color: 'red', textDecoration: 'underline' }}>
-                                                            Вопрос {questionError.id_question}
-                                                        </Link>: {error.text_error}
-                                                    </span>
+                                                <span style={{ color: 'red' }}>
+                                                    - <Link to={`/createQuestion/${questionError.id_question}`} style={{ color: 'red', textDecoration: 'underline' }}>
+                                                        Вопрос {questionError.id_question}
+                                                    </Link>: {error.text_error}
+                                                </span>
                                                 </div>
                                             ))
                                         ))}
@@ -205,11 +235,11 @@ export default function CreatorLayout() {
                                         {expandedSections.logicQuestionErrors && quizErrors.logical_errors.map((questionError, index) => (
                                             questionError.errors.map((error, errorIndex) => (
                                                 <div key={`${index}-${errorIndex}`} className="error-item">
-                                                    <span>
-                                                        - <Link to={`/createQuestion/${questionError.id_question}`} style={{ color: 'inherit', textDecoration: 'underline' }}>
-                                                            Вопрос {questionError.id_question}
-                                                        </Link>: {error.text_error}
-                                                    </span>
+                                                <span>
+                                                    - <Link to={`/createQuestion/${questionError.id_question}`} style={{ color: 'inherit', textDecoration: 'underline' }}>
+                                                        Вопрос {questionError.id_question}
+                                                    </Link>: {error.text_error}
+                                                </span>
                                                 </div>
                                             ))
                                         ))}
@@ -224,11 +254,11 @@ export default function CreatorLayout() {
                                         {expandedSections.minorQuestionErrors && quizErrors.minor_errors.map((questionError, index) => (
                                             questionError.errors.map((error, errorIndex) => (
                                                 <div key={`${index}-${errorIndex}`} className="error-item">
-                                                    <span>
-                                                        - <Link to={`/createQuestion/${questionError.id_question}`} style={{ color: 'inherit', textDecoration: 'underline' }}>
-                                                            Вопрос {questionError.id_question}
-                                                        </Link>: {error.text_error}
-                                                    </span>
+                                                <span>
+                                                    - <Link to={`/createQuestion/${questionError.id_question}`} style={{ color: 'inherit', textDecoration: 'underline' }}>
+                                                        Вопрос {questionError.id_question}
+                                                    </Link>: {error.text_error}
+                                                </span>
                                                 </div>
                                             ))
                                         ))}
@@ -243,11 +273,11 @@ export default function CreatorLayout() {
                                         {expandedSections.syntaxQuestionErrors && quizErrors.cosmetic_errors.map((questionError, index) => (
                                             questionError.errors.map((error, errorIndex) => (
                                                 <div key={`${index}-${errorIndex}`} className="error-item">
-                                                    <span>
-                                                        - <Link to={`/createQuestion/${questionError.id_question}`} style={{ color: 'inherit', textDecoration: 'underline' }}>
-                                                            Вопрос {questionError.id_question}
-                                                        </Link>: {error.text_error}
-                                                    </span>
+                                                <span>
+                                                    - <Link to={`/createQuestion/${questionError.id_question}`} style={{ color: 'inherit', textDecoration: 'underline' }}>
+                                                        Вопрос {questionError.id_question}
+                                                    </Link>: {error.text_error}
+                                                </span>
                                                 </div>
                                             ))
                                         ))}
