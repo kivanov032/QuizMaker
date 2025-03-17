@@ -1,20 +1,29 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { Outlet, Link, Navigate } from "react-router-dom";
+import {Outlet, Link, Navigate, useNavigate} from "react-router-dom";
 import { QuestionContext } from '../context/QuestionContext';
-import { sendQuestions } from "../SenderQuiz.jsx";
+import {sendQuestionsToFixError, sendQuestionsToSearchError} from "../SenderQuiz.jsx";
 import "./CreatorLayout.css";
 import { useStateContext } from "../context/ContextProvider.jsx";
 
 export default function CreatorLayout() {
-    const { questions } = useContext(QuestionContext);
+    const navigate = useNavigate();
+    const { questions, setQuestions } = useContext(QuestionContext);
     const [quizName, setQuizName] = useState('');
     const [quizErrors, setQuizErrors] = useState(null);
     const { token } = useStateContext();
     const maxNameQuizLength = 200;
 
-    useEffect(() => {
-        console.log("quizErrors updated:", quizErrors);
-    }, [quizErrors]);
+    const [checkboxes, setCheckboxes] = useState({
+        cosmeticErrorQuizName: false,
+        cosmeticErrors: false,
+        minorErrors: false,
+        logicalErrors: false,
+    });
+
+
+    // useEffect(() => {
+    //     //console.log("quizErrors updated:", quizErrors);
+    // }, [quizErrors]);
 
     const [expandedSections, setExpandedSections] = useState({
         quizErrors: quizErrors?.name_quiz_errors && Object.keys(quizErrors.name_quiz_errors).length > 0, // Раскрыть, если есть ошибки викторин
@@ -32,12 +41,20 @@ export default function CreatorLayout() {
         return <Navigate to="/login" />;
     }
 
-    const handleFinish = async () => {
+    const handleNameQuizChange = (event) => {
+        setQuizName(event.target.value);
+    };
+
+    const handleCheckboxChange = (key) => (e) => {
+        setCheckboxes({ ...checkboxes, [key]: e.target.checked });
+    };
+
+
+    const handleFinishQuiz = async () => {
         try {
-            const response = await sendQuestions(quizName, questions);
+            const response = await sendQuestionsToSearchError(quizName, questions);
             setQuizErrors(response);
             console.log("Данные от сервера успешно сохранены:", response);
-            // Обновляем expandedSections при изменении quizErrors
             setExpandedSections(prev => ({
                 ...prev,
                 quizErrors: response?.name_quiz_errors && Object.keys(response.name_quiz_errors).length > 0,
@@ -51,17 +68,43 @@ export default function CreatorLayout() {
         }
     };
 
-    const handleNameQuizChange = (event) => {
-        setQuizName(event.target.value);
+    const handleAnalyzeQuiz = async () => {
+        try {
+            const response = await sendQuestionsToSearchError(quizName, questions);
+            setQuizErrors(response);
+            console.log("Данные от сервера успешно сохранены:", response);
+            setExpandedSections(prev => ({
+                ...prev,
+                quizErrors: response?.name_quiz_errors && Object.keys(response.name_quiz_errors).length > 0,
+                questionErrors: (response?.critical_errors?.length > 0 || response?.cosmetic_errors?.length > 0 ||
+                    response?.logical_errors?.length > 0 || response?.minor_errors?.length > 0),
+                criticalQuizErrors: response?.name_quiz_errors?.critical_error,
+                criticalQuestionErrors: response?.critical_errors?.length > 0,
+            }));
+        } catch (error) {
+            console.error('Ошибка при отправке вопросов:', error);
+        }
     };
 
-    const handleAnalyze = () => {
-        // Логика для анализа викторины
-    };
-
-    const handleFixErrors = () => {
-        // Логика для исправления ошибок
-        console.log("Исправление ошибок...");
+    const handleFixErrors = async () => {
+        try {
+            const response = await sendQuestionsToFixError(quizName, questions, checkboxes, false);
+            setQuizName(response.quizName);
+            setQuestions(response.questions);
+            setQuizErrors(response.errors);
+            navigate(`/createQuestion/1}`);
+            console.log("Данные от сервера успешно сохранены:", response);
+            setExpandedSections(prev => ({
+                ...prev,
+                quizErrors: response?.name_quiz_errors && Object.keys(response.name_quiz_errors).length > 0,
+                questionErrors: (response?.critical_errors?.length > 0 || response?.cosmetic_errors?.length > 0 ||
+                    response?.logical_errors?.length > 0 || response?.minor_errors?.length > 0),
+                criticalQuizErrors: response?.name_quiz_errors?.critical_error,
+                criticalQuestionErrors: response?.critical_errors?.length > 0,
+            }));
+        } catch (error) {
+            console.error('Ошибка при отправке вопросов:', error);
+        }
     };
 
     const hasErrors_NOT_significant =
@@ -83,7 +126,7 @@ export default function CreatorLayout() {
 
     const renderErrors = () => {
         if (!quizErrors) return null;
-        console.log("Rendering errors with data:", quizErrors);
+        //console.log("Rendering errors with data:", quizErrors);
 
         return (
             <div className="error-container">
@@ -222,8 +265,6 @@ export default function CreatorLayout() {
         <div id="creatorLayout" style={{ display: 'flex', flexDirection: 'row', height: '100vh', margin: '0 auto', boxSizing: 'border-box' }}>
             {/* Левая часть */}
             <div style={{ flex: '1', padding: '20px', borderRight: '1px solid rgba(0, 0, 0, 0.2)', backgroundColor: 'rgba(0, 0, 0, 0.1)', boxSizing: 'border-box', minHeight: '100%' }}>
-                <h2>Левая секция</h2>
-                <p>Некоторый текст или элементы.</p>
                 {renderErrors()}
             </div>
 
@@ -252,10 +293,10 @@ export default function CreatorLayout() {
                     <Outlet />
                 </main>
                 <footer style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', paddingBottom: '20px', paddingTop: '10px' }}>
-                    <button className="btn btn-primary" onClick={handleAnalyze} style={{ padding: '10px 10px', fontSize: '14px' }}>
+                    <button className="btn btn-primary" onClick={handleAnalyzeQuiz} style={{ padding: '10px 10px', fontSize: '14px' }}>
                         Анализ викторины
                     </button>
-                    <button className="btn btn-success" onClick={handleFinish} style={{ marginLeft: '20px', padding: '10px 20px', fontSize: '14px' }}>
+                    <button className="btn btn-success" onClick={handleFinishQuiz} style={{ marginLeft: '20px', padding: '10px 20px', fontSize: '14px' }}>
                         Завершить викторину
                     </button>
                 </footer>
@@ -263,9 +304,6 @@ export default function CreatorLayout() {
 
             {/* Правая часть */}
             <div style={{ flex: '1', padding: '20px', backgroundColor: 'rgba(0, 0, 0, 0.1)', boxSizing: 'border-box', minHeight: '100%' }}>
-                <h2>Правая секция</h2>
-                <p>Некоторый текст или элементы.</p>
-
                 {/* Табличка с ошибками */}
                 {hasErrors_NOT_significant && (
                     <div style={{ border: '1px solid #ccc', borderRadius: '5px', padding: '15px', backgroundColor: '#fff', boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)', marginBottom: '20px' }}>
@@ -273,28 +311,48 @@ export default function CreatorLayout() {
                         {quizErrors?.name_quiz_errors?.cosmetic_error && (
                             <div style={{ marginBottom: '10px' }}>
                                 <label>
-                                    <input type="checkbox" /> Косметические (название викторины)
+                                    <input
+                                        type="checkbox"
+                                        checked={checkboxes.cosmeticErrorQuizName}
+                                        onChange={handleCheckboxChange('cosmeticErrorQuizName')}
+                                    />
+                                    Косметические (название викторины)
                                 </label>
                             </div>
                         )}
                         {quizErrors?.cosmetic_errors && quizErrors.cosmetic_errors.length > 0 && (
                             <div style={{ marginBottom: '10px' }}>
                                 <label>
-                                    <input type="checkbox" /> Косметические (вопросы)
+                                    <input
+                                        type="checkbox"
+                                        checked={checkboxes.cosmeticErrors}
+                                        onChange={handleCheckboxChange('cosmeticErrors')}
+                                    />
+                                    Косметические (вопросы)
                                 </label>
                             </div>
                         )}
                         {quizErrors?.minor_errors && quizErrors.minor_errors.length > 0 && (
                             <div style={{ marginBottom: '10px' }}>
                                 <label>
-                                    <input type="checkbox" /> Несущественные (вопросы)
+                                    <input
+                                        type="checkbox"
+                                        checked={checkboxes.minorErrors}
+                                        onChange={handleCheckboxChange('minorErrors')}
+                                    />
+                                    Несущественные (вопросы)
                                 </label>
                             </div>
                         )}
                         {quizErrors?.logical_errors && quizErrors.logical_errors.length > 0 && (
                             <div style={{ marginBottom: '10px' }}>
                                 <label>
-                                    <input type="checkbox" /> Логические (вопросы)
+                                    <input
+                                        type="checkbox"
+                                        checked={checkboxes.logicalErrors}
+                                        onChange={handleCheckboxChange('logicalErrors')}
+                                    />
+                                    Логические (вопросы)
                                 </label>
                             </div>
                         )}

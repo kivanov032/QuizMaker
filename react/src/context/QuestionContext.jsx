@@ -40,8 +40,9 @@ export const QuestionProvider = ({ children }) => {
 
 
     return (
-        <QuestionContext.Provider value={{ questions, updateQuestion, getQuestion, deleteQuestion, addQuestion }}>
+        <QuestionContext.Provider value={{ questions, setQuestions, updateQuestion, getQuestion, deleteQuestion, addQuestion }}>
             {children}
         </QuestionContext.Provider>
     );
+
 };

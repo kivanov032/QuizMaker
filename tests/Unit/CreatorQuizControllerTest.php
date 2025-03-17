@@ -240,6 +240,25 @@ class CreatorQuizControllerTest extends TestCase
         $this->assertEquals($expectedQuestions, $filteredQuestions);
     }
 
+    // Тест на фильтрацию вопросов (случай, если все вопросы пустые)
+    public function testFilterQuestionsWithAllEmptyQuestions()
+    {
+        $questions = [
+            ["id" => 1, "question" => null, "answers" => [null, null], "correctAnswerIndex" => 0],
+            ["id" => 2, "question" => null, "answers" => [null, null], "correctAnswerIndex" => 0],
+            ["id" => 3, "question" => null, "answers" => [null, null], "correctAnswerIndex" => 0]
+        ];
+
+        $expectedQuestions = [
+            ["id" => 1, "question" => null, "answers" => [null, null], "correctAnswerIndex" => 0]
+        ];
+
+        $filteredQuestions = $this->controller->getFilteredQuestions($questions);
+
+        $this->assertCount(1, $filteredQuestions);
+        $this->assertEquals($expectedQuestions, $filteredQuestions);
+    }
+
     // Тест на фильтрацию ответов в вопросах !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     public function testFilterAnswers1()
     {

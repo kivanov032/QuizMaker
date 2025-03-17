@@ -8,6 +8,7 @@ use App\Models\QuizQuestion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use function Webmozart\Assert\Tests\StaticAnalysis\length;
 
 class CreatorQuizController extends Controller
 {
@@ -62,36 +63,39 @@ class CreatorQuizController extends Controller
         $data = $request->all();
         $questions = $data['questions']; // Массив вопросов
         $quizName = $data['quizName'];   // Название викторины
+        $errors = $data['errors'];       // Массив меток на исправление ошибок
 
-        // Флаги для различных типов ошибок
-        $cosmetic_errors_flag = $data['cosmetic_errors_flag'];
-        $minor_errors_flag = $data['minor_errors_flag'];
-        $logical_errors_flag = $data['logical_errors_flag'];
-        $quiz_name_cosmetic_errors_flag = $data['quiz_name_cosmetic_errors_flag'];
         $create_quiz_flag = $data['create_quiz_flag'];
 
         // Логирование данных
         Log::info("Полученные данные в метод fixQuizErrors:", $data);
 
-        // Очистка пустых полей
         $questions = $this->cleanEmptyFields($questions);
 
         // Обработка ошибок в вопросах
-        if ($cosmetic_errors_flag) {
+        if ($errors['cosmeticErrors']) {
             $questions = $this->trimQuestions($questions);
         }
-        if ($minor_errors_flag) {
+
+        if ($errors['minorErrors']) {
+            // Фильтруем вопросы
             $questions = $this->filterQuestions($questions);
-            $questions = $this->filterAnswers($questions);
+            // Если осталось больше одного вопроса, фильтруем ответы
+            if (count($questions) > 1) {
+                $questions = $this->filterAnswers($questions);
+            }
         }
-        if ($logical_errors_flag) {
+
+        if ($errors['logicalErrors']) {
             $questions = $this->fixLogicalErrors($questions);
         }
 
         // Обработка ошибок в названии викторины
-        if ($quiz_name_cosmetic_errors_flag) {
+        if ($errors['cosmeticErrorQuizName']) {
             $quizName = trim($quizName);
         }
+
+        Log::info("123: ", $questions);
 
         // Проверка на создание викторины
         if (!$create_quiz_flag) {
@@ -104,16 +108,21 @@ class CreatorQuizController extends Controller
             $errorResponse = $this->searchQuizErrors($requestForErrors);
             $errorsData = json_decode($errorResponse->getContent(), true);
 
-            // Возвращаем ответ клиенту
-            return response()->json([
-                'questions' => $questions,
-                'quizName' => $quizName,
+            // Объединяем ошибки в одну переменную
+            $errors = [
                 'cosmetic_errors' => $errorsData['cosmetic_errors'],
                 'minor_errors' => $errorsData['minor_errors'],
                 'critical_errors' => $errorsData['critical_errors'],
                 'logical_errors' => $errorsData['logical_errors'],
                 'name_quiz_errors' => $errorsData['name_quiz_errors'],
+            ];
+
+            return response()->json([
+                'questions' => $questions,
+                'quizName' => $quizName,
+                'errors' => $errors,
             ], 200);
+
         } else {
             // Вызов метода для создания викторины
             $requestForBD = new Request([
@@ -368,7 +377,7 @@ class CreatorQuizController extends Controller
      */
     private function filterQuestions(array $questions): array
     {
-        return array_filter($questions, function($question) {
+        $filteredQuestions = array_filter($questions, function($question) {
             return !(
                 is_null($question['question']) && (empty($question['answers'])
                     || array_filter($question['answers'], function($answer) {
@@ -376,7 +385,16 @@ class CreatorQuizController extends Controller
                     }) === [])
             );
         });
+
+        // Если все вопросы отфильтрованы, оставляем первый вопрос
+        if (empty($filteredQuestions)) {
+            return [reset($questions)];
+        }
+
+        return $filteredQuestions;
     }
+
+
 
     /**
      * Удаляет элементы из массива ответов каждого вопроса, которые равны null,
@@ -573,6 +591,17 @@ class CreatorQuizController extends Controller
     {
         $result = [];
 
+        // Проверка на пустой массив вопросов
+        if (empty($questions)) {
+            $result[] = [
+                "id_question" => 1,
+                "errors" => [
+                    ["id_error" => 5, "text_error" => "В викторине должно быть как минимум одна не пустая страница вопроса."]
+                ]
+            ];
+            return $result; // Возвращаем результат сразу, так как дальнейшие проверки не имеют смысла
+        }
+
         foreach ($questions as $question) {
             $errors = [];
 
@@ -608,6 +637,7 @@ class CreatorQuizController extends Controller
 
         return $result;
     }
+
 
 
     /**

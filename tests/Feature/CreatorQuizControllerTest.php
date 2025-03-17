@@ -19,7 +19,7 @@ class CreatorQuizControllerTest extends TestCase
         ];
 
         // Выполните POST-запрос к вашему маршруту
-        $response = $this->json('POST', '/api/questions', $data);
+        $response = $this->json('POST', '/api/searchQuizErrors', $data);
 
         // Проверьте, что ответ имеет статус 200
         $response->assertStatus(200);
