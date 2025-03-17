@@ -1,16 +1,15 @@
 import React, { useState, useContext, useEffect } from 'react';
-import {Outlet, Link, Navigate} from "react-router-dom";
+import { Outlet, Link, Navigate } from "react-router-dom";
 import { QuestionContext } from '../context/QuestionContext';
 import { sendQuestions } from "../SenderQuiz.jsx";
 import "./CreatorLayout.css";
-import {useStateContext} from "../context/ContextProvider.jsx";
-
+import { useStateContext } from "../context/ContextProvider.jsx";
 
 export default function CreatorLayout() {
     const { questions } = useContext(QuestionContext);
     const [quizName, setQuizName] = useState('');
     const [quizErrors, setQuizErrors] = useState(null);
-    const {token} = useStateContext();
+    const { token } = useStateContext();
     const maxNameQuizLength = 200;
 
     useEffect(() => {
@@ -18,18 +17,19 @@ export default function CreatorLayout() {
     }, [quizErrors]);
 
     const [expandedSections, setExpandedSections] = useState({
-        quizErrors: true,
-        questionErrors: false,
-        criticalQuizErrors: true,
+        quizErrors: quizErrors?.name_quiz_errors && Object.keys(quizErrors.name_quiz_errors).length > 0, // Раскрыть, если есть ошибки викторин
+        questionErrors: (quizErrors?.critical_errors?.length > 0 || quizErrors?.cosmetic_errors?.length > 0 ||
+            quizErrors?.logical_errors?.length > 0 || quizErrors?.minor_errors?.length > 0), // Раскрыть, если есть ошибки вопросов
+        criticalQuizErrors: quizErrors?.name_quiz_errors?.critical_error, // Критические ошибки викторин раскрыты
         syntaxQuizErrors: false,
-        criticalQuestionErrors: false,
+        criticalQuestionErrors: quizErrors?.critical_errors?.length > 0, // Критические ошибки вопросов раскрыты
         logicQuestionErrors: false,
         minorQuestionErrors: false,
         syntaxQuestionErrors: false,
     });
 
     if (!token) {
-        return <Navigate to="/login" />
+        return <Navigate to="/login" />;
     }
 
     const handleFinish = async () => {
@@ -37,6 +37,15 @@ export default function CreatorLayout() {
             const response = await sendQuestions(quizName, questions);
             setQuizErrors(response);
             console.log("Данные от сервера успешно сохранены:", response);
+            // Обновляем expandedSections при изменении quizErrors
+            setExpandedSections(prev => ({
+                ...prev,
+                quizErrors: response?.name_quiz_errors && Object.keys(response.name_quiz_errors).length > 0,
+                questionErrors: (response?.critical_errors?.length > 0 || response?.cosmetic_errors?.length > 0 ||
+                    response?.logical_errors?.length > 0 || response?.minor_errors?.length > 0),
+                criticalQuizErrors: response?.name_quiz_errors?.critical_error,
+                criticalQuestionErrors: response?.critical_errors?.length > 0,
+            }));
         } catch (error) {
             console.error('Ошибка при отправке вопросов:', error);
         }
@@ -65,8 +74,6 @@ export default function CreatorLayout() {
         (quizErrors?.critical_errors && quizErrors.critical_errors.length > 0) ||
         (quizErrors?.name_quiz_errors && quizErrors.name_quiz_errors.critical_error);
 
-
-
     const toggleSection = (section) => {
         setExpandedSections(prev => ({
             ...prev,
@@ -90,12 +97,25 @@ export default function CreatorLayout() {
                             <div className="error-subsections">
                                 {quizErrors.name_quiz_errors.critical_error && (
                                     <div className="error-subsection">
-                                        <h4 onClick={() => toggleSection('criticalQuizErrors')} className="subsection-title">
+                                        <h4 className="subsection-title">
                                             Критические {expandedSections.criticalQuizErrors ? '▼' : '▶'}
                                         </h4>
                                         {expandedSections.criticalQuizErrors && (
                                             <div className="error-item">
                                                 <span style={{ color: 'red' }}> - {quizErrors.name_quiz_errors.critical_error}</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                                {/* Синтаксические ошибки (свернуты по умолчанию) */}
+                                {quizErrors.name_quiz_errors.cosmetic_error && (
+                                    <div className="error-subsection">
+                                        <h4 onClick={() => toggleSection('syntaxQuizErrors')} className="subsection-title">
+                                            Синтаксические {expandedSections.syntaxQuizErrors ? '▼' : '▶'}
+                                        </h4>
+                                        {expandedSections.syntaxQuizErrors && (
+                                            <div className="error-item">
+                                                <span> - {quizErrors.name_quiz_errors.cosmetic_error}</span>
                                             </div>
                                         )}
                                     </div>
@@ -117,7 +137,7 @@ export default function CreatorLayout() {
                                 {/* Критические */}
                                 {quizErrors.critical_errors && quizErrors.critical_errors.length > 0 && (
                                     <div className="error-subsection">
-                                        <h4 onClick={() => toggleSection('criticalQuestionErrors')} className="subsection-title">
+                                        <h4 className="subsection-title">
                                             Критические {expandedSections.criticalQuestionErrors ? '▼' : '▶'}
                                         </h4>
                                         {expandedSections.criticalQuestionErrors && quizErrors.critical_errors.map((questionError, index) => (
