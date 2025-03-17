@@ -8,6 +8,7 @@ use App\Models\QuizQuestion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use function Webmozart\Assert\Tests\StaticAnalysis\length;
 
 class CreatorQuizController extends Controller
 {
@@ -75,10 +76,16 @@ class CreatorQuizController extends Controller
         if ($errors['cosmeticErrors']) {
             $questions = $this->trimQuestions($questions);
         }
+
         if ($errors['minorErrors']) {
+            // Фильтруем вопросы
             $questions = $this->filterQuestions($questions);
-            $questions = $this->filterAnswers($questions);
+            // Если осталось больше одного вопроса, фильтруем ответы
+            if (count($questions) > 1) {
+                $questions = $this->filterAnswers($questions);
+            }
         }
+
         if ($errors['logicalErrors']) {
             $questions = $this->fixLogicalErrors($questions);
         }
@@ -87,6 +94,8 @@ class CreatorQuizController extends Controller
         if ($errors['cosmeticErrorQuizName']) {
             $quizName = trim($quizName);
         }
+
+        Log::info("123: ", $questions);
 
         // Проверка на создание викторины
         if (!$create_quiz_flag) {
@@ -99,16 +108,21 @@ class CreatorQuizController extends Controller
             $errorResponse = $this->searchQuizErrors($requestForErrors);
             $errorsData = json_decode($errorResponse->getContent(), true);
 
-            // Возвращаем ответ клиенту
-            return response()->json([
-                'questions' => $questions,
-                'quizName' => $quizName,
+            // Объединяем ошибки в одну переменную
+            $errors = [
                 'cosmetic_errors' => $errorsData['cosmetic_errors'],
                 'minor_errors' => $errorsData['minor_errors'],
                 'critical_errors' => $errorsData['critical_errors'],
                 'logical_errors' => $errorsData['logical_errors'],
                 'name_quiz_errors' => $errorsData['name_quiz_errors'],
+            ];
+
+            return response()->json([
+                'questions' => $questions,
+                'quizName' => $quizName,
+                'errors' => $errors,
             ], 200);
+
         } else {
             // Вызов метода для создания викторины
             $requestForBD = new Request([
@@ -363,7 +377,7 @@ class CreatorQuizController extends Controller
      */
     private function filterQuestions(array $questions): array
     {
-        return array_filter($questions, function($question) {
+        $filteredQuestions = array_filter($questions, function($question) {
             return !(
                 is_null($question['question']) && (empty($question['answers'])
                     || array_filter($question['answers'], function($answer) {
@@ -371,7 +385,16 @@ class CreatorQuizController extends Controller
                     }) === [])
             );
         });
+
+        // Если все вопросы отфильтрованы, оставляем первый вопрос
+        if (empty($filteredQuestions)) {
+            return [reset($questions)];
+        }
+
+        return $filteredQuestions;
     }
+
+
 
     /**
      * Удаляет элементы из массива ответов каждого вопроса, которые равны null,

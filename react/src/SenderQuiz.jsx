@@ -36,10 +36,24 @@ export const sendQuestionsToFixError = async (quizName, questions, errors, creat
         });
 
         console.log("Полученный ответ от сервера:", response.data);
-        return response.data;
+
+        // Преобразование данных после получения ответа от сервера
+        const processedData = {
+            ...response.data,
+            quizName: response.data.quizName ?? "", // Заменяем null на пустую строку для quizName
+            questions: response.data.questions.map(question => ({
+                ...question,
+                question: question.question ?? "", // Заменяем null на пустую строку для текста вопроса
+                answers: question.answers.map(answer => answer ?? ""), // Заменяем null на пустую строку для ответов
+            })),
+        };
+
+        console.log("Обработанные данные:", processedData);
+        return processedData;
     } catch (error) {
         console.error('Ошибка при отправке вопросов:', error);
         throw error.response;
     }
 };
+
 
