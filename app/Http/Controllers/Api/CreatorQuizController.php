@@ -28,7 +28,7 @@ class CreatorQuizController extends Controller
 
         //Log::info("questions 1:", $questions); // Логирование данных
 
-        $questions = $this->filterQuestions($questions); // Фильтрация страничек вопросов
+        $questions = $this->filterQuestions($questions, false); // Фильтрация страничек вопросов
 
         //Log::info("questions 2:", $questions); // Логирование данных
 
@@ -79,7 +79,7 @@ class CreatorQuizController extends Controller
 
         if ($errors['minorErrors']) {
             // Фильтруем вопросы
-            $questions = $this->filterQuestions($questions);
+            $questions = $this->filterQuestions($questions, false);
             // Если осталось больше одного вопроса, фильтруем ответы
             if (count($questions) > 1) {
                 $questions = $this->filterAnswers($questions);
@@ -366,17 +366,19 @@ class CreatorQuizController extends Controller
 
     /**
      * Фильтрует массив вопросов, удаляя те, у которых отсутствует текст вопроса
-     * и нет ненулевых ответов
+     * и нет ненулевых ответов.
      *
      * @param array $questions Массив вопросов, где каждый вопрос представлен
-     * ассоциативным массивом с ключами 'question' и 'answers'
+     * ассоциативным массивом с ключами 'question' и 'answers'.
+     * @param bool $reindex Указывает, нужно ли пересчитывать индексы массива.
      *
      * @return array Отфильтрованный массив вопросов, содержащий только те
      * вопросы, которые имеют ненулевой текст вопроса или хотя бы
-     * один ненулевой ответ
+     * один ненулевой ответ.
      */
-    private function filterQuestions(array $questions): array
+    private function filterQuestions(array $questions, bool $reindex): array
     {
+        // Фильтрация вопросов
         $filteredQuestions = array_filter($questions, function($question) {
             return !(
                 is_null($question['question']) && (empty($question['answers'])
@@ -389,6 +391,16 @@ class CreatorQuizController extends Controller
         // Если все вопросы отфильтрованы, оставляем первый вопрос
         if (empty($filteredQuestions)) {
             return [reset($questions)];
+        }
+
+        // Пересчитываем индексы массива, если метка $reindex равна true
+        if ($reindex) {
+            $filteredQuestions = array_values($filteredQuestions);
+
+            // Обновляем id вопросов в соответствии с новыми индексами
+            foreach ($filteredQuestions as $index => &$question) {
+                $question['id'] = $index + 1; // id начинаются с 1
+            }
         }
 
         return $filteredQuestions;
@@ -463,10 +475,14 @@ class CreatorQuizController extends Controller
         $questionTexts = [];
         foreach ($questions as $question) {
             $questionText = $question['question'];
-            if (isset($questionTexts[$questionText])) {
-                $questionTexts[$questionText][] = $question['id'];
-            } else {
-                $questionTexts[$questionText] = [$question['id']];
+
+            // Игнорируем вопросы с текстом null
+            if ($questionText !== null) {
+                if (isset($questionTexts[$questionText])) {
+                    $questionTexts[$questionText][] = $question['id'];
+                } else {
+                    $questionTexts[$questionText] = [$question['id']];
+                }
             }
         }
 
@@ -476,7 +492,7 @@ class CreatorQuizController extends Controller
                 foreach ($ids as $id) {
                     $errors[$id][] = [
                         "id_error" => 1,
-                        "text_error" => "Встречаются одинаковые вопросы в викторине: №" . implode(", №", $ids). "."
+                        "text_error" => "Встречаются одинаковые вопросы в викторине: №" . implode(", №", $ids) . "."
                     ];
                 }
             }
@@ -498,7 +514,7 @@ class CreatorQuizController extends Controller
                 if (count($indices) > 1) {
                     $errors[$question['id']][] = [
                         "id_error" => 2,
-                        "text_error" => "Встречаются одинаковые варианты ответов в полях: №" . implode(", №", $indices). "."
+                        "text_error" => "Встречаются одинаковые варианты ответов в полях: №" . implode(", №", $indices) . "."
                     ];
                 }
             }
@@ -516,6 +532,8 @@ class CreatorQuizController extends Controller
         return $formattedErrors;
     }
 
+
+
     /**
      * Исправляет логические ошибки в массиве вопросов и ответов.
      *
@@ -528,26 +546,38 @@ class CreatorQuizController extends Controller
         $uniqueQuestions = [];
         $questionTexts = [];
 
-        // Удаление дублирующихся вопросов
+        // Удаление дублирующихся вопросов с учетом null
         foreach ($questions as $question) {
             $questionText = $question['question'];
 
-            if (!in_array($questionText, $questionTexts)) {
+            // Проверяем, что вопрос не равен null и не дублируется
+            if ($questionText !== null && !in_array($questionText, $questionTexts)) {
                 $questionTexts[] = $questionText;
                 $uniqueQuestions[] = $question; // Сохраняем уникальный вопрос
+            } else {
+                // Если вопрос равен null, добавляем его в уникальные вопросы
+                if ($questionText === null) {
+                    $uniqueQuestions[] = $question;
+                }
             }
         }
 
-        // Удаление дублирующихся ответов и пересчет индексов
+        // Удаление дублирующихся ответов и пересчет индексов с учетом null
         foreach ($uniqueQuestions as &$question) {
             $answerTexts = [];
             $uniqueAnswers = [];
             $correctAnswerIndex = $question['correctAnswerIndex'];
 
             foreach ($question['answers'] as $index => $answerText) {
-                if (!in_array($answerText, $answerTexts)) {
+                // Проверяем, что ответ не равен null и не дублируется
+                if ($answerText !== null && !in_array($answerText, $answerTexts)) {
                     $answerTexts[] = $answerText;
                     $uniqueAnswers[] = $answerText;
+                } else {
+                    // Если ответ равен null, добавляем его в уникальные ответы
+                    if ($answerText === null) {
+                        $uniqueAnswers[] = $answerText;
+                    }
                 }
             }
 
@@ -577,6 +607,7 @@ class CreatorQuizController extends Controller
 
         return $uniqueQuestions;
     }
+
 
 
 
