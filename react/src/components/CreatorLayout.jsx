@@ -20,6 +20,9 @@ export default function CreatorLayout() {
         logicalErrors: false,
     });
 
+    // Состояние для модального окна
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
 
     // useEffect(() => {
     //     //console.log("quizErrors updated:", quizErrors);
@@ -80,6 +83,7 @@ export default function CreatorLayout() {
             }));
             //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             // Здесь должно быть всплывающее окно
+            setIsModalOpen(true);
         } catch (error) {
             console.error('Ошибка при отправке вопросов:', error);
         }
@@ -331,6 +335,17 @@ export default function CreatorLayout() {
                     </button>
                 </footer>
             </div>
+
+            {/* Всплывающее окно */}
+            {isModalOpen && (
+                <div className="modal">
+                    <div className="modal-content">
+                        <span className="close" onClick={() => setIsModalOpen(false)}>&times;</span>
+                        <p>Всплывающее окно</p>
+                        <button onClick={() => setIsModalOpen(false)}>ОК</button>
+                    </div>
+                </div>
+            )}
 
             {/* Правая часть */}
             <div style={{ flex: '1', padding: '20px', backgroundColor: 'rgba(0, 0, 0, 0.1)', boxSizing: 'border-box', minHeight: '100%' }}>
