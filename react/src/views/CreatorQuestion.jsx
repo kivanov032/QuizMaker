@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { QuestionContext } from '../context/QuestionContext';
+import "./creatorQuestion.css";
 
 export default function CreatorQuestion() {
     const { id } = useParams();
@@ -36,7 +37,6 @@ export default function CreatorQuestion() {
             setCorrectAnswerIndex(null);
         }
     }, [questions, id]);
-
 
     const handleQuestionChange = (value) => {
         setQuestion(value);
@@ -90,10 +90,6 @@ export default function CreatorQuestion() {
     };
 
     const handlePreviousQuestion = () => {
-        // const currentQuestion = getQuestion(parseInt(id));
-        // if (currentQuestion) {
-        //     updateQuestion(currentQuestion.id, question, answers, correctAnswerIndex);
-        // }
         if (parseInt(id) > 1) {
             navigate(`/createQuestion/${parseInt(id) - 1}`);
         } else {
@@ -102,10 +98,6 @@ export default function CreatorQuestion() {
     };
 
     const handleNextQuestion = () => {
-        // const currentQuestion = getQuestion(parseInt(id));
-        // if (currentQuestion) {
-        //     updateQuestion(currentQuestion.id, question, answers, correctAnswerIndex);
-        // }
         if (parseInt(id) < questions.length) {
             navigate(`/createQuestion/${parseInt(id) + 1}`);
         } else {
@@ -129,8 +121,6 @@ export default function CreatorQuestion() {
             }
         }
     };
-
-
 
     const handleAddNewQuestion = () => {
         const currentQuestion = getQuestion(parseInt(id));
@@ -159,44 +149,60 @@ export default function CreatorQuestion() {
                         value={question}
                         onChange={(e) => handleQuestionChange(e.target.value)}
                         maxLength={maxQuestionLength}
-                        style={{ flex: 1 }}
+                        style={{ flex: 1, border: '1px solid #ccc', padding: '5px' }}
                     />
                 </div>
                 {question.length >= maxQuestionLength && (
-                    <div style={{ color: 'red', marginTop: '5px' }}>
+                    <div style={{ color: 'red', marginTop: '5px', marginBottom: '10px' }}>
                         Достигнут максимум символов ({maxQuestionLength} символов).
                     </div>
                 )}
-                {answers.map((answer, index) => (
-                    <div key={index} style={{ marginBottom: '10px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <input
-                                type="radio"
-                                name="answer"
-                                checked={correctAnswerIndex === index}
-                                onChange={() => handleCorrectAnswerIndexChange(index)}
-                                style={{ marginRight: '10px' }}
-                            />
-                            <input
-                                type="text"
-                                placeholder={`Вариант ответа ${index + 1}`}
-                                value={answer}
-                                onChange={(e) => handleAnswerChange(index, e.target.value)}
-                                maxLength={maxAnswerLength}
-                                style={{ flex: 1, marginRight: '10px' }}
-                            />
-                            <button onClick={() => removeAnswerField(index)}>-</button>
-                        </div>
-                        {answer.length >= maxAnswerLength && (
-                            <div style={{ color: 'red', marginTop: '5px' }}>
-                                Достигнут максимум символов ({maxAnswerLength} символов).
+                <div>
+                    <div
+                        style={{
+                            ...(answers.length > 4
+                                ? { maxHeight: '240px', overflowY: 'auto', marginBottom: '10px' } // Увеличиваем maxHeight, чтобы вместить 5-й и 6-й ответы
+                                : { minHeight: '240px', marginBottom: '10px' }), // Фиксируем minHeight для случаев <= 4 ответов
+                        }}
+                    >
+                        {answers.map((answer, index) => (
+                            <div key={index} style={{ marginBottom: '10px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                    <input
+                                        type="radio"
+                                        name="answer"
+                                        checked={correctAnswerIndex === index}
+                                        onChange={() => handleCorrectAnswerIndexChange(index)}
+                                        style={{ marginRight: '10px' }}
+                                    />
+                                    <input
+                                        type="text"
+                                        placeholder={`Вариант ответа ${index + 1}`}
+                                        value={answer}
+                                        onChange={(e) => handleAnswerChange(index, e.target.value)}
+                                        maxLength={maxAnswerLength}
+                                        style={{ flex: 1, border: '1px solid #ccc', padding: '5px', marginRight: '10px' }}
+                                    />
+                                    <button onClick={() => removeAnswerField(index)} style={{ padding: '5px' }}>
+                                        -
+                                    </button>
+                                </div>
+                                {answer.length >= maxAnswerLength && (
+                                    <div style={{ color: 'red', marginTop: '5px' }}>
+                                        Достигнут максимум символов ({maxAnswerLength} символов).
+                                    </div>
+                                )}
                             </div>
+                        ))}
+                    </div>
+                    <div style={{ height: '30px' }}> {/* Фиксированный контейнер для кнопки */}
+                        {answers.length < 6 && (
+                            <button onClick={addAnswerField} style={{ padding: '5px' }}>
+                                +
+                            </button>
                         )}
                     </div>
-                ))}
-                {answers.length < 6 && (
-                    <button onClick={addAnswerField} style={{ marginTop: '10px' }}>+</button>
-                )}
+                </div>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <button className="btn btn-block" onClick={handlePreviousQuestion}>Предыдущий вопрос</button>
@@ -209,11 +215,10 @@ export default function CreatorQuestion() {
                     Удалить вопрос
                 </button>
                 <button className="btn" onClick={handleAddNewQuestion}
-                    style={{ visibility: (questions.length === parseInt(id)) ? 'visible' : 'hidden' }}>
+                        style={{ visibility: (questions.length === parseInt(id)) ? 'visible' : 'hidden' }}>
                     Добавить вопрос
                 </button>
             </div>
-
         </div>
     );
 }
