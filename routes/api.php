@@ -1,13 +1,9 @@
 <?php
 
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CreatorQuizController;
 use Illuminate\Support\Facades\Route;
-
-Route::post('/searchQuizErrors', [CreatorQuizController::class, 'searchQuizErrors']);
-Route::post('/fixQuizErrors', [CreatorQuizController::class, 'fixQuizErrors']);
-Route::post('/createQuizWithQuestions', [CreatorQuizController::class, 'createQuizWithQuestions']);
-
-
+use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,6 +15,23 @@ Route::post('/createQuizWithQuestions', [CreatorQuizController::class, 'createQu
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
+Route::post('/searchQuizErrors', [CreatorQuizController::class, 'searchQuizErrors']);
+Route::post('/fixQuizErrors', [CreatorQuizController::class, 'fixQuizErrors']);
+Route::post('/createQuizWithQuestions', [CreatorQuizController::class, 'createQuizWithQuestions']);
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
+
+});
+
+Route::post('/signup', [AuthController::class, 'signup']);
+Route::post('/login', [AuthController::class, 'login']);
+
+
 
 /*
 Route::middleware('auth:sanctum')->group(function () {

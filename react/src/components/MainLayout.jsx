@@ -1,13 +1,36 @@
 import {Navigate, Outlet} from "react-router-dom";
 import {useStateContext} from "../context/ContextProvider.jsx";
+import axiosClient from "../axios-client.js";
+import {useEffect} from "react";
 //import React from "react";
 
-export default function GuestLayout() {
-    const {token}  = useStateContext()
+export default function MainLayout() {
+    const {user, token, setUser, setToken}  = useStateContext()
+
+    useEffect(() => {
+        axiosClient.get('/user')
+            .then(({data}) => {
+                setUser(data)
+            })
+    }, []);
 
     if (!token) {
         return <Navigate to="/login" />
     }
+
+
+    const onLogout = (ev) => {
+        ev.preventDefault()
+
+        axiosClient.post('/logout')
+            .then(() => {
+                setUser({})
+                setToken(null)
+            })
+    }
+
+
+
 
     return (
         <div>
@@ -15,8 +38,8 @@ export default function GuestLayout() {
             <header className="header">
                 <div className="header-left">MainLayout</div>
                 <div className="header-right">
-                    <span className="clickable">User info</span>
-                    <span className="clickable logout">Logout</span>
+                    <span className="clickable">{user.login}</span>
+                    <span onClick={onLogout} className="clickable logout">Logout</span>
                 </div>
             </header>
 
