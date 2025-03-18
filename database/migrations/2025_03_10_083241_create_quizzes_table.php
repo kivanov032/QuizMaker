@@ -18,7 +18,6 @@ return new class extends Migration
                 ->comment('Id викторины');
 
             $table->string('name_quiz', 200)
-                ->unique()
                 ->nullable(false)
                 ->comment('Название викторины');
 

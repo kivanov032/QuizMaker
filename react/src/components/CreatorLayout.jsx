@@ -1,13 +1,13 @@
 import React, { useState, useContext, useEffect } from 'react';
 import {Outlet, Link, Navigate, useNavigate} from "react-router-dom";
 import { QuestionContext } from '../context/QuestionContext';
-import {sendQuestionsToFixError, sendQuestionsToSearchError} from "../SenderQuiz.jsx";
+import {sendQuestionsToFixError, sendQuestionsToRecordInBD, sendQuestionsToSearchError} from "../SenderQuiz.jsx";
 import "./CreatorLayout.css";
 import { useStateContext } from "../context/ContextProvider.jsx";
 
 export default function CreatorLayout() {
     const navigate = useNavigate();
-    const { questions, setQuestions } = useContext(QuestionContext);
+    const { questions, setQuestions  } = useContext(QuestionContext);
     const [quizName, setQuizName] = useState('');
     const [quizErrors, setQuizErrors] = useState(null);
     const { token } = useStateContext();
@@ -68,21 +68,39 @@ export default function CreatorLayout() {
     };
 
 
+    const processResponse = (response) => {
+        const hasCriticalQuizErrors = response?.name_quiz_errors?.critical_error || false;
+        const hasCriticalQuestionErrors = response?.critical_errors?.length > 0;
+
+        setExpandedSections({
+            quizErrors: hasCriticalQuizErrors || (response?.name_quiz_errors && Object.keys(response.name_quiz_errors).length > 0),
+            questionErrors: hasCriticalQuestionErrors || (response?.critical_errors?.length > 0 || response?.cosmetic_errors?.length > 0 ||
+                response?.logical_errors?.length > 0 || response?.minor_errors?.length > 0),
+            criticalQuizErrors: hasCriticalQuizErrors,
+            syntaxQuizErrors: false,
+            criticalQuestionErrors: hasCriticalQuestionErrors,
+            logicQuestionErrors: false,
+            minorQuestionErrors: false,
+            syntaxQuestionErrors: false,
+        });
+    };
+
+    // Функция для сброса всех меток
+    const resetCheckboxes = () => {
+        setCheckboxes({
+            cosmeticErrorQuizName: false,
+            cosmeticErrors: false,
+            minorErrors: false,
+            logicalErrors: false,
+        });
+    };
+
     const handleFinishQuiz = async () => {
         try {
             const response = await sendQuestionsToSearchError(quizName, questions);
             setQuizErrors(response);
             console.log("Данные от сервера успешно сохранены:", response);
-            setExpandedSections(prev => ({
-                ...prev,
-                quizErrors: response?.name_quiz_errors && Object.keys(response.name_quiz_errors).length > 0,
-                questionErrors: (response?.critical_errors?.length > 0 || response?.cosmetic_errors?.length > 0 ||
-                    response?.logical_errors?.length > 0 || response?.minor_errors?.length > 0),
-                criticalQuizErrors: response?.name_quiz_errors?.critical_error,
-                criticalQuestionErrors: response?.critical_errors?.length > 0,
-            }));
-            //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            // Здесь должно быть всплывающее окно
+            processResponse(response);
             setIsModalOpen(true);
         } catch (error) {
             console.error('Ошибка при отправке вопросов:', error);
@@ -94,20 +112,7 @@ export default function CreatorLayout() {
             const response = await sendQuestionsToSearchError(quizName, questions);
             setQuizErrors(response);
             console.log("Данные от сервера успешно сохранены:", response);
-
-            const hasCriticalQuizErrors = response?.name_quiz_errors?.critical_error || false;
-            const hasCriticalQuestionErrors = response?.critical_errors?.length > 0;
-
-            setExpandedSections({
-                quizErrors: hasCriticalQuizErrors || (response?.name_quiz_errors && Object.keys(response.name_quiz_errors).length > 0),
-                questionErrors: hasCriticalQuestionErrors || (response?.critical_errors?.length > 0),
-                criticalQuizErrors: hasCriticalQuizErrors,
-                syntaxQuizErrors: false,
-                criticalQuestionErrors: hasCriticalQuestionErrors,
-                logicQuestionErrors: false,
-                minorQuestionErrors: false,
-                syntaxQuestionErrors: false,
-            });
+            processResponse(response);
         } catch (error) {
             console.error('Ошибка при отправке вопросов:', error);
         }
@@ -115,29 +120,39 @@ export default function CreatorLayout() {
 
     const handleFixErrors = async () => {
         try {
-            const response = await sendQuestionsToFixError(quizName, questions, checkboxes, false);
+            const response = await sendQuestionsToFixError(quizName, questions, checkboxes);
             setQuizName(response.quizName);
             setQuestions(response.questions);
             setQuizErrors(response.errors);
             navigate(`/createQuestion/1`);
+            resetCheckboxes();
             console.log("Данные от сервера успешно сохранены:", response);
-
-            const hasCriticalQuizErrors = response?.name_quiz_errors?.critical_error || false;
-            const hasCriticalQuestionErrors = response?.critical_errors?.length > 0;
-
-            setExpandedSections({
-                quizErrors: hasCriticalQuizErrors || (response?.name_quiz_errors && Object.keys(response.name_quiz_errors).length > 0),
-                questionErrors: hasCriticalQuestionErrors || (response?.critical_errors?.length > 0 || response?.cosmetic_errors?.length > 0 ||
-                    response?.logical_errors?.length > 0 || response?.minor_errors?.length > 0),
-                criticalQuizErrors: hasCriticalQuizErrors,
-                syntaxQuizErrors: false,
-                criticalQuestionErrors: hasCriticalQuestionErrors,
-                logicQuestionErrors: false,
-                minorQuestionErrors: false,
-                syntaxQuestionErrors: false,
-            });
+            processResponse(response);
         } catch (error) {
             console.error('Ошибка при отправке вопросов:', error);
+        }
+    };
+
+
+    const handleConfirmFinishQuiz = async () => {
+        try {
+            checkboxes.minorErrors = true;
+
+            const response = await sendQuestionsToRecordInBD(quizName, questions, checkboxes);
+
+            // Обработка ответа от сервера
+            if (response.status === 'success') {
+                console.log("Операция успешна, индекс операции:", response.operation_index);
+                alert("Викторина успешно создана!")
+                navigate(`/`);
+                setQuestions([]);
+            } else {
+                console.error("Ошибка при выполнении операции:", response);
+                // Здесь можно добавить обработку ошибок
+            }
+        } catch (error) {
+            console.error('Ошибка при отправке вопросов:', error);
+            // Здесь можно добавить дополнительную обработку ошибок
         }
     };
 
@@ -341,11 +356,93 @@ export default function CreatorLayout() {
                 <div className="modal">
                     <div className="modal-content">
                         <span className="close" onClick={() => setIsModalOpen(false)}>&times;</span>
-                        <p>Всплывающее окно</p>
-                        <button onClick={() => setIsModalOpen(false)}>ОК</button>
+
+                        {hasErrors_NOT_significant && !hasErrors_significant && (
+                            <div>
+                                <h3>Ошибки викторины</h3>
+                                <p>В викторине нет критических ошибок, но есть ряд других ошибок:</p>
+
+                                {quizErrors?.name_quiz_errors?.cosmetic_error && (
+                                    <div className="checkbox-container">
+                                        <label>
+                                            <input
+                                                type="checkbox"
+                                                checked={checkboxes.cosmeticErrorQuizName}
+                                                onChange={handleCheckboxChange('cosmeticErrorQuizName')}
+                                            />
+                                            Косметические (название викторины)
+                                        </label>
+                                    </div>
+                                )}
+
+                                {quizErrors?.cosmetic_errors && quizErrors.cosmetic_errors.length > 0 && (
+                                    <div className="checkbox-container">
+                                        <label>
+                                            <input
+                                                type="checkbox"
+                                                checked={checkboxes.cosmeticErrors}
+                                                onChange={handleCheckboxChange('cosmeticErrors')}
+                                            />
+                                            Косметические (вопросы)
+                                        </label>
+                                    </div>
+                                )}
+
+                                {quizErrors?.logical_errors && quizErrors.logical_errors.length > 0 && (
+                                    <div className="checkbox-container">
+                                        <label>
+                                            <input
+                                                type="checkbox"
+                                                checked={checkboxes.logicalErrors}
+                                                onChange={handleCheckboxChange('logicalErrors')}
+                                            />
+                                            Логические (вопросы)
+                                        </label>
+                                    </div>
+                                )}
+
+                                {quizErrors?.minor_errors && quizErrors.minor_errors.length > 0 && (
+                                    <p>
+                                        - несущественные ошибки (будут исправлены автоматически).
+                                    </p>
+                                )}
+
+                                {(
+                                    (quizErrors?.cosmetic_errors && quizErrors.cosmetic_errors.length > 0) ||
+                                    (quizErrors?.logical_errors && quizErrors.logical_errors.length > 0) ||
+                                    (quizErrors?.name_quiz_errors && quizErrors.name_quiz_errors.cosmetic_error)
+                                ) && !quizErrors?.minor_errors?.length > 0 && (
+                                    <p>
+                                        Перед нажатием на Кнопку Подтвердить можете выбрать <br />
+                                        автоматическое исправление выше представленных типов ошибок.
+                                    </p>
+                                )}
+
+                                <button onClick={handleConfirmFinishQuiz}>Подтвердить</button>
+                            </div>
+                        )}
+
+
+                        {hasErrors_significant && (
+                            <div>
+                                <h3>Критические ошибки</h3>
+                                <p>В викторине присутствуют критические ошибки. Завершение викторины невозможно.</p>
+                                <p>Исправьте критические ошибки, чтобы завершить данную викторину.</p>
+                                <button onClick={() => {setIsModalOpen(false)}}>OK</button>
+                            </div>
+                        )}
+
+                        {!hasErrors_significant && !hasErrors_NOT_significant && (
+                            <div>
+                                <h3>Нет ошибок</h3>
+                                <p>В викторине ошибок не найдено. Желаете сохранить викторину?</p>
+                                <button onClick={handleConfirmFinishQuiz}>Подтвердить</button>
+                            </div>
+                        )}
                     </div>
                 </div>
             )}
+
 
             {/* Правая часть */}
             <div style={{ flex: '1', padding: '20px', backgroundColor: 'rgba(0, 0, 0, 0.1)', boxSizing: 'border-box', minHeight: '100%' }}>
