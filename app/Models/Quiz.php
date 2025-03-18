@@ -4,8 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-//use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 
 class Quiz extends Model
 {
@@ -26,11 +24,26 @@ class Quiz extends Model
     protected $primaryKey = 'id_quiz';
 
     /**
+     * Indicates if the IDs are auto-incrementing.
+     *
+     * @var bool
+     */
+    public $incrementing = false;
+
+    /**
+     * The type of the primary key.
+     *
+     * @var string
+     */
+    protected $keyType = 'string';
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
      */
     protected $fillable = [
+        'id_quiz', // Добавлено
         'name_quiz',
         'was_taken',
         'is_ready',
@@ -53,20 +66,4 @@ class Quiz extends Model
     {
         return $this->belongsTo(User::class, 'id_user');
     }
-
-    /**
-     * The "booting" method of the model.
-     *
-     * @return void
-     */
-    protected static function boot(): void
-    {
-        parent::boot();
-
-        static::creating(function ($quiz) {
-            $quiz->id_quiz = (string) Str::uuid();
-            //Log::info('Полученные вопросы:', $quiz);
-        });
-    }
 }
-

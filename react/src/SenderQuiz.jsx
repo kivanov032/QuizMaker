@@ -21,7 +21,7 @@ export const sendQuestionsToSearchError = async (quizName, questions) => {
     }
 };
 
-export const sendQuestionsToFixError = async (quizName, questions, errors, create_quiz_flag) => {
+export const sendQuestionsToFixError = async (quizName, questions, errors) => {
     try {
         console.log("Я в sendQuestionsToFixError");
         console.log("Вопросы:", questions);
@@ -32,11 +32,10 @@ export const sendQuestionsToFixError = async (quizName, questions, errors, creat
             questions: questions,
             quizName: quizName,
             errors: errors,
-            create_quiz_flag: create_quiz_flag
+            searchQuizErrors_flag: true
         });
 
         console.log("Полученный ответ от сервера:", response.data);
-
         // Преобразование данных после получения ответа от сервера
         const processedData = {
             ...response.data,
@@ -47,7 +46,6 @@ export const sendQuestionsToFixError = async (quizName, questions, errors, creat
                 answers: question.answers.map(answer => answer ?? ""), // Заменяем null на пустую строку для ответов
             })),
         };
-
         console.log("Обработанные данные:", processedData);
         return processedData;
     } catch (error) {
@@ -55,5 +53,26 @@ export const sendQuestionsToFixError = async (quizName, questions, errors, creat
         throw error.response;
     }
 };
+
+export const sendQuestionsToRecordInBD = async (quizName, questions, errors) => {
+    try {
+        console.log("Я в sendQuestionsToRecordInBD");
+        console.log("Вопросы:", questions);
+        console.log("Название викторины:", quizName);
+
+        const response = await axios.post(`${BASE_URL}/api/createQuizWithQuestions`, {
+            questions: questions,
+            quizName: quizName,
+            errors: errors
+        });
+
+        console.log("Полученный ответ от сервера:", response.data);
+        return response.data; // Возвращаем данные ответа
+    } catch (error) {
+        console.error('Ошибка при отправке вопросов:', error);
+        throw error.response; // Бросаем ошибку для обработки в вызывающей функции
+    }
+};
+
 
 

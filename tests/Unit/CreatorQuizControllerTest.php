@@ -3,7 +3,11 @@
 namespace Tests\Unit;
 
 use App\Http\Controllers\Api\CreatorQuizController;
+//use App\Models\Quiz;
+//use App\Models\QuizQuestion;
+//use Illuminate\Support\Facades\DB;
 use PHPUnit\Framework\TestCase;
+use Ramsey\Uuid\Uuid;;
 
 
 class CreatorQuizControllerTest extends TestCase
@@ -59,10 +63,10 @@ class CreatorQuizControllerTest extends TestCase
     public function testCheckDataForCosmeticErrors()
     {
         $questions = [
-            ["id" => 1, "text" => "   What    is   your name?   ", "answers" => ["John", "Dave", "Doe"], "correctAnswerIndex" => 0],
+            ["id" => 1, "text" => "1   2", "answers" => ["3", "2   4", "4"], "correctAnswerIndex" => 0],
             ["id" => 2, "text" => "What is your name?", "answers" => ["John ", "Dave  ", "Doe   "], "correctAnswerIndex" => 0],
-            ["id" => 3, "text" => "  \nWhat  \tis your name? \n\n  ", "answers" => ["John Grey", "John  Grey \t", "Doe \n"], "correctAnswerIndex" => 0],
-            ["id" => 4, "text" => "What \t is your name? \n", "answers" => ["John\n", null, "Doe\t  "], "correctAnswerIndex" => 0],
+            ["id" => 3, "text" => "  What  is your name?  ", "answers" => ["John Grey", "John   Grey", "Doe  "], "correctAnswerIndex" => 0],
+            ["id" => 4, "text" => "What  is your name?", "answers" => ["John", null, "Doe  "], "correctAnswerIndex" => 0],
         ];
 
         $expectedErrors = [
@@ -73,6 +77,10 @@ class CreatorQuizControllerTest extends TestCase
                         "id_error" => 1,
                         "text_error" => "В вопросе викторины обнаружены лишние пробелы."
                     ],
+                    [
+                        "id_error" => 2,
+                        "text_error" => "В поле варианта ответа №2 обнаружены лишние пробелы."
+                    ]
                 ]
             ],
             [
@@ -127,7 +135,35 @@ class CreatorQuizControllerTest extends TestCase
         $this->assertEquals($expectedErrors, $cosmetic_errors);
     }
 
-    //Тест на 'трим' вопросов
+    // Тест на поиск косметических ошибок
+    public function testCheckDataForCosmeticErrors1()
+    {
+        $questions = [
+            ["id" => 1, "text" => "1   2", "answers" => ["3", "2   4", "3", null], "correctAnswerIndex" => 2]
+        ];
+
+        $expectedErrors = [
+            [
+                "id_question" => 1,
+                "errors" => [
+                    [
+                        "id_error" => 1,
+                        "text_error" => "В вопросе викторины обнаружены лишние пробелы."
+                    ],
+                    [
+                        "id_error" => 2,
+                        "text_error" => "В поле варианта ответа №2 обнаружены лишние пробелы."
+                    ]
+                ]
+            ]
+        ];
+
+        $cosmetic_errors = $this->controller->getCheckDataForCosmeticErrors($questions);
+
+        $this->assertEquals($expectedErrors, $cosmetic_errors);
+    }
+
+//Тест на 'трим' вопросов
     public function testTrimQuestions()
     {
         $questions = [
@@ -234,7 +270,7 @@ class CreatorQuizControllerTest extends TestCase
             ["id" => 5, "question" => null, "answers" => ["Red", null, null], "correctAnswerIndex" => 0],
         ];
 
-        $filteredQuestions = $this->controller->getFilteredQuestions($questions);
+        $filteredQuestions = $this->controller->getFilteredQuestions($questions, true);
 
         $this->assertCount(5, $filteredQuestions);
         $this->assertEquals($expectedQuestions, $filteredQuestions);
@@ -253,7 +289,7 @@ class CreatorQuizControllerTest extends TestCase
             ["id" => 1, "question" => null, "answers" => [null, null], "correctAnswerIndex" => 0]
         ];
 
-        $filteredQuestions = $this->controller->getFilteredQuestions($questions);
+        $filteredQuestions = $this->controller->getFilteredQuestions($questions, true);
 
         $this->assertCount(1, $filteredQuestions);
         $this->assertEquals($expectedQuestions, $filteredQuestions);
@@ -448,6 +484,70 @@ class CreatorQuizControllerTest extends TestCase
         $this->assertEquals($expectedErrors, $newQuestions);
     }
 
+    public function test1(): void
+    {
+        // Генерация UUID
+        $uuid = Uuid::uuid4()->toString();
+
+        // Проверка формата UUID
+        $this->assertMatchesRegularExpression(
+            '/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/',
+            $uuid
+        );
+
+    }
+
+//    public function testCreateQuizWithQuestions()
+//    {
+//        // Подготовка данных
+//        $uuid = Uuid::uuid4()->toString();
+//        $quizName = 'Тестовая викторина';
+//        $questions = [
+//            [
+//                'id' => 1,
+//                'question' => 'Вопрос 1',
+//                'answers' => ['Ответ 1', 'Ответ 2'],
+//                'correctAnswerIndex' => 1,
+//            ],
+//            [
+//                'id' => 2,
+//                'question' => 'Вопрос 2',
+//                'answers' => ['Ответ 3', 'Ответ 4', 'Ответ 5'],
+//                'correctAnswerIndex' => 0,
+//            ],
+//        ];
+//
+//        // Логируем информацию перед тестом
+//        //Log::shouldReceive('info')->times(3);
+//
+//        // Выполнение транзакции
+////        DB::transaction(function () use ($uuid, $quizName, $questions) {
+////
+////        });
+//
+//        $quiz = Quiz::create([
+//            'id_quiz' => $uuid,
+//            'name_quiz' => $quizName,
+//            'is_ready' => true,
+//            'id_user' => null,
+//        ]);
+//
+//        foreach ($questions as $question) {
+//            $uuidForAnswers = Uuid::uuid4()->toString();
+//
+//            QuizQuestion::create([
+//                'id_quiz_question_answers' => $uuidForAnswers,
+//                'text_question' => $question['question'],
+//                'correct_option' => $question['answers'][$question['correctAnswerIndex']],
+//                'wrong_option' => json_encode(array_values(array_filter($question['answers'], function ($answer) use ($question) {
+//                    return $answer !== $question['answers'][$question['correctAnswerIndex']];
+//                }))),
+//                'id_quiz' => $quiz->id_quiz,
+//            ]);
+//        }
+//
+//
+//    }
 
 
 

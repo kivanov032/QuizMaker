@@ -8,7 +8,7 @@ use App\Models\QuizQuestion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use function Webmozart\Assert\Tests\StaticAnalysis\length;
+use Ramsey\Uuid\Uuid;
 
 class CreatorQuizController extends Controller
 {
@@ -22,7 +22,9 @@ class CreatorQuizController extends Controller
         Log::info("Полученные данные в метод searchQuizErrors:", $data); // Логирование данных
 
         $questions = $this->cleanEmptyFields($questions); //Обращение фактически пустых строк в null
+        Log::info("questions 1:", $questions); // Логирование данных
         $cosmetic_errors = $this->checkDataForCosmeticErrors($questions); //Формирование списка косметических ошибок
+        Log::info("cosmetic_errors:", $cosmetic_errors); // Логирование данных
         $questions = $this->trimQuestions($questions); //'Trim' полей вопросов
         $minor_errors = $this->checkDataForMinorErrors($questions); //Формирование списка несущественных ошибок
 
@@ -65,7 +67,8 @@ class CreatorQuizController extends Controller
         $quizName = $data['quizName'];   // Название викторины
         $errors = $data['errors'];       // Массив меток на исправление ошибок
 
-        $create_quiz_flag = $data['create_quiz_flag'];
+        // Исправлено: убрано лишнее `$`
+        $searchQuizErrors_flag = $data['searchQuizErrors_flag']; // Метка на возвращение ошибок
 
         // Логирование данных
         Log::info("Полученные данные в метод fixQuizErrors:", $data);
@@ -95,10 +98,7 @@ class CreatorQuizController extends Controller
             $quizName = trim($quizName);
         }
 
-        Log::info("123: ", $questions);
-
-        // Проверка на создание викторины
-        if (!$create_quiz_flag) {
+        if ($searchQuizErrors_flag) {
             // Вызов метода для поиска ошибок
             $requestForErrors = new Request([
                 'questions' => $questions,
@@ -122,23 +122,14 @@ class CreatorQuizController extends Controller
                 'quizName' => $quizName,
                 'errors' => $errors,
             ], 200);
-
         } else {
-            // Вызов метода для создания викторины
-            $requestForBD = new Request([
-                'questions' => $questions,
-                'quizName' => $quizName,
-            ]);
-
-            $responseBD = $this->createQuizWithQuestions($requestForBD);
-            $responseBDMessage = json_decode($responseBD->getContent(), true);
-
-            // Возвращаем ответ клиенту
             return response()->json([
-                'message' => $responseBDMessage['message']
+                'questions' => $questions,
+                'quizName' => $quizName
             ], 200);
         }
     }
+
 
 
     public function createQuizWithQuestions(Request $request): \Illuminate\Http\JsonResponse
@@ -147,6 +138,28 @@ class CreatorQuizController extends Controller
         $data = $request->all();
         $questions = $data['questions']; // Массив вопросов
         $quizName = $data['quizName'];   // Название викторины
+        $errors = $data['errors'];       // Массив меток на исправление ошибок
+
+        Log::info("1) Полученные данные в метод createQuizWithQuestions:", $data);
+
+        if ($errors !== null) {
+            // Вызов метода для поиска ошибок
+            $requestForFixErrors = new Request([
+                'questions' => $questions,
+                'quizName' => $quizName,
+                'errors' =>  $errors,
+                'searchQuizErrors_flag' => false
+            ]);
+
+            $response = $this->fixQuizErrors($requestForFixErrors);
+            $fixedData = json_decode($response->getContent(), true);
+
+            Log::info("2) Полученные данные в метод createQuizWithQuestions:", $fixedData);
+
+            // Обновляем вопросы и название викторины
+            $questions = $fixedData['questions'];
+            $quizName = $fixedData['quizName'];
+        }
 
         // Валидация входящих данных
         $request->validate([
@@ -157,40 +170,53 @@ class CreatorQuizController extends Controller
             'questions.*.correctAnswerIndex' => 'required|integer',
         ]);
 
-        // Начало транзакции
-        DB::transaction(function () use ($quizName, $questions) {
-            // Создание викторины
-            $quiz = Quiz::create([
-                'name_quiz' => $quizName,
-                'is_ready' => true,
-                'id_user' => null,
-            ]);
+        $uuid = Uuid::uuid4()->toString();
+        Log::info('uuid = ' . $uuid);
 
-            // Создание вопросов викторины
-            foreach ($questions as $question) {
-                // Получаем текст вопроса
-                $textQuestion = $question['question'];
-
-                // Получаем правильный ответ
-                $correctOption = $question['answers'][$question['correctAnswerIndex']];
-
-                // Получаем неправильные ответы (все остальные)
-                $wrongOptions = array_filter($question['answers'], function($answer) use ($correctOption) {
-                    return $answer !== $correctOption;
-                });
-
-                // Создание записи вопроса
-                QuizQuestion::create([
-                    'text_question' => $textQuestion,
-                    'correct_option' => $correctOption,
-                    'wrong_option' => json_encode(array_values($wrongOptions)), // Преобразуем в JSON
-                    'id_quiz' => $quiz->id_quiz,
+        // Транзакция создания викторины
+        DB::transaction(function () use ($uuid, $quizName, $questions) {
+            try {
+                $quiz = Quiz::create([
+                    'id_quiz' => $uuid,
+                    'name_quiz' => $quizName,
+                    'is_ready' => true,
+                    'id_user' => null,
                 ]);
+
+                $id_quiz = $quiz->id_quiz; // Это будет корректный UUID
+
+                // Логируем созданный id_quiz
+                Log::info('Создание викторины', ['id_quiz' => $id_quiz]);
+
+                // Создание вопросов викторины
+                foreach ($questions as $question) {
+                    Log::info('Создание вопроса', [
+                        'text_question' => $question['question'],
+                        'id_quiz' => $id_quiz,
+                    ]);
+
+                    $uuidForAnswers = Uuid::uuid4()->toString();
+
+                    QuizQuestion::create([
+                        'id_quiz_question_answers' => $uuidForAnswers,
+                        'text_question' => $question['question'],
+                        'correct_option' => $question['answers'][$question['correctAnswerIndex']],
+                        'wrong_option' => json_encode(array_values(array_filter($question['answers'], function($answer) use ($question) {
+                            return $answer !== $question['answers'][$question['correctAnswerIndex']];
+                        }))), //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                        'id_quiz' => $id_quiz, // Используем UUID, созданный выше
+                    ]);
+                }
+            } catch (\Exception $e) {
+                Log::error('Ошибка при создании викторины: ' . $e->getMessage());
+                throw $e; // Перебрасываем исключение, чтобы транзакция откатилась
             }
         });
 
-        return response()->json(['message' => 'Викторина и вопросы успешно созданы!'], 201);
+        // Возвращаем индекс операции (например, 1 для успешного выполнения)
+        return response()->json(['status' => 'success', 'operation_index' => 1], 201);
     }
+
 
 
     /**
@@ -248,7 +274,7 @@ class CreatorQuizController extends Controller
             $errors = [];
 
             // Проверка текста вопроса на лишние пробелы
-            if (isset($question['text']) && preg_match('/\s{2,}/', $question['text'])) {
+            if (isset($question['question']) && preg_match('/\s{2,}/', $question['question'])) {
                 $errors[] = [
                     "id_error" => 1,
                     "text_error" => "В вопросе викторины обнаружены лишние пробелы."
@@ -733,9 +759,9 @@ class CreatorQuizController extends Controller
     }
 
     // Публичный метод для доступа к фильтрации вопросов
-    public function getFilteredQuestions(array $questions): array
+    public function getFilteredQuestions(array $questions, bool $reindex): array
     {
-        return $this->filterQuestions($questions);
+        return $this->filterQuestions($questions, $reindex);
     }
 
     // Публичный метод для доступа к фильтрации ответов вопросов

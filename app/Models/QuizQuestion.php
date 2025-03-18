@@ -36,6 +36,7 @@ class QuizQuestion extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'id_quiz_question_answers',
         'text_question',
         'correct_option',
         'wrong_option',
