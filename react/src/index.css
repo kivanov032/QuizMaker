@@ -293,6 +293,12 @@ input {
     transition: color 0.3s;
 }
 
+.clickable-main {
+    cursor: pointer;
+    text-decoration: none;
+    color: black;
+}
+
 .clickable:hover {
     color: #0056b3;
 }
