@@ -13,11 +13,21 @@ use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
+    /**
+     * Регистрирует нового пользователя.
+     *
+     * Принимает данные из валидированного запроса, создаёт пользователя,
+     * генерирует UUID, хэширует пароль, создаёт токен авторизации
+     * и возвращает пользователя вместе с токеном.
+     *
+     * @param SignupRequest $request Валидированный запрос с данными для регистрации.
+     * @return \Illuminate\Http\Response Ответ с данными пользователя и токеном.
+     */
     public function signup(SignupRequest $request) {
         $data = $request->validated();
-        Log::info('Signup request received', ['data' => $request->all()]);
+        //Log::info('Signup request received', ['data' => $request->all()]);
         $uuid = Str::uuid();
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = User::create([
             'id_user' => $uuid,
             'login' => $data['login'],
@@ -30,6 +40,17 @@ class AuthController extends Controller
         return response(compact('user', 'token'));
 
     }
+
+    /**
+     * Авторизует пользователя.
+     *
+     * Проверяет переданные данные через валидированный запрос, выполняет попытку входа.
+     * В случае успешной аутентификации создаёт токен авторизации
+     * и возвращает пользователя с токеном. При ошибке возвращает сообщение.
+     *
+     * @param LoginRequest $request Валидированный запрос с данными для входа.
+     * @return \Illuminate\Http\Response Ответ с данными пользователя и токеном или сообщение об ошибке.
+     */
     public function login(LoginRequest $request) {
         $credentials = $request->validated();
         if (!Auth::attempt($credentials)) {
@@ -43,6 +64,14 @@ class AuthController extends Controller
         return response(compact('user', 'token'));
     }
 
+    /**
+     * Выполняет выход пользователя.
+     *
+     * Удаляет текущий access-токен пользователя и возвращает успешный ответ.
+     *
+     * @param Request $request Запрос, содержащий аутентифицированного пользователя.
+     * @return \Illuminate\Http\Response Пустой ответ с кодом 204 (успешный выход).
+     */
     public function logout(Request $request) {
         /** @var User $user */
         $user = $request->user();
