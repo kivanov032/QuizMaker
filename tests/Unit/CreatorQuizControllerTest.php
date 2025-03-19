@@ -46,13 +46,13 @@ class CreatorQuizControllerTest extends TestCase
     public function testCleanEmptyFields()
     {
         $questions = [
-            ["id" => 1, "text" => "   \n\t", 'answers' => ["John", "   ", "\t\n", "Doe"], "correctAnswerIndex" => 0],
-            ["id" => 2, "text" => "What is your name?", "answers" => ["Alice", "Bob", "   ", "\n"], "correctAnswerIndex" => 1]
+            ["id" => 1, "question" => "   \n\t", 'answers' => ["John", "   ", "\t\n", "Doe"], "correctAnswerIndex" => 0],
+            ["id" => 2, "question" => "What is your name?", "answers" => ["Alice", "Bob", "   ", "\n"], "correctAnswerIndex" => 1]
         ];
 
         $expectedResult = [
-            ["id" => 1, "text" => null, "answers" => ["John", null, null, "Doe"], "correctAnswerIndex" => 0],
-            ["id" => 2, "text" => "What is your name?", "answers" => ["Alice", "Bob", null, null], "correctAnswerIndex" => 1]
+            ["id" => 1, "question" => null, "answers" => ["John", null, null, "Doe"], "correctAnswerIndex" => 0],
+            ["id" => 2, "question" => "What is your name?", "answers" => ["Alice", "Bob", null, null], "correctAnswerIndex" => 1]
         ];
 
         $result = $this->controller->getCleanEmptyFields($questions);
@@ -63,10 +63,10 @@ class CreatorQuizControllerTest extends TestCase
     public function testCheckDataForCosmeticErrors()
     {
         $questions = [
-            ["id" => 1, "text" => "1   2", "answers" => ["3", "2   4", "4"], "correctAnswerIndex" => 0],
-            ["id" => 2, "text" => "What is your name?", "answers" => ["John ", "Dave  ", "Doe   "], "correctAnswerIndex" => 0],
-            ["id" => 3, "text" => "  What  is your name?  ", "answers" => ["John Grey", "John   Grey", "Doe  "], "correctAnswerIndex" => 0],
-            ["id" => 4, "text" => "What  is your name?", "answers" => ["John", null, "Doe  "], "correctAnswerIndex" => 0],
+            ["id" => 1, "question" => "1   2", "answers" => ["3", "2   4", "4"], "correctAnswerIndex" => 0],
+            ["id" => 2, "question" => "What is your name?", "answers" => ["John ", "Dave  ", "Doe   "], "correctAnswerIndex" => 0],
+            ["id" => 3, "question" => "  What  is your name?  ", "answers" => ["John Grey", "John   Grey", "Doe  "], "correctAnswerIndex" => 0],
+            ["id" => 4, "question" => "What  is your name?", "answers" => ["John", null, "Doe  "], "correctAnswerIndex" => 0],
         ];
 
         $expectedErrors = [
@@ -139,7 +139,7 @@ class CreatorQuizControllerTest extends TestCase
     public function testCheckDataForCosmeticErrors1()
     {
         $questions = [
-            ["id" => 1, "text" => "1   2", "answers" => ["3", "2   4", "3", null], "correctAnswerIndex" => 2]
+            ["id" => 1, "question" => "1   2", "answers" => ["3", "2   4", "3", null], "correctAnswerIndex" => 2]
         ];
 
         $expectedErrors = [
@@ -163,7 +163,7 @@ class CreatorQuizControllerTest extends TestCase
         $this->assertEquals($expectedErrors, $cosmetic_errors);
     }
 
-//Тест на 'трим' вопросов
+    //Тест на 'трим' вопросов
     public function testTrimQuestions()
     {
         $questions = [
@@ -173,7 +173,8 @@ class CreatorQuizControllerTest extends TestCase
             ["id" => 4, "question" => "How old are you?", "answers" => ["  ", "", "30"], "correctAnswerIndex" => 0],
             ["id" => 5, "question" => "What is your favorite color?", "answers" => ["Red", "Blue", "Green"], "correctAnswerIndex" => 0],
             ["id" => 6, "question" => "   What is your name?\n   ", "answers" => ["John\n", "   ", "Doe"], "correctAnswerIndex" => 0],
-            ["id" => 7, "question" => "\n   ", "answers" => ["\n", "25", "\r\n"], "correctAnswerIndex" => 0]
+            ["id" => 7, "question" => "\n   ", "answers" => ["\n", "25", "\r\n"], "correctAnswerIndex" => 0],
+            ["id" => 8,"question" => "1   3", "answers" => ["3","4","5"], "correctAnswerIndex" => null]
         ];
 
         $expected = [
@@ -183,7 +184,8 @@ class CreatorQuizControllerTest extends TestCase
             ["id" => 4, "question" => "How old are you?", "answers" => [null, null, "30"], "correctAnswerIndex" => 0],
             ["id" => 5, "question" => "What is your favorite color?", "answers" => ["Red", "Blue", "Green"], "correctAnswerIndex" => 0],
             ["id" => 6, "question" => "What is your name?", "answers" => ["John", null, "Doe"], "correctAnswerIndex" => 0],
-            ["id" => 7, "question" => null, "answers" => [null, "25", null], "correctAnswerIndex" => 0]
+            ["id" => 7, "question" => null, "answers" => [null, "25", null], "correctAnswerIndex" => 0],
+            ["id" => 8,"question" => "1 3","answers" => ["3","4","5"], "correctAnswerIndex" => null]
         ];
 
         $result = $this->controller->getTrimQuestions($questions);
@@ -195,10 +197,10 @@ class CreatorQuizControllerTest extends TestCase
     public function testCheckDataForMinorErrors()
     {
         $questions = [
-            ["id" => 1, "text" => null, 'answers' => [null, null, null], "correctAnswerIndex" => 1],
-            ["id" => 2, "text" => null, "answers" => [], "correctAnswerIndex" => 1],
-            ["id" => 3, "text" => "What is your name?", "answers" => ["Alice", "Bob", null], "correctAnswerIndex" => 1],
-            ["id" => 4, "text" => "What is your name?", "answers" => ["Alice", null, null, "Bob", null], "correctAnswerIndex" => 1],
+            ["id" => 1, "question" => null, 'answers' => [null, null, null], "correctAnswerIndex" => 1],
+            ["id" => 2, "question" => null, "answers" => [], "correctAnswerIndex" => 1],
+            ["id" => 3, "question" => "What is your name?", "answers" => ["Alice", "Bob", null], "correctAnswerIndex" => 1],
+            ["id" => 4, "question" => "What is your name?", "answers" => ["Alice", null, null, "Bob", null], "correctAnswerIndex" => 1],
         ];
 
         $expectedErrors = [
@@ -295,7 +297,6 @@ class CreatorQuizControllerTest extends TestCase
         $this->assertEquals($expectedQuestions, $filteredQuestions);
     }
 
-    // Тест на фильтрацию ответов в вопросах !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     public function testFilterAnswers1()
     {
         $questions = [
