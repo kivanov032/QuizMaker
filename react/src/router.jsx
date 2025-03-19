@@ -48,15 +48,15 @@ const router = createBrowserRouter([
             },
             {
                 path: '/createQuestion',
-                    element: <CreatorLayout />,
-                    children: [
-                        {
-                                    path: '/createQuestion/:id', // Добавляем параметр id
-                                    element: <CreatorQuestion />
-                                },
-                        ]
+                element: <CreatorLayout />,
+                children: [
+                    {
+                        path: '/createQuestion/:id', // Добавляем параметр id
+                        element: <CreatorQuestion />
+                    },
+                ]
             },
-            ]
+        ]
     },
     {
         path: '*',
