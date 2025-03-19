@@ -1,4 +1,4 @@
-import {Navigate, Outlet} from "react-router-dom";
+import {Navigate, Outlet, useNavigate} from "react-router-dom";
 import {useStateContext} from "../context/ContextProvider.jsx";
 import axiosClient from "../axios-client.js";
 import {useEffect} from "react";
@@ -6,7 +6,7 @@ import {useEffect} from "react";
 
 export default function MainLayout() {
     const {user, token, setUser, setToken}  = useStateContext()
-
+    const navigate = useNavigate(); // Хук для навигации
     useEffect(() => {
         axiosClient.get('/user')
             .then(({data}) => {
@@ -29,14 +29,19 @@ export default function MainLayout() {
             })
     }
 
-
-
+    // Обработчик клика для перенаправления на главную страницу
+    const handleMainLayoutClick = () => {
+        navigate("/");
+    };
 
     return (
         <div>
             {/* Верхняя панель */}
             <header className="header">
-                <div className="header-left">MainLayout</div>
+                <div className="header-left">
+                    <span className="clickable" onClick={handleMainLayoutClick}>МЕНЮ</span>
+                </div>
+
                 <div className="header-right">
                     <span className="clickable">{user.login}</span>
                     <span onClick={onLogout} className="clickable logout">Logout</span>

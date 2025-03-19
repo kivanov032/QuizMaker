@@ -19,6 +19,7 @@ use Illuminate\Http\Request;
 Route::post('/searchQuizErrors', [CreatorQuizController::class, 'searchQuizErrors']);
 Route::post('/fixQuizErrors', [CreatorQuizController::class, 'fixQuizErrors']);
 Route::post('/createQuizWithQuestions', [CreatorQuizController::class, 'createQuizWithQuestions']);
+Route::get('/checkConnectionWithBD', [CreatorQuizController::class, 'checkConnectionWithBD']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
