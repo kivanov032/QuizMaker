@@ -1,5 +1,5 @@
 import {useNavigate} from "react-router-dom";
-import {checkConnectionWithBD} from "../SenderQuiz.jsx";
+import {checkConnectionWithBD} from "../SenderQuiz.js";
 
 export default function MainPage() {
     const navigate = useNavigate();

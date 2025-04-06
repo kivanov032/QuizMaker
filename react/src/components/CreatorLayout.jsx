@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
 import {Outlet, Link, Navigate, useNavigate} from "react-router-dom";
 import { QuestionContext } from '../context/QuestionContext';
-import {sendQuestionsToFixError, sendQuestionsToRecordInBD, sendQuestionsToSearchError} from "../SenderQuiz.jsx";
+import {sendQuestionsToFixError, sendQuestionsToRecordInBD, sendQuestionsToSearchError} from "../SenderQuiz.js";
 import "./CreatorLayout.css";
 import { useStateContext } from "../context/ContextProvider.jsx";
 
