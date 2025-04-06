@@ -4,29 +4,45 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class Kernel extends ConsoleKernel
 {
-    /**
-     * Define the application's command schedule.
-     *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
-     * @return void
-     */
-    protected function schedule(Schedule $schedule)
+    protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        // Очистка старых логов
+        $schedule->command('logcleaner:run', [
+            '--keeplines' => 5000,
+            '--keepfiles' => 14,
+        ])
+            ->daily()
+            ->at('05:00')
+            ->onSuccess(function () {
+                Log::info('Очистка логов выполнена успешно.');
+            })
+            ->onFailure(function () {
+                Log::error('Очистка логов завершилась ошибкой.');
+            });
+
+        // Очистка истёкших токенов
+        $schedule->call(function () {
+            PersonalAccessToken::where('expires_at', '<', now())->delete();
+        })->daily()
+            ->at('05:30')
+            ->onSuccess(function () {
+                Log::info('Очистка истёкших токенов выполнена успешно.');
+            })
+            ->onFailure(function () {
+                Log::error('Очистка истёкших токенов завершилась ошибкой.');
+            });
     }
 
-    /**
-     * Register the commands for the application.
-     *
-     * @return void
-     */
-    protected function commands()
+    protected function commands(): void
     {
         $this->load(__DIR__.'/Commands');
-
         require base_path('routes/console.php');
     }
 }
+

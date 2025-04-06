@@ -47,9 +47,14 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function getAuthIdentifierName()
+    public function getAuthIdentifierName(): string
     {
         return 'id_user';
     }
+
+    public function findForPassport($login) {
+        return $this->where('login', $login)->first();
+    }
+
 
 }

@@ -3,7 +3,6 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CreatorQuizController;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,29 +20,12 @@ Route::post('/fixQuizErrors', [CreatorQuizController::class, 'fixQuizErrors']);
 Route::post('/createQuizWithQuestions', [CreatorQuizController::class, 'createQuizWithQuestions']);
 Route::get('/checkConnectionWithBD', [CreatorQuizController::class, 'checkConnectionWithBD']);
 
-Route::middleware('auth:sanctum')->group(function () {
+//Route::middleware(['auth:sanctum', 'delete.token'])->group(function () {
+Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/user', function (Request $request) {
-        return $request->user();
-    });
-
+    Route::get('/user', [AuthController::class, 'getUser']);
 });
 
 Route::post('/signup', [AuthController::class, 'signup']);
 Route::post('/login', [AuthController::class, 'login']);
 
-
-
-/*
-Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/user', function (Request $request) {
-        return $request->user();
-    });
-
-    Route::apiResource('/users', UserController::class);
-});
-
-Route::post('/signup', [AuthController::class, 'signup']);
-Route::post('/login', [AuthController::class, 'login']);
-*/

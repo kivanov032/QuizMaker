@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\SignupRequest;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -21,11 +23,13 @@ class AuthController extends Controller
      * и возвращает пользователя вместе с токеном.
      *
      * @param SignupRequest $request Валидированный запрос с данными для регистрации.
-     * @return \Illuminate\Http\Response Ответ с данными пользователя и токеном.
+     * @return Response Ответ с данными пользователя и токеном.
      */
-    public function signup(SignupRequest $request) {
+    public function signup(SignupRequest $request): Response
+    {
         $data = $request->validated();
         //Log::info('Signup request received', ['data' => $request->all()]);
+        Log::info("Я в методе signup");
         $uuid = Str::uuid();
         /** @var User $user */
         $user = User::create([
@@ -35,7 +39,7 @@ class AuthController extends Controller
             'password' => bcrypt($data['password']),
         ]);
 
-        $token = $user->createToken('main')->plainTextToken;
+        $token = $user->createToken('main', ['*'], now()->addDays(2))->plainTextToken;
 
         return response(compact('user', 'token'));
 
@@ -49,20 +53,25 @@ class AuthController extends Controller
      * и возвращает пользователя с токеном. При ошибке возвращает сообщение.
      *
      * @param LoginRequest $request Валидированный запрос с данными для входа.
-     * @return \Illuminate\Http\Response Ответ с данными пользователя и токеном или сообщение об ошибке.
+     * @return Response Ответ с данными пользователя и токеном или сообщение об ошибке.
      */
-    public function login(LoginRequest $request) {
+    public function login(LoginRequest $request): Response
+    {
+        Log::info("Я в методе login");
         $credentials = $request->validated();
+
         if (!Auth::attempt($credentials)) {
             return response([
-                'message' => 'Provided email address or password is incorrect'
+                'message' => 'Логин или пароль не верны.'
             ], 422);
         }
+
         /** @var User $user */
         $user = Auth::user();
-        $token = $user->createToken('main')->plainTextToken;
+        $token = $user->createToken('main', ['*'], now()->addDays(2))->plainTextToken;
         return response(compact('user', 'token'));
     }
+
 
     /**
      * Выполняет выход пользователя.
@@ -70,12 +79,32 @@ class AuthController extends Controller
      * Удаляет текущий access-токен пользователя и возвращает успешный ответ.
      *
      * @param Request $request Запрос, содержащий аутентифицированного пользователя.
-     * @return \Illuminate\Http\Response Пустой ответ с кодом 204 (успешный выход).
+     * @return Response Пустой ответ с кодом 204 (успешный выход).
      */
-    public function logout(Request $request) {
+    public function logout(Request $request): Response
+    {
+        Log::info("Я в методе logout");
         /** @var User $user */
         $user = $request->user();
         $user->currentAccessToken()->delete();
         return response('', 204);
     }
+
+
+    /**
+     * Получает информацию о текущем аутентифицированном пользователе.
+     *
+     * Возвращает данные пользователя и сообщение о действительности токена.
+     *
+     * @param Request $request Запрос, содержащий аутентифицированного пользователя.
+     * @return JsonResponse Ответ в формате JSON с данными пользователя и сообщением.
+     */
+    public function getUser(Request $request): JsonResponse
+    {
+        return response()->json([
+            'user' => $request->user(),
+            'message' => 'Токен действителен'
+        ]);
+    }
+
 }

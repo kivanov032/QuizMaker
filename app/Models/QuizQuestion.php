@@ -51,7 +51,6 @@ class QuizQuestion extends Model
     protected $casts = [
         'wrong_option' => 'array', // Преобразуем JSON в массив
     ];
-
     /**
      * Get the quiz that owns the question answer.
      */

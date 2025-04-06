@@ -1,38 +1,33 @@
-import {createContext, useContext, useState} from "react";
+import { createContext, useContext, useState } from "react";
 
 const StateContext = createContext({
     user: null,
     token: null,
     setUser: () => {},
     setToken: () => {},
-})
+    getStoredToken: () => {},
+});
 
-// eslint-disable-next-line react/prop-types
-export const ContextProvider = ({children}) => {
-
+export const ContextProvider = ({ children }) => {
     const [user, setUser] = useState({});
-    const [token, _setToken] = useState(localStorage.getItem('ACCESS_TOKEN'));
-    //const [token, _setToken] = useState(123);
+    const [token, setToken] = useState(null);
 
-    const setToken = (token) => {
-        _setToken(token)
-        if (token) {
-            localStorage.setItem('ACCESS_TOKEN', token);
-        } else {
-            localStorage.removeItem('ACCESS_TOKEN')
-        }
-    }
+    // Функция для получения токена из localStorage
+    const getStoredToken = () => {
+        return localStorage.getItem('ACCESS_TOKEN');
+    };
 
     return (
         <StateContext.Provider value={{
             user,
             token,
             setUser,
-            setToken
+            setToken,
+            getStoredToken,
         }}>
             {children}
         </StateContext.Provider>
-    )
-}
+    );
+};
 
-export const useStateContext = () => useContext(StateContext)
+export const useStateContext = () => useContext(StateContext);

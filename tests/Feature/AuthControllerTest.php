@@ -16,13 +16,13 @@ class AuthControllerTest extends TestCase
     {
         // Создаем пользователя через фабрику
         $user = \App\Models\User::factory()->create([
-            'email' => 'password123@example.com',
+            'login' => 'password123',
             'password' => bcrypt('password/123'),
         ]);
 
         // Отправляем запрос
         $response = $this->postJson('/api/login', [
-            'email' => 'password123@example.com',
+            'login' => 'password123',
             'password' => 'password/123',
         ]);
 
@@ -35,22 +35,22 @@ class AuthControllerTest extends TestCase
     }
 
     // Ошибка, если email невалидный
-    public function test_login_fails_with_invalid_email_format(): void
+    public function test_login_fails_with_invalid_login_format(): void
     {
         $response = $this->postJson('/api/login', [
-            'email' => 'not-an-email',
+            'login' => 'not-an-email',
             'password' => 'password/123',
         ]);
 
         $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['email']);
+        $response->assertJsonValidationErrors(['login']);
     }
 
     // Ошибка, если пароль не передан
     public function test_login_fails_with_missing_password(): void
     {
         $response = $this->postJson('/api/login', [
-            'email' => 'test@example.com',
+            'login' => 'test@example.com',
             // Пароль отсутствует
         ]);
 
@@ -62,12 +62,12 @@ class AuthControllerTest extends TestCase
     public function test_login_fails_if_user_does_not_exist(): void
     {
         $response = $this->postJson('/api/login', [
-            'email' => 'nonexistent@example.com',
+            'login' => '123456',
             'password' => 'password/123',
         ]);
 
         $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['email']);
+        $response->assertJsonValidationErrors(['login']);
     }
 
     // Ошибка, если переданы пустые данные
@@ -76,7 +76,7 @@ class AuthControllerTest extends TestCase
         $response = $this->postJson('/api/login', []);
 
         $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['email', 'password']);
+        $response->assertJsonValidationErrors(['login', 'password']);
     }
 
 
