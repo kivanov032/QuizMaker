@@ -4,11 +4,13 @@ namespace App\Services;
 
 use App\Helpers\CreatorQuizHelper;
 use App\Http\Requests\CreateQuizRequest;
+use App\Jobs\NotifyUserServerAboutUserQuiz;
 use App\Models\Quiz;
 use App\Models\QuizQuestion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Queue;
 use Ramsey\Uuid\Uuid;
 
 class CreatorQuizService
@@ -21,20 +23,25 @@ class CreatorQuizService
     }
 
     //Проверка связи с бд
-    public function checkConnectionWithDB(): \Illuminate\Http\JsonResponse
+    public function checkActivity(): \Illuminate\Http\JsonResponse
     {
         Log::info("Я в checkConnectionWithDB");
+        $serverStatus = 'Активен';
         try {
             DB::connection()->getPdo();
             return response()->json([
                 'status' => 'success',
-                'message' => 'Соединение с БД успешно установлено.',
+                'message' => 'Сервер активен, соединение с БД успешно установлено.',
+                'server_status' => $serverStatus,
+                'database_status' => 'Подключение к БД успешно',
             ], 200);
         } catch (\PDOException $e) {
             return response()->json([
                 'status' => 'error',
                 'code' => 'DB_CONNECTION_ERROR',
                 'message' => 'Ошибка подключения к БД.',
+                'server_status' => $serverStatus,
+                'database_status' => 'Ошибка подключения к БД',
                 'error' => $e->getMessage(),
             ], 500);
         } catch (\Exception $e) {
@@ -42,6 +49,8 @@ class CreatorQuizService
                 'status' => 'error',
                 'code' => 'UNKNOWN_ERROR',
                 'message' => 'Неизвестная ошибка при подключении к БД.',
+                'server_status' => $serverStatus,
+                'database_status' => 'Неизвестная ошибка',
                 'error' => $e->getMessage(),
             ], 500);
         }
@@ -154,17 +163,19 @@ class CreatorQuizService
     }
 
 
-    // Занесение викторины в бд
-    public function createQuizWithQuestions(CreateQuizRequest $request): \Illuminate\Http\JsonResponse
+    // Предварительная обработка данных викторины и последующее занесение её в бд (+ занесение )
+    public function createQuiz(CreateQuizRequest $request): \Illuminate\Http\JsonResponse
     {
         // Получаем данные из запроса
         $data = $request->all();
         $questions = $data['questions']; // Массив вопросов
         $quizName = $data['quizName'] ?? ''; // Название викторины; если quizName отсутствует или null, используем пустую строку
         $errors = $data['errors']; // Массив меток на исправление ошибок
+        $id_user = $data['id_user']; // ID пользователя
 
         Log::info("Полученные данные в метод createQuizWithQuestions:", $data);
 
+        // Исправление ошибок, если они есть
         if ($errors !== null) {
             // Вызов метода для поиска ошибок
             $requestForFixErrors = new Request([
@@ -194,45 +205,55 @@ class CreatorQuizService
         $validatedData = $request->validate($request->rules());
 
         try {
-            // Транзакция создания викторины
-            DB::transaction(function () use ($quizName, $questions) {
-                // Занесение в бд название викторины (табл. quizzes)
-                $quiz = Quiz::create([
-                    'id_quiz' => Uuid::uuid4()->toString(),
-                    'name_quiz' => $quizName,
-                    'is_ready' => true,
-                    'id_user' => null,
-                ]);
-                $id_quiz = $quiz->id_quiz;
+            // Вызов метода для записи викторины в базу данных
+            $this->saveQuizToDatabase($quizName, $questions);
 
-                // Занесение в бд вопросов викторины (табл. quiz_question_answers)
-                foreach ($questions as $question) {
-                    Log::info("question: ", $question);
-                    QuizQuestion::create([
-                        'id_quiz_question_answers' => Uuid::uuid4()->toString(),
-                        'text_question' => $question['question'],
-                        'correct_option' => $question['answers'][$question['correctAnswerIndex']],
-                        'wrong_option' => array_values(array_filter($question['answers'], function($answer) use ($question) {
-                            return $answer !== $question['answers'][$question['correctAnswerIndex']];
-                        })),
-                        'id_quiz' => $id_quiz,
-                    ]);
-                }
-            });
+            // Отправка данных викторины на внешний сервер в фоновом режиме
+            Queue::push(new NotifyUserServerAboutUserQuiz([
+                'id_user' => $id_user
+            ]));
+
+            // Возвращаем успешный ответ
+            return response()->json(['status' => 'success', 'operation_index' => 1], 201);
         } catch (\Exception $e) {
             Log::error('Ошибка при создании викторины: ' . $e->getMessage());
 
-            // Формируем ответ для клиента
+            // Возвращаем ошибку
             return response()->json([
                 'status' => 'error',
                 'message' => 'Произошла ошибка при создании викторины.',
                 'error' => $e->getMessage(),
             ], 500);
         }
-
-        // Возвращаем успешный ответ
-        return response()->json(['status' => 'success', 'operation_index' => 1], 201);
     }
 
+    // Сохранение викторины в бд
+    private function saveQuizToDatabase(string $quizName, array $questions): void
+    {
+        DB::transaction(function () use ($quizName, $questions) {
+            // Занесение в бд название викторины (табл. quizzes)
+            $quiz = Quiz::create([
+                'id_quiz' => Uuid::uuid4()->toString(),
+                'name_quiz' => $quizName,
+                'is_ready' => true,
+                'id_user' => null,
+            ]);
+            $id_quiz = $quiz->id_quiz;
+
+            // Занесение в бд вопросов викторины (табл. quiz_question_answers)
+            foreach ($questions as $question) {
+                Log::info("question: ", $question);
+                QuizQuestion::create([
+                    'id_quiz_question_answers' => Uuid::uuid4()->toString(),
+                    'text_question' => $question['question'],
+                    'correct_option' => $question['answers'][$question['correctAnswerIndex']],
+                    'wrong_option' => array_values(array_filter($question['answers'], function($answer) use ($question) {
+                        return $answer !== $question['answers'][$question['correctAnswerIndex']];
+                    })),
+                    'id_quiz' => $id_quiz,
+                ]);
+            }
+        });
+    }
 
 }

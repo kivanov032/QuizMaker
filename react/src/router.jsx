@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate } from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 import NotFound from "./views/NotFound.jsx";
 import CreatorQuestion from "./views/CreatorQuestion.jsx";
 import CreatorLayout from "./components/CreatorLayout.jsx";
@@ -9,20 +9,6 @@ import SignUp from "./views/SignUp.jsx";
 import MainPage from "./views/MainPage.jsx";
 
 const router = createBrowserRouter([
-    // {
-    //     path: '/createQuestion',
-    //     element: <CreatorLayout />,
-    //     children: [
-    //         {
-    //             path: '/',
-    //             element: <Navigate to="/createQuestion/1" /> // Перенаправляем на первый вопрос
-    //         },
-    //         {
-    //             path: '/createQuestion/:id', // Добавляем параметр id
-    //             element: <CreatorQuestion />
-    //         },
-    //     ]
-    // },
     {
         path: '/',
         element: <GuestLayout />,
@@ -51,7 +37,7 @@ const router = createBrowserRouter([
                 element: <CreatorLayout />,
                 children: [
                     {
-                        path: '/createQuestion/:id', // Добавляем параметр id
+                        path: '/createQuestion/:id',
                         element: <CreatorQuestion />
                     },
                 ]

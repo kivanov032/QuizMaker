@@ -16,9 +16,9 @@ class CreatorQuizController extends Controller
         $this->creatorQuizService = $creatorQuizService;
     }
 
-    public function checkConnectionWithBD(Request $request): \Illuminate\Http\JsonResponse
+    public function checkActivity(Request $request): \Illuminate\Http\JsonResponse
     {
-        return $this->creatorQuizService->checkConnectionWithDB();
+        return $this->creatorQuizService->checkActivity();
     }
 
     public function searchQuizErrors(Request $request): \Illuminate\Http\JsonResponse
@@ -31,9 +31,9 @@ class CreatorQuizController extends Controller
         return $this->creatorQuizService->fixQuizErrors($request);
     }
 
-    public function createQuizWithQuestions(CreateQuizRequest $request): \Illuminate\Http\JsonResponse
+    public function createQuiz(CreateQuizRequest $request): \Illuminate\Http\JsonResponse
     {
-        return $this->creatorQuizService->createQuizWithQuestions($request);
+        return $this->creatorQuizService->createQuiz($request);
     }
 }
 

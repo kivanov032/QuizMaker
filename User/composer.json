@@ -8,11 +8,14 @@
         "php": "^8.4.4",
         "ext-pdo": "*",
         "accentinteractive/laravel-logcleaner": "^1.6",
+        "darkaonline/l5-swagger": "dev-master",
         "guzzlehttp/guzzle": "^7.9.2",
         "laravel/framework": "^12.1.1",
         "laravel/sanctum": "^v4.0.8",
         "laravel/tinker": "^v2.10.1",
-        "nunomaduro/collision": "^v8.6.1"
+        "nextapps/laravel-swagger-ui": "*",
+        "nunomaduro/collision": "^v8.6.1",
+        "wotz/laravel-swagger-ui": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^v1.24.1",

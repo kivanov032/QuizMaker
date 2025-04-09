@@ -13,8 +13,51 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
+use Illuminate\Support\Facades\DB;
+
 class AuthController extends Controller
 {
+
+    /**
+     * Проверяет активность сервера и подключение к базе данных.
+     *
+     * @return JsonResponse Ответ с состоянием сервера и БД.
+     */
+    //Проверка связи с бд
+    public function checkActivity(): \Illuminate\Http\JsonResponse
+    {
+        Log::info("Я в checkConnectionWithDB");
+        $serverStatus = 'Активен';
+        try {
+            DB::connection()->getPdo();
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Сервер активен, соединение с БД успешно установлено.',
+                'server_status' => $serverStatus,
+                'database_status' => 'Подключение к БД успешно',
+            ], 200);
+        } catch (\PDOException $e) {
+            return response()->json([
+                'status' => 'error',
+                'code' => 'DB_CONNECTION_ERROR',
+                'message' => 'Ошибка подключения к БД.',
+                'server_status' => $serverStatus,
+                'database_status' => 'Ошибка подключения к БД',
+                'error' => $e->getMessage(),
+            ], 500);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'code' => 'UNKNOWN_ERROR',
+                'message' => 'Неизвестная ошибка при подключении к БД.',
+                'server_status' => $serverStatus,
+                'database_status' => 'Неизвестная ошибка',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+
     /**
      * Регистрирует нового пользователя.
      *
@@ -106,5 +149,34 @@ class AuthController extends Controller
             'message' => 'Токен действителен'
         ]);
     }
+
+    public function incrementCreatedQuizzesCounter(Request $request): JsonResponse
+    {
+        // Валидация входящих данных
+        $request->validate([
+            'id_user' => 'required|uuid', // Убедитесь, что id_user передан и является UUID
+        ]);
+
+        // Получаем id_user из запроса
+        $id_user = $request->input('id_user');
+
+        // Находим пользователя по id_user
+        $user = User::where('id_user', $id_user)->first();
+
+        // Проверяем, существует ли пользователь
+        if (!$user) {
+            return response()->json(['message' => 'Пользователь не найден'], 404);
+        }
+
+        // Увеличиваем счетчик созданных викторин
+        $user->increment('created_quizzes_counter');
+
+        // Возвращаем обновленные данные пользователя
+        return response()->json([
+            'user' => $user,
+            'message' => 'Счетчик созданных викторин успешно обновлен',
+        ]);
+    }
+
 
 }

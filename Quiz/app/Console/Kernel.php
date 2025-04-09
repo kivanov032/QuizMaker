@@ -12,11 +12,11 @@ class Kernel extends ConsoleKernel
     {
         // Очистка старых логов
         $schedule->command('logcleaner:run', [
-            '--keeplines' => 5000,
+            '--keeplines' => 500,
             '--keepfiles' => 14,
         ])
             ->daily()
-            ->at('05:00')
+            ->at('23:20')
             ->onSuccess(function () {
                 Log::info('Очистка логов выполнена успешно.');
             })

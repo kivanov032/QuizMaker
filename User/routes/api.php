@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+Route::get('/check-activity', [AuthController::class, 'checkActivity']);
 
 //Route::middleware(['auth:sanctum', 'delete.token'])->group(function () {
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -22,4 +23,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 Route::post('/signup', [AuthController::class, 'signup']);
 Route::post('/login', [AuthController::class, 'login']);
+
+Route::post('/increment-created-quizzes-counter', [AuthController::class, 'incrementCreatedQuizzesCounter']);
+
+
 

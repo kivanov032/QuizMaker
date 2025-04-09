@@ -14,9 +14,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::post('/searchQuizErrors', [CreatorQuizController::class, 'searchQuizErrors']);
-Route::post('/fixQuizErrors', [CreatorQuizController::class, 'fixQuizErrors']);
-Route::post('/createQuizWithQuestions', [CreatorQuizController::class, 'createQuizWithQuestions']);
-Route::get('/checkConnectionWithBD', [CreatorQuizController::class, 'checkConnectionWithBD']);
+Route::post('/search-quiz-errors', [CreatorQuizController::class, 'searchQuizErrors']);
+Route::post('/fix-quiz-errors', [CreatorQuizController::class, 'fixQuizErrors']);
+Route::post('/create-quiz', [CreatorQuizController::class, 'createQuiz']);
+Route::get('/check-activity', [CreatorQuizController::class, 'checkActivity']);
 
 

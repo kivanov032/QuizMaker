@@ -1,12 +1,12 @@
 import {useNavigate} from "react-router-dom";
-import {checkConnectionWithBD} from "../SenderQuiz.js";
+import {checkActivityServerAndBD} from "../SenderQuiz.js";
 
 export default function MainPage() {
     const navigate = useNavigate();
 
     const createQuiz = async () => {
         try {
-            const result = await checkConnectionWithBD();
+            const result = await checkActivityServerAndBD();
 
             // Проверяем, есть ли ошибка в результате
             if (result?.error) {
