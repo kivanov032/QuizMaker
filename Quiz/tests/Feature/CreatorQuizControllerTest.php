@@ -2,100 +2,487 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class CreatorQuizControllerTest extends TestCase
 {
-    public function testQuestionsReturnsEditedQuestionsAndErrors1()
+    /**
+     * --- Тестирование метода checkActivity ---
+     */
+
+    /**
+     * Тест успешного подключения к базе данных.
+     */
+    public function test_check_activity_successful_database_connection(): void
     {
-        // Подготовьте данные для запроса
-        $data = [
-            [
-                "id" => 1,
-                "question" => "What is 2 + 2?",
-                "answers" => ["2", "4"],
-                "correctAnswerIndex" => 1
-            ]
-        ];
+        // Вызов метода
+        $response = $this->getJson('/api/check-activity');
 
-        // Выполните POST-запрос к вашему маршруту
-        $response = $this->json('POST', '/api/searchQuizErrors', $data);
-
-        // Проверьте, что ответ имеет статус 200
-        $response->assertStatus(200);
-
-        // Проверьте структуру ответа
-        $response->assertJsonStructure([
-            'questionsEdited',
-            'errors',
-        ]);
-
-        // Ожидаемые данные для questionsEdited
-        $expectedQuestionsEdited = [
-            [
-                "id" => 1,
-                "question" => "What is 2 + 2?",
-                "answers" => ["2", "4"],
-                "correctAnswerIndex" => 1
-            ]
-        ];
-
-        // Ожидаемые ошибки (в данном случае пустой массив)
-        $expectedErrors = [];
-
-        // Проверяем, что в ответе есть ожидаемые данные
-        $response->assertJsonFragment($expectedQuestionsEdited);
-        $response->assertJsonFragment(['errors' => $expectedErrors]);
+        // Проверка статуса ответа и структуры JSON
+        $response->assertStatus(200)
+            ->assertJson([
+                'status' => 'success',
+                'message' => 'Сервер активен, соединение с БД успешно установлено.',
+                'server_status' => 'Активен',
+                'database_status' => 'Подключение к БД успешно',
+            ]);
     }
 
-    public function testQuestionsReturnsEditedQuestionsAndErrors2()
+    /**
+     * Тест ошибки подключения к базе данных.
+     */
+    public function test_check_activity_fails_with_database_connection_error(): void
     {
-        // Подготовьте данные для запроса
-        $data = [
+        // Имитируем ошибку подключения к БД
+        DB::shouldReceive('connection->getPdo')
+            ->andThrow(new \PDOException('Ошибка подключения к БД'));
+
+        // Вызов метода
+        $response = $this->getJson('/api/check-activity');
+
+        // Проверка статуса ответа и структуры JSON
+        $response->assertStatus(500)
+            ->assertJson([
+                'status' => 'error',
+                'code' => 'DB_CONNECTION_ERROR',
+                'message' => 'Ошибка подключения к БД.',
+                'server_status' => 'Активен',
+                'database_status' => 'Ошибка подключения к БД',
+            ]);
+    }
+
+    /**
+     * Тест неизвестной ошибки при подключении к базе данных.
+     */
+    public function test_check_activity_fails_with_unknown_error(): void
+    {
+        // Имитируем неизвестную ошибку
+        DB::shouldReceive('connection->getPdo')
+            ->andThrow(new \Exception('Неизвестная ошибка'));
+
+        // Вызов метода
+        $response = $this->getJson('/api/check-activity');
+
+        // Проверка статуса ответа и структуры JSON
+        $response->assertStatus(500)
+            ->assertJson([
+                'status' => 'error',
+                'code' => 'UNKNOWN_ERROR',
+                'message' => 'Неизвестная ошибка при подключении к БД.',
+                'server_status' => 'Активен',
+                'database_status' => 'Неизвестная ошибка',
+            ]);
+    }
+
+
+    /**
+     * --- Тестирование метода searchQuizErrors ---
+     */
+
+    /**
+     * Тест успешного анализа викторины без ошибок.
+     */
+    public function test_search_quiz_errors_successful_analysis(): void
+    {
+        // Подготовка данных
+        $quizName = 'Тестовая викторина';
+        $questions = [
             [
-                "id" => 2,
-                "question" => "  \n",
-                "answers" => ["2", null],
-                "correctAnswerIndex" => 0
-            ]
+                'id' => 1,
+                'question' => 'Какой язык программирования используется в Laravel?',
+                'answers' => ['JavaScript', 'PHP', 'Python', 'Java'],
+                'correctAnswerIndex' => 1,
+            ],
         ];
 
-        // Выполните POST-запрос к вашему маршруту
-        $response = $this->json('POST', '/api/questions', $data);
-
-        // Проверьте, что ответ имеет статус 200
-        $response->assertStatus(200);
-
-        // Проверьте структуру ответа
-        $response->assertJsonStructure([
-            'questionsEdited',
-            'errors',
+        // Вызов метода
+        $response = $this->postJson('/api/search-quiz-errors', [
+            'quizName' => $quizName,
+            'questions' => $questions,
         ]);
 
-        // Ожидаемые данные для questionsEdited
-        $expectedQuestionsEdited = [
+        // Проверка статуса ответа и структуры JSON
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'cosmetic_errors',
+                'minor_errors',
+                'critical_errors',
+                'logical_errors',
+                'name_quiz_errors',
+            ])
+            ->assertJson([
+                'cosmetic_errors' => [],
+                'minor_errors' => [],
+                'critical_errors' => [],
+                'logical_errors' => [],
+                'name_quiz_errors' => [],
+            ]);
+    }
+
+    /**
+     * Тест анализа викторины с критическими ошибками.
+     */
+    public function test_search_quiz_errors_with_critical_errors(): void
+    {
+        // Подготовка данных с критическими ошибками
+        $quizName = '';
+        $questions = [
             [
-                "id" => 1,
-                "question" => null,
-                "answers" => ["2"],
-                "correctAnswerIndex" => 0
-            ]
+                'id' => 1,
+                'question' => null,
+                'answers' => [],
+                'correctAnswerIndex' => null,
+            ],
         ];
 
-        // Ожидаемые ошибки (в данном случае пустой массив)
-        $expectedErrors = [
+        // Вызов метода
+        $response = $this->postJson('/api/search-quiz-errors', [
+            'quizName' => $quizName,
+            'questions' => $questions,
+        ]);
+
+        // Проверка статуса ответа и структуры JSON
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'cosmetic_errors',
+                'minor_errors',
+                'critical_errors',
+                'logical_errors',
+                'name_quiz_errors',
+            ])
+            ->assertJson([
+                'critical_errors' => [
+                    [
+                        'id_question' => 1,
+                        'errors' => [
+                            [
+                                'id_error' => 1,
+                                'text_error' => 'Вопрос не должен быть null.',
+                            ],
+                            [
+                                'id_error' => 2,
+                                'text_error' => 'Должно быть как минимум 2 ответа.',
+                            ],
+                            [
+                                'id_error' => 3,
+                                'text_error' => 'Индекс правильного ответа не может быть null.',
+                            ],
+                        ],
+                    ],
+                ],
+                'name_quiz_errors' => [
+                    "critical_error" => "В названии викторины должно быть хотя бы 5 символов."
+                ],
+            ]);
+    }
+
+    /**
+     * Тест анализа викторины с логическими ошибками.
+     */
+    public function test_search_quiz_errors_with_logical_errors(): void
+    {
+        // Подготовка данных с логическими ошибками
+        $quizName = 'Тестовая викторина';
+        $questions = [
             [
-                "id_question" => 1,
-                "errors" => [
-                    ["id_error" => 1, "text_error" => "Вопрос не должен быть null"],
-                    ["id_error" => 2, "text_error" => "Должно быть как минимум 2 ответа"]
-                ]
-            ]
+                'id' => 1,
+                'question' => 'Какой язык программирования используется в Laravel?',
+                'answers' => ['PHP', 'PHP', 'Python', 'Java'],
+                'correctAnswerIndex' => 0,
+            ],
         ];
 
-        // Проверяем, что в ответе есть ожидаемые данные
-        $response->assertJsonFragment($expectedQuestionsEdited);
-        $response->assertJsonFragment(['errors' => $expectedErrors]);
+        // Вызов метода
+        $response = $this->postJson('/api/search-quiz-errors', [
+            'quizName' => $quizName,
+            'questions' => $questions,
+        ]);
+
+        // Проверка статуса ответа и структуры JSON
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'cosmetic_errors',
+                'minor_errors',
+                'critical_errors',
+                'logical_errors',
+                'name_quiz_errors',
+            ])
+            ->assertJson([
+                'logical_errors' => [
+                    [
+                        'id_question' => 1,
+                        'errors' => [
+                            [
+                                'id_error' => 2,
+                                'text_error' => 'Встречаются одинаковые варианты ответов в полях: №1, №2.',
+                            ],
+                        ],
+                    ],
+                ],
+            ]);
+    }
+
+
+    /**
+     * --- Тестирование метода fixQuizErrors ---
+     */
+
+    /**
+     * Тест успешного исправления ошибок с возвращением исправленных данных.
+     */
+    public function test_fix_quiz_errors_successful_fix(): void
+    {
+        // Подготовка данных
+        $quizName = '  Тестовая викторина  ';
+        $questions = [
+            [
+                'id' => 1,
+                'question' => '  Какой язык программирования используется в Laravel?  ',
+                'answers' => ['JavaScript', 'PHP', 'Python', 'Java'],
+                'correctAnswerIndex' => 1,
+            ],
+        ];
+        $errors = [
+            'cosmeticErrors' => true,
+            'minorErrors' => false,
+            'logicalErrors' => false,
+            'cosmeticErrorQuizName' => true,
+        ];
+        $searchQuizErrors_flag = false;
+
+        // Вызов метода
+        $response = $this->postJson('/api/fix-quiz-errors', [
+            'quizName' => $quizName,
+            'questions' => $questions,
+            'errors' => $errors,
+            'searchQuizErrors_flag' => $searchQuizErrors_flag,
+        ]);
+
+        // Проверка статуса ответа и структуры JSON
+        $response->assertStatus(200)
+            ->assertJson([
+                'questions' => [
+                    [
+                        'id' => 1,
+                        'question' => 'Какой язык программирования используется в Laravel?',
+                        'answers' => ['JavaScript', 'PHP', 'Python', 'Java'],
+                        'correctAnswerIndex' => 1,
+                    ],
+                ],
+                'quizName' => 'Тестовая викторина',
+            ]);
+    }
+
+    /**
+     * Тест успешного исправления ошибок с возвращением списка ошибок.
+     */
+    public function test_fix_quiz_errors_successful_fix_with_errors(): void
+    {
+        // Подготовка данных
+        $quizName = '  Тестовая викторина  ';
+        $questions = [
+            [
+                'id' => 1,
+                'question' => '  Какой язык программирования используется в Laravel?  ',
+                'answers' => ['JavaScript', 'PHP', 'Python', 'Java'],
+                'correctAnswerIndex' => 1,
+            ],
+        ];
+        $errors = [
+            'cosmeticErrors' => true,
+            'minorErrors' => false,
+            'logicalErrors' => false,
+            'cosmeticErrorQuizName' => true,
+        ];
+        $searchQuizErrors_flag = true;
+
+        // Вызов метода
+        $response = $this->postJson('/api/fix-quiz-errors', [
+            'quizName' => $quizName,
+            'questions' => $questions,
+            'errors' => $errors,
+            'searchQuizErrors_flag' => $searchQuizErrors_flag,
+        ]);
+
+        // Проверка статуса ответа и структуры JSON
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'questions',
+                'quizName',
+                'errors' => [
+                    'cosmetic_errors',
+                    'minor_errors',
+                    'critical_errors',
+                    'logical_errors',
+                    'name_quiz_errors',
+                ],
+            ]);
+    }
+
+    /**
+     * Тест исправления ошибок с логическими ошибками.
+     */
+    public function test_fix_quiz_errors_with_logical_errors(): void
+    {
+        // Подготовка данных с логическими ошибками
+        $quizName = 'Тестовая викторина';
+        $questions = [
+            [
+                'id' => 1,
+                'question' => 'Какой язык программирования используется в Laravel?',
+                'answers' => ['PHP', 'PHP', 'Python', 'Java'],
+                'correctAnswerIndex' => 0,
+            ],
+        ];
+        $errors = [
+            'cosmeticErrors' => false,
+            'minorErrors' => false,
+            'logicalErrors' => true,
+            'cosmeticErrorQuizName' => false,
+        ];
+        $searchQuizErrors_flag = false;
+
+        // Вызов метода
+        $response = $this->postJson('/api/fix-quiz-errors', [
+            'quizName' => $quizName,
+            'questions' => $questions,
+            'errors' => $errors,
+            'searchQuizErrors_flag' => $searchQuizErrors_flag,
+        ]);
+
+        // Проверка статуса ответа и структуры JSON
+        $response->assertStatus(200)
+            ->assertJson([
+                'questions' => [
+                    [
+                        'id' => 1,
+                        'question' => 'Какой язык программирования используется в Laravel?',
+                        'answers' => ['PHP', 'Python', 'Java'],
+                        'correctAnswerIndex' => 0,
+                    ],
+                ],
+                'quizName' => 'Тестовая викторина',
+            ]);
+    }
+
+
+    /**
+     * --- Тестирование метода createQuiz ---
+     */
+
+    /**
+     * Тест успешного создания викторины.
+     */
+    public function test_create_quiz_successful_creation(): void
+    {
+        // Подготовка данных
+        $quizName = 'Тестовая викторина';
+        $questions = [
+            [
+                'id' => 1,
+                'question' => 'Какой язык программирования используется в Laravel?',
+                'answers' => ['JavaScript', 'PHP', 'Python', 'Java'],
+                'correctAnswerIndex' => 1,
+            ],
+        ];
+        $errors = [
+            'cosmeticErrors' => false,
+            'minorErrors' => false,
+            'logicalErrors' => false,
+            'cosmeticErrorQuizName' => false,
+        ];
+        $id_user = '6f17c6d3-ed20-4e48-985a-f6d0848fe175';
+
+        // Вызов метода
+        $response = $this->postJson('/api/create-quiz', [
+            'quizName' => $quizName,
+            'questions' => $questions,
+            'errors' => $errors,
+            'id_user' => $id_user,
+        ]);
+
+        // Проверка статуса ответа и структуры JSON
+        $response->assertStatus(201)
+            ->assertJson([
+                'status' => 'success',
+                'operation_index' => 1,
+            ]);
+    }
+
+    /**
+     * Тест создания викторины с исправлением ошибок.
+     */
+    public function test_create_quiz_with_error_fixing(): void
+    {
+        // Подготовка данных с ошибками
+        $quizName = '  Тестовая викторина  ';
+        $questions = [
+            [
+                'id' => 1,
+                'question' => '  Какой язык программирования используется в Laravel?  ',
+                'answers' => ['JavaScript', 'PHP', 'Python', 'Java'],
+                'correctAnswerIndex' => 1,
+            ],
+        ];
+        $errors = [
+            'cosmeticErrors' => true,
+            'minorErrors' => false,
+            'logicalErrors' => false,
+            'cosmeticErrorQuizName' => true,
+        ];
+        $id_user = '6f17c6d3-ed20-4e48-985a-f6d0848fe175';
+
+        // Вызов метода
+        $response = $this->postJson('/api/create-quiz', [
+            'quizName' => $quizName,
+            'questions' => $questions,
+            'errors' => $errors,
+            'id_user' => $id_user,
+        ]);
+
+        // Проверка статуса ответа и структуры JSON
+        $response->assertStatus(201)
+            ->assertJson([
+                'status' => 'success',
+                'operation_index' => 1,
+            ]);
+    }
+
+    /**
+     * Тест создания викторины с ошибками валидации.
+     */
+    public function test_create_quiz_with_validation_errors(): void
+    {
+        // Подготовка данных с ошибками валидации
+        $quizName = 'Тестовая викторина';
+        $questions = []; // Пустой массив вопросов
+        $errors = [
+            'cosmeticErrors' => false,
+            'minorErrors' => false,
+            'logicalErrors' => false,
+            'cosmeticErrorQuizName' => false,
+        ];
+        $id_user = '6f17c6d3-ed20-4e48-985a-f6d0848fe175';
+
+        // Вызов метода
+        $response = $this->postJson('/api/create-quiz', [
+            'quizName' => $quizName,
+            'questions' => $questions,
+            'errors' => $errors,
+            'id_user' => $id_user,
+        ]);
+
+        // Проверка статуса ответа и структуры JSON
+        $response->assertStatus(422)
+            ->assertJson([
+                'message' => 'Поле questions обязательно для заполнения.',
+                'errors' => [
+                    'questions' => [
+                        'Поле questions обязательно для заполнения.',
+                    ],
+                ],
+            ]);
     }
 
 }

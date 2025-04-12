@@ -545,22 +545,22 @@ class CreatorQuizHelper
 
             // Проверка на null для question
             if (is_null($question['question'])) {
-                $errors[] = ["id_error" => 1, "text_error" => "Вопрос не должен быть null"];
+                $errors[] = ["id_error" => 1, "text_error" => "Вопрос не должен быть null."];
             }
 
             // Проверка на количество ответов
             if (count($question['answers']) < 2) {
-                $errors[] = ["id_error" => 2, "text_error" => "Должно быть как минимум 2 ответа"];
+                $errors[] = ["id_error" => 2, "text_error" => "Должно быть как минимум 2 ответа."];
             }
 
             // Проверка на null для correctAnswerIndex
             if (is_null($question['correctAnswerIndex'])) {
-                $errors[] = ["id_error" => 3, "text_error" => "Индекс правильного ответа не может быть null"];
+                $errors[] = ["id_error" => 3, "text_error" => "Индекс правильного ответа не может быть null."];
             }
 
             if (!is_null($question['correctAnswerIndex'])) {
                 if (is_null($question['answers'][$question['correctAnswerIndex']])) {
-                    $errors[] = ["id_error" => 4, "text_error" => "Правильный ответ не может быть null"];
+                    $errors[] = ["id_error" => 4, "text_error" => "Правильный ответ не может быть null."];
                 }
             }
 
@@ -661,5 +661,7 @@ class CreatorQuizHelper
             }
         });
     }
+
+
 
 }

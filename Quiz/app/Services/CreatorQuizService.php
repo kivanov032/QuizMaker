@@ -5,14 +5,11 @@ namespace App\Services;
 use App\Helpers\CreatorQuizHelper;
 use App\Http\Requests\CreateQuizRequest;
 use App\Jobs\NotifyUserServerAboutUserQuiz;
-use App\Models\Quiz;
-use App\Models\QuizQuestion;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Queue;
-use Ramsey\Uuid\Uuid;
 
 class CreatorQuizService
 {

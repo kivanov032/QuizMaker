@@ -9,11 +9,11 @@ use Random\RandomException;
 class HelperTest extends TestCase
 {
 
-    //Тест на генерацию 6-разрядного числа
     /**
+     * Тест на генерацию 6-разрядного числа
      * @throws RandomException
      */
-    public function testGenerateVerificationCodeReturnsSixDigits(): void
+    public function test_GenerateVerificationCodeReturnsSixDigits(): void
     {
         $code = MailHelper::generateVerificationCode();
         $this->assertEquals(6, strlen($code));

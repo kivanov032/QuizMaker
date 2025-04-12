@@ -8,8 +8,10 @@ use PHPUnit\Framework\TestCase;
 class CreatorQuizHelperTest extends TestCase
 {
 
-    // Тест на функцию, которая обращает фактически пустые поля в null
-    public function test_CleanEmptyFields()
+    /**
+     * Тест на функцию, которая обращает фактически пустые поля в null
+     */
+    public function test_CleanEmptyFields(): void
     {
         $questions = [
             ["id" => 1, "question" => "   \n\t", 'answers' => ["John", "   ", "\t\n", "Doe"], "correctAnswerIndex" => 0],
@@ -34,8 +36,10 @@ class CreatorQuizHelperTest extends TestCase
     }
 
 
-    // Тест на поиск косметических ошибок
-    public function test_CheckDataForCosmeticErrors()
+    /**
+     * Тест на поиск косметических ошибок
+     */
+    public function test_CheckDataForCosmeticErrors(): void
     {
         $questions = [
             ["id" => 1, "question" => "1  2", "answers" => ["1", "2", "3"], "correctAnswerIndex" => 0],
@@ -123,8 +127,10 @@ class CreatorQuizHelperTest extends TestCase
     }
 
 
-    //Тест на 'трим' вопросов
-    public function test_TrimQuestions()
+    /**
+     * Тест на 'трим' вопросов
+     */
+    public function test_TrimQuestions(): void
     {
         $questions = [
             ["id" => 1, "question" => "   What is your name?   ", "answers" => ["John", "   ", "Doe"], "correctAnswerIndex" => 0],
@@ -153,8 +159,11 @@ class CreatorQuizHelperTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    // Тест на обрезку строк
-    public function test_TrimString()
+
+    /**
+     * Тест на обрезку строк
+     */
+    public function test_TrimString(): void
     {
         $testCases = [
             // Тестовые случаи с ожидаемыми результатами
@@ -180,8 +189,10 @@ class CreatorQuizHelperTest extends TestCase
     }
 
 
-    // Тест на поиск незначительных ошибок
-    public function test_CheckDataForMinorErrors()
+    /**
+     * Тест на поиск незначительных ошибок
+     */
+    public function test_CheckDataForMinorErrors(): void
     {
         $questions = [
             ["id" => 1, "question" => null, 'answers' => [null, null, null], "correctAnswerIndex" => 1],
@@ -238,8 +249,11 @@ class CreatorQuizHelperTest extends TestCase
         $this->assertEquals($expectedErrors, $minor_errors);
     }
 
-    // Тест на фильтрацию вопросов
-    public function test_FilterQuestions()
+
+    /**
+     * Тест на фильтрацию вопросов
+     */
+    public function test_FilterQuestions(): void
     {
         $questions = [
             ["id" => 1, "question" => "What is your name?", "answers" => ["Alice", "Bob"], "correctAnswerIndex" => 0],
@@ -265,8 +279,11 @@ class CreatorQuizHelperTest extends TestCase
         $this->assertEquals($expectedQuestions, $filteredQuestions);
     }
 
-    // Тест на фильтрацию вопросов (случай, если все вопросы пустые)
-    public function test_FilterQuestionsWithAllEmptyQuestions()
+
+    /**
+     * Тест на фильтрацию вопросов (случай, если все вопросы пустые)
+     */
+    public function test_FilterQuestionsWithAllEmptyQuestions(): void
     {
         $questions = [
             ["id" => 1, "question" => null, "answers" => [null, null], "correctAnswerIndex" => 0],
@@ -285,8 +302,10 @@ class CreatorQuizHelperTest extends TestCase
     }
 
 
-    // Тест на фильтрацию ответов в вопросах
-    public function test_FilterAnswers()
+    /**
+     * Тест на фильтрацию ответов в вопросах
+     */
+    public function test_FilterAnswers(): void
     {
         $questions = [
             ["id" => 1, "question" => "What is your favorite fruit?", "answers" => ["Apple", "Banana", "Cherry"], "correctAnswerIndex" => 2],
@@ -318,8 +337,11 @@ class CreatorQuizHelperTest extends TestCase
         $this->assertEquals($expectedQuestions, $filteredQuestions);
     }
 
-    // Тест на поиск логических ошибок
-    public function test_CheckDataForLogicalErrors()
+
+    /**
+     * Тест на поиск логических ошибок
+     */
+    public function test_CheckDataForLogicalErrors(): void
     {
         $questions = [
             ["id" => 1, "question" => "Какой язык программирования вы изучаете?", "answers" => ["PHP", "JavaScript", "PHP"], "correctAnswerIndex" => 0],
@@ -355,8 +377,11 @@ class CreatorQuizHelperTest extends TestCase
         $this->assertEquals($expectedErrors, $logic_errors);
     }
 
-    // Тест на исправление логических ошибок
-    public function test_FixLogicalErrors()
+
+    /**
+     * Тест на исправление логических ошибок
+     */
+    public function test_FixLogicalErrors(): void
     {
         $questions = [
             ["id" => 1, "question" => "1", "answers" => ["1", "1", "1"], "correctAnswerIndex" => 2],
@@ -377,8 +402,11 @@ class CreatorQuizHelperTest extends TestCase
         $this->assertEquals($expectedErrors, $newQuestions);
     }
 
-    // Тест на поиск критических ошибок
-    public function test_CheckDataForCriticalErrors()
+
+    /**
+     * Тест на поиск критических ошибок
+     */
+    public function test_CheckDataForCriticalErrors(): void
     {
         $questions = [
             ["id" => 1, "question" => null, "answers" => ["Answer 1", "Answer 2"], "correctAnswerIndex" => 0],
@@ -391,20 +419,20 @@ class CreatorQuizHelperTest extends TestCase
             [
                 "id_question" => 1,
                 "errors" => [
-                    ["id_error" => 1, "text_error" => "Вопрос не должен быть null"]
+                    ["id_error" => 1, "text_error" => "Вопрос не должен быть null."]
                 ]
             ],
             [
                 "id_question" => 2,
                 "errors" => [
-                    ["id_error" => 2, "text_error" => "Должно быть как минимум 2 ответа"],
-                    ["id_error" => 3, "text_error" => "Индекс правильного ответа не может быть null"]
+                    ["id_error" => 2, "text_error" => "Должно быть как минимум 2 ответа."],
+                    ["id_error" => 3, "text_error" => "Индекс правильного ответа не может быть null."]
                 ]
             ],
             [
                 "id_question" => 3,
                 "errors" => [
-                    ["id_error" => 4, "text_error" => "Правильный ответ не может быть null"]
+                    ["id_error" => 4, "text_error" => "Правильный ответ не может быть null."]
                 ]
             ]
         ];
@@ -413,7 +441,11 @@ class CreatorQuizHelperTest extends TestCase
         $this->assertEquals($expectedErrors, $critical_errors);
     }
 
-    public function test_CheckNameQuizForErrors()
+
+    /**
+     * Тест на поиск ошибок викторины
+     */
+    public function test_CheckNameQuizForErrors(): void
     {
         // Тест 1: Название викторины корректное
         $quizName1 = "Программирование на PHP";
@@ -455,6 +487,15 @@ class CreatorQuizHelperTest extends TestCase
 
         $this->assertEquals($expectedErrors5, $name_quiz_errors5);
     }
+
+    /**
+     * Тест на создание викторины.
+     */
+    public function test_saveQuizToDatabase(): void
+    {
+        //НАПИСАТЬ!!!!!!!!!!!!!!!!!!!!!!!!
+    }
+
 
 }
 

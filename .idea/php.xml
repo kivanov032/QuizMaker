@@ -241,6 +241,13 @@
       <path value="$PROJECT_DIR$/User/vendor/symfony/polyfill-uuid" />
       <path value="$PROJECT_DIR$/User/vendor/symfony/finder" />
       <path value="$PROJECT_DIR$/User/vendor/myclabs/deep-copy" />
+      <path value="$PROJECT_DIR$/Quiz/vendor/darkaonline/l5-swagger" />
+      <path value="$PROJECT_DIR$/Quiz/vendor/psr/cache" />
+      <path value="$PROJECT_DIR$/Quiz/vendor/doctrine/annotations" />
+      <path value="$PROJECT_DIR$/Quiz/vendor/zircote/swagger-php" />
+      <path value="$PROJECT_DIR$/Quiz/vendor/swagger-api/swagger-ui" />
+      <path value="$PROJECT_DIR$/Quiz/vendor/nextapps/laravel-swagger-ui" />
+      <path value="$PROJECT_DIR$/Quiz/vendor/predis/predis" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.4" />
