@@ -4,7 +4,6 @@ namespace Database\Factories;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
@@ -24,7 +23,7 @@ class UserFactory extends Factory
             'id_user' => $this->faker->uuid(),
             'login' => $this->faker->userName(),
             'email' => $this->faker->unique()->safeEmail(),
-            'password' => bcrypt('password123'),  // Пароль
+            'password' => bcrypt('password123'),
             'created_quizzes_counter' => 0,
             'taken_quizzes_counter' => 0,
         ];

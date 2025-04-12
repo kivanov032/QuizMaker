@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\MailSenderController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -25,6 +26,10 @@ Route::post('/signup', [AuthController::class, 'signup']);
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::post('/increment-created-quizzes-counter', [AuthController::class, 'incrementCreatedQuizzesCounter']);
+
+
+Route::post('/send-mail-for-code-confirmation', [MailSenderController::class, 'sendMailForCodeConfirmation']);
+Route::post('/confirm-code', [MailSenderController::class, 'confirmCode']);
 
 
 
