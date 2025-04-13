@@ -1,91 +1,90 @@
 <?php
-
 namespace Tests\Feature;
 
+use App\Http\Controllers\Api\AuthController;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class AuthControllerTest extends TestCase
 {
     /**
-     * Тесты для Входа
+     * --- Тестирование метода checkActivity ---
      */
 
-    // Успешный логин
-    public function test_login_successful_with_valid_credentials(): void
+    /**
+     * Тест успешного подключения к базе данных.
+     */
+    public function test_check_activity_successful_database_connection(): void
     {
-        // Создаем пользователя через фабрику
-        $user = \App\Models\User::factory()->create([
-            'login' => 'password123',
-            'password' => bcrypt('password/123'),
-        ]);
+        // Вызов метода
+        $response = $this->getJson('/api/check-activity');
 
-        // Отправляем запрос
-        $response = $this->postJson('/api/login', [
-            'login' => 'password123',
-            'password' => 'password/123',
-        ]);
-
-        // Проверяем успешный ответ
-        $response->assertStatus(200);
-        $response->assertJsonStructure(['token']);
-
-        // Удаляем созданного пользователя
-        $user->delete();
+        // Проверка статуса ответа и структуры JSON
+        $response->assertStatus(200)
+            ->assertJson([
+                'status' => 'success',
+                'message' => 'Сервер активен, соединение с БД успешно установлено.',
+                'server_status' => 'Активен',
+                'database_status' => 'Подключение к БД успешно',
+            ]);
     }
 
-    // Ошибка, если email невалидный
-    public function test_login_fails_with_invalid_login_format(): void
+    /**
+     * Тест ошибки подключения к базе данных.
+     */
+    public function test_check_activity_fails_with_database_connection_error(): void
     {
-        $response = $this->postJson('/api/login', [
-            'login' => 'not-an-email',
-            'password' => 'password/123',
-        ]);
+        // Имитируем ошибку подключения к БД
+        DB::shouldReceive('connection->getPdo')
+            ->andThrow(new \PDOException('Ошибка подключения к БД'));
 
-        $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['login']);
+        // Вызов метода
+        $response = $this->getJson('/api/check-activity');
+
+        // Проверка статуса ответа и структуры JSON
+        $response->assertStatus(500)
+            ->assertJson([
+                'status' => 'error',
+                'code' => 'DB_CONNECTION_ERROR',
+                'message' => 'Ошибка подключения к БД.',
+                'server_status' => 'Активен',
+                'database_status' => 'Ошибка подключения к БД',
+            ]);
     }
 
-    // Ошибка, если пароль не передан
-    public function test_login_fails_with_missing_password(): void
+    /**
+     * Тест неизвестной ошибки при подключении к базе данных.
+     */
+    public function test_check_activity_fails_with_unknown_error(): void
     {
-        $response = $this->postJson('/api/login', [
-            'login' => 'test@example.com',
-            // Пароль отсутствует
-        ]);
+        // Имитируем неизвестную ошибку
+        DB::shouldReceive('connection->getPdo')
+            ->andThrow(new \Exception('Неизвестная ошибка'));
 
-        $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['password']);
-    }
+        // Вызов метода
+        $response = $this->getJson('/api/check-activity');
 
-    // Ошибка, если пользователь с таким email не существует
-    public function test_login_fails_if_user_does_not_exist(): void
-    {
-        $response = $this->postJson('/api/login', [
-            'login' => '123456',
-            'password' => 'password/123',
-        ]);
-
-        $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['login']);
-    }
-
-    // Ошибка, если переданы пустые данные
-    public function test_login_fails_with_empty_data(): void
-    {
-        $response = $this->postJson('/api/login', []);
-
-        $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['login', 'password']);
+        // Проверка статуса ответа и структуры JSON
+        $response->assertStatus(500)
+            ->assertJson([
+                'status' => 'error',
+                'code' => 'UNKNOWN_ERROR',
+                'message' => 'Неизвестная ошибка при подключении к БД.',
+                'server_status' => 'Активен',
+                'database_status' => 'Неизвестная ошибка',
+            ]);
     }
 
 
     /**
-     * Тесты Регистрации
+     *  --- Тестирование метода signup ---
      */
 
-
-    // Успешную регистрация
+    /**
+     * Тест успешной регистрации с валидными данными.
+     */
     public function test_signup_successful_with_valid_data(): void
     {
         $response = $this->postJson('/api/signup', [
@@ -95,8 +94,9 @@ class AuthControllerTest extends TestCase
             'password_confirmation' => 'password/123',
         ]);
 
-        $response->assertStatus(200);
-        $response->assertJsonStructure(['user', 'token']);
+        // Проверяем статус ответа и структуру JSON
+        $response->assertStatus(200)
+            ->assertJsonStructure(['user', 'token']);
 
         // Получаем данные созданного пользователя
         $user = json_decode($response->getContent(), true)['user'];
@@ -105,7 +105,9 @@ class AuthControllerTest extends TestCase
         User::find($user['id_user'])->delete();
     }
 
-    // Ошибка, если логин не передан
+    /**
+     * Тест ошибки при регистрации без логина.
+     */
     public function test_signup_fails_without_login(): void
     {
         $response = $this->postJson('/api/signup', [
@@ -114,15 +116,18 @@ class AuthControllerTest extends TestCase
             'password_confirmation' => 'password123',
         ]);
 
-        $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['login']);
+        // Проверяем статус ответа и наличие ошибки валидации
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['login']);
     }
 
-    // Ошибка, если логин уже существует
+    /**
+     * Тест ошибки при регистрации, если логин уже занят.
+     */
     public function test_signup_fails_if_login_is_taken(): void
     {
         // Создаем пользователя с таким же логином
-        $user = \App\Models\User::factory()->create(['login' => 'newuser1']);
+        $user = User::factory()->create(['login' => 'newuser1']);
 
         $response = $this->postJson('/api/signup', [
             'login' => 'newuser1',
@@ -131,13 +136,17 @@ class AuthControllerTest extends TestCase
             'password_confirmation' => 'password/123',
         ]);
 
-        $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['login']);
+        // Проверяем статус ответа и наличие ошибки валидации
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['login']);
 
+        // Удаляем созданного пользователя
         $user->delete();
     }
 
-    // Ошибка, если email невалидный
+    /**
+     * Тест ошибки при регистрации с невалидным email.
+     */
     public function test_signup_fails_with_invalid_email_format(): void
     {
         $response = $this->postJson('/api/signup', [
@@ -147,11 +156,14 @@ class AuthControllerTest extends TestCase
             'password_confirmation' => 'password/123',
         ]);
 
-        $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['email']);
+        // Проверяем статус ответа и наличие ошибки валидации
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['email']);
     }
 
-    // Ошибка, если пароль не передан
+    /**
+     * Тест ошибки при регистрации без пароля.
+     */
     public function test_signup_fails_without_password(): void
     {
         $response = $this->postJson('/api/signup', [
@@ -160,11 +172,14 @@ class AuthControllerTest extends TestCase
             // Пароль отсутствует
         ]);
 
-        $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['password']);
+        // Проверяем статус ответа и наличие ошибки валидации
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['password']);
     }
 
-    // Ошибка, если пароли не совпадают
+    /**
+     * Тест ошибки при регистрации, если пароли не совпадают.
+     */
     public function test_signup_fails_if_passwords_do_not_match(): void
     {
         $response = $this->postJson('/api/signup', [
@@ -174,11 +189,14 @@ class AuthControllerTest extends TestCase
             'password_confirmation' => 'password/1234',
         ]);
 
-        $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['password']);
+        // Проверяем статус ответа и наличие ошибки валидации
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['password']);
     }
 
-    // Ошибка, если пароль слишком короткий
+    /**
+     * Тест ошибки при регистрации, если пароль слишком короткий.
+     */
     public function test_signup_fails_if_password_is_too_short(): void
     {
         $response = $this->postJson('/api/signup', [
@@ -188,11 +206,14 @@ class AuthControllerTest extends TestCase
             'password_confirmation' => 'short',
         ]);
 
-        $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['password']);
+        // Проверяем статус ответа и наличие ошибки валидации
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['password']);
     }
 
-    // Ошибка, если пароль не содержит символов
+    /**
+     * Тест ошибки при регистрации, если пароль не содержит символов.
+     */
     public function test_signup_fails_if_password_does_not_contain_symbols(): void
     {
         $response = $this->postJson('/api/signup', [
@@ -202,36 +223,325 @@ class AuthControllerTest extends TestCase
             'password_confirmation' => 'password123',
         ]);
 
-        $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['password']);
+        // Проверяем статус ответа и наличие ошибки валидации
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['password']);
+    }
+
+    /**
+     *  --- Тестирование метода login ---
+     */
+
+    /**
+     * Тест успешного входа с валидными данными.
+     */
+    public function test_login_successful_with_valid_credentials(): void
+    {
+        // Создаем пользователя через фабрику
+        $user = User::factory()->create([
+            'login' => 'password123',
+            'password' => bcrypt('password/123'),
+        ]);
+
+        // Отправляем запрос на вход
+        $response = $this->postJson('/api/login', [
+            'login' => 'password123',
+            'password' => 'password/123',
+        ]);
+
+        // Проверяем статус ответа и структуру JSON
+        $response->assertStatus(200)
+            ->assertJsonStructure(['token']);
+
+        // Удаляем созданного пользователя
+        $user->delete();
+    }
+
+    /**
+     * Тест ошибки при входе с невалидным логином.
+     */
+    public function test_login_fails_with_invalid_login_format(): void
+    {
+        $response = $this->postJson('/api/login', [
+            'login' => 'not-an-email',
+            'password' => 'password/123',
+        ]);
+
+        // Проверяем статус ответа и наличие ошибки валидации
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['login']);
+    }
+
+    /**
+     * Тест ошибки при входе без пароля.
+     */
+    public function test_login_fails_with_missing_password(): void
+    {
+        $response = $this->postJson('/api/login', [
+            'login' => 'test@example.com',
+            // Пароль отсутствует
+        ]);
+
+        // Проверяем статус ответа и наличие ошибки валидации
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['password']);
+    }
+
+    /**
+     * Тест ошибки при входе, если пользователь не существует.
+     */
+    public function test_login_fails_if_user_does_not_exist(): void
+    {
+        $response = $this->postJson('/api/login', [
+            'login' => '123456',
+            'password' => 'password/123',
+        ]);
+
+        // Проверяем статус ответа и наличие ошибки валидации
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['login']);
+    }
+
+    /**
+     * Тест ошибки при входе с пустыми данными.
+     */
+    public function test_login_fails_with_empty_data(): void
+    {
+        $response = $this->postJson('/api/login', []);
+
+        // Проверяем статус ответа и наличие ошибок валидации
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['login', 'password']);
     }
 
 
     /**
-     * Тесты Выхода
+     *  --- Тестирование метода logout ---
      */
 
-
-
-    // Успешного выход (удаления токена)
+    /**
+     * Тест успешного выхода (удаления токена).
+     */
     public function test_logout_successfully(): void
     {
+        // Создаем пользователя и токен
         $user = User::factory()->create();
         $token = $user->createToken('main')->plainTextToken;
 
+        // Отправляем запрос на выход с токеном
         $response = $this->withHeader('Authorization', 'Bearer ' . $token)
             ->postJson('/api/logout');
 
+        // Проверяем статус ответа
         $response->assertStatus(204);
 
+        // Удаляем созданного пользователя
+        $user->delete();
+    }
+
+    /**
+     * Тест ошибки при выходе без авторизации (без токена).
+     */
+    public function test_logout_fails_without_token(): void
+    {
+        $response = $this->postJson('/api/logout');
+
+        // Проверяем статус ответа
+        $response->assertStatus(401);
+    }
+
+
+    /**
+     * --- Тестирование метода getUser ---
+     */
+
+    /**
+     * Тест успешного получения данных пользователя.
+     */
+    public function test_get_user_successful_with_valid_token(): void
+    {
+        // Создаем пользователя через фабрику
+        $user = User::factory()->create();
+        $token = $user->createToken('main')->plainTextToken;
+
+        // Отправляем запрос с токеном
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->getJson('/api/user');
+
+        // Проверяем статус ответа и структуру JSON
+        $response->assertStatus(200)
+            ->assertJson([
+                'user' => [
+                    'id_user' => $user->id_user,
+                    'login' => $user->login,
+                    'email' => $user->email,
+                ],
+                'message' => 'Токен действителен',
+            ]);
+
+        // Удаляем созданного пользователя
+        $user->delete();
+    }
+
+    /**
+     * Тест ошибки при отсутствии токена.
+     */
+    public function test_get_user_fails_without_token(): void
+    {
+        // Отправляем запрос без токена
+        $response = $this->getJson('/api/user');
+
+        // Проверяем статус ответа и сообщение об ошибке
+        $response->assertStatus(401)
+            ->assertJson([
+                'message' => 'Unauthenticated.',
+            ]);
+    }
+
+    /**
+     * Тест ошибки при недействительном токене.
+     */
+    public function test_get_user_fails_with_invalid_token(): void
+    {
+        // Отправляем запрос с недействительным токеном
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer invalid_token',
+        ])->getJson('/api/user');
+
+        // Проверяем статус ответа и сообщение об ошибке
+        $response->assertStatus(401)
+            ->assertJson([
+                'message' => 'Unauthenticated.',
+            ]);
+    }
+
+    /**
+     * Тест внутренней ошибки сервера.
+     */
+    public function test_get_user_fails_with_server_error(): void
+    {
+        // Создаем пользователя через фабрику
+        $user = User::factory()->create();
+
+        // Аутентифицируем пользователя
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        // Имитируем внутреннюю ошибку сервера
+        $this->mock(AuthController::class, function ($mock) {
+            $mock->shouldReceive('getUser')
+                ->andThrow(new \Exception('Произошла внутренняя ошибка сервера.'));
+        });
+
+        // Отправляем запрос с токеном
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->getJson('/api/user');
+
+        // Проверяем статус ответа и сообщение об ошибке
+        $response->assertStatus(500);
+
+        // Удаляем созданного пользователя
         $user->delete();
     }
 
 
-    // Выхода без авторизации (без токена)
-    public function test_logout_fails_without_token(): void
+    /**
+     * --- Тестирование метода incrementCreatedQuizzesCounter ---
+     */
+
+    /**
+     * Тест успешного увеличения счетчика созданных викторин.
+     */
+    public function test_increment_created_quizzes_counter_successful(): void
     {
-        $response = $this->postJson('/api/logout');
-        $response->assertStatus(401);
+        // Создаем пользователя через фабрику
+        $user = User::factory()->create(['created_quizzes_counter' => 5]);
+
+        // Отправляем запрос с UUID пользователя
+        $response = $this->postJson('/api/increment-created-quizzes-counter', [
+            'id_user' => $user->id_user,
+        ]);
+
+        // Проверяем статус ответа и структуру JSON
+        $response->assertStatus(200)
+            ->assertJson([
+                'user' => [
+                    'id_user' => $user->id_user,
+                    'created_quizzes_counter' => 6,
+                ],
+                'message' => 'Счетчик созданных викторин успешно обновлен',
+            ]);
+
+        // Удаляем созданного пользователя
+        $user->delete();
     }
+
+    /**
+     * Тест ошибки при отсутствии UUID пользователя.
+     */
+    public function test_increment_created_quizzes_counter_fails_without_user_id(): void
+    {
+        // Отправляем запрос без UUID пользователя
+        $response = $this->postJson('/api/increment-created-quizzes-counter', []);
+
+        // Проверяем статус ответа и сообщение об ошибке
+        $response->assertStatus(422)
+            ->assertJson([
+                'message' => 'Поле id user обязательно для заполнения.',
+                'errors' => [
+                    'id_user' => ['Поле id user обязательно для заполнения.'],
+                ],
+            ]);
+    }
+
+    /**
+     * Тест ошибки при несуществующем UUID пользователя.
+     */
+    public function test_increment_created_quizzes_counter_fails_with_invalid_user_id(): void
+    {
+        // Генерируем случайный UUID
+        $randomUuid = Str::uuid();
+
+        // Отправляем запрос с несуществующим UUID
+        $response = $this->postJson('/api/increment-created-quizzes-counter', [
+            'id_user' => $randomUuid,
+        ]);
+
+        // Проверяем статус ответа и сообщение об ошибке
+        $response->assertStatus(404)
+            ->assertJson([
+                'message' => 'Пользователь не найден',
+            ]);
+    }
+
+    /**
+     * Тест внутренней ошибки сервера.
+     */
+    public function test_increment_created_quizzes_counter_fails_with_server_error(): void
+    {
+        // Создаем пользователя через фабрику
+        $user = User::factory()->create();
+
+        // Имитируем внутреннюю ошибку сервера
+        $this->mock(AuthController::class, function ($mock) {
+            $mock->shouldReceive('where->first')
+                ->andThrow(new \Exception('Произошла внутренняя ошибка сервера.'));
+        });
+
+        // Отправляем запрос с UUID пользователя
+        $response = $this->postJson('/api/increment-created-quizzes-counter', [
+            'id_user' => $user->id_user,
+        ]);
+
+        // Проверяем статус ответа и сообщение об ошибке
+        $response->assertStatus(500);
+
+        // Удаляем созданного пользователя
+        $user->delete();
+    }
+
+
 }
+
+

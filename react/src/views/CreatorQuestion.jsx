@@ -23,7 +23,7 @@ export default function CreatorQuestion() {
             }
             isFirstRender.current = false;
         }
-    }, [questions.length]);
+    }, [addQuestion, questions.length]);
 
     useEffect(() => {
         const currentQuestion = getQuestion(parseInt(id));
@@ -36,7 +36,7 @@ export default function CreatorQuestion() {
             setAnswers(['', '', '', '']);
             setCorrectAnswerIndex(null);
         }
-    }, [questions, id]);
+    }, [questions, getQuestion, id]);
 
     const handleQuestionChange = (value) => {
         setQuestion(value);

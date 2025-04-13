@@ -13,7 +13,6 @@ export default function MainLayout() {
         // Проверяем, есть ли пользователь и токен в контексте
         if (!user || !token) {
             const storedToken = getStoredToken(); // Получаем токен из localStorage
-
             if (storedToken) {
                 const checkToken = async () => {
                     try {

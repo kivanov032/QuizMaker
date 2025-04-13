@@ -1,5 +1,5 @@
-import React, { useState, useContext, useEffect } from 'react';
-import {Outlet, Link, Navigate, useNavigate} from "react-router-dom";
+import  { useState, useContext, useEffect } from 'react';
+import {Outlet, Link, useNavigate} from "react-router-dom";
 import { QuestionContext } from '../context/QuestionContext';
 import {sendQuestionsToFixError, sendQuestionsToRecordInBD, sendQuestionsToSearchError} from "../SenderQuiz.js";
 import "./CreatorLayout.css";
@@ -10,8 +10,10 @@ export default function CreatorLayout() {
     const { questions, setQuestions  } = useContext(QuestionContext); //Контекст вопросов
     const [quizName, setQuizName] = useState(''); //Состояние для названия викторины
     const [quizErrors, setQuizErrors] = useState(null); //Состояние для отображения ошибок
-    const { token } = useStateContext(); //Состояние для токена
+    const { user} = useStateContext(); //Состояние для токена
     const maxNameQuizLength = 200; // Максимальная длина названия викторины
+
+
 
     //Состояние для чекбоксов ошибок (метки на то, какие ошибки исправить (все кроме критических))
     const [checkboxes, setCheckboxes] = useState({
@@ -37,16 +39,15 @@ export default function CreatorLayout() {
         syntaxQuestionErrors: false,
     });
 
-    if (!token) {
-        return <Navigate to="/login" />; //Если нет токена, то переброс на регистрацию
-    }
-
-    // useEffect(() => {
-    //     //console.log("quizErrors updated:", quizErrors);
-    // }, [quizErrors]);
+    // if (!token) {
+    //     return <Navigate to="/login"/>; //Если нет токена, то переброс на регистрацию
+    // }
 
     //Хук для автоматического обновления состояния expandedSections при изменении quizErrors.
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
+        console.log(user.id_user)
+
         if (quizErrors) {
             const hasCriticalQuizErrors = quizErrors?.name_quiz_errors?.critical_error || false;
             const hasCriticalQuestionErrors = quizErrors?.critical_errors?.length > 0;
@@ -154,8 +155,9 @@ export default function CreatorLayout() {
     // Функция для отправки данных по викторине, исправление отмеченных ошибок и отправка данных в БД для записи;
     const handleConfirmFinishQuiz = async () => {
         try {
+            console.log(user.id_user)
             checkboxes.minorErrors = true;
-            const response = await sendQuestionsToRecordInBD(quizName, questions, checkboxes);
+            const response = await sendQuestionsToRecordInBD(quizName, questions, checkboxes, user.id_user);
             if (response.status === 'success') {
                 console.log("Операция успешна, индекс операции:", response.operation_index);
                 alert("Викторина успешно создана!")

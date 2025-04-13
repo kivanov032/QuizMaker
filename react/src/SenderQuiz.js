@@ -12,7 +12,7 @@ export const sendQuestionsToSearchError = async (quizName, questions) => {
     try {
         console.log('Отправка запроса для поиска ошибок в викторине:', { quizName, questions });
 
-        const response = await axios.post(`${BASE_URL}/api/searchQuizErrors`, {
+        const response = await axios.post(`${BASE_URL}/api/search-quiz-errors`, {
             questions,
             quizName,
         });
@@ -35,7 +35,7 @@ export const sendQuestionsToFixError = async (quizName, questions, errors) => {
     try {
         console.log('Отправка запроса для исправления ошибок в викторине:', { quizName, questions, errors });
 
-        const response = await axios.post(`${BASE_URL}/api/fixQuizErrors`, {
+        const response = await axios.post(`${BASE_URL}/api/fix-quiz-errors`, {
             questions,
             quizName,
             errors,
@@ -64,20 +64,24 @@ export const sendQuestionsToFixError = async (quizName, questions, errors) => {
 };
 
 /**
- * Отправляет вопросы для записи в базу данных (с предварительной обработкой ошибок)
- * @param {string} quizName - Название викторины.
- * @param {Array} questions - Список вопросов.
- * @param {{cosmeticErrorQuizName: boolean, cosmeticErrors: boolean, minorErrors: boolean, logicalErrors: boolean}} errors - Список ошибок.
- * @returns {Promise} - Ответ от сервера.
+ * Отправляет вопросы для записи в базу данных с предварительной обработкой ошибок.
+ *
+ * @param {string} quizName - Название викторины. Должно быть уникальным и не пустым.
+ * @param {Array<Object>} questions - Список вопросов. Каждый вопрос должен быть объектом с полями, соответствующими структуре вопроса.
+ * @param {Object} errors - Объект, содержащий флаги ошибок для обработки.
+ * @param {number} id_user - Идентификатор пользователя, создающего викторину.
+ * @returns {Promise<Object>} - Ответ от сервера. В случае успеха возвращает объект с данными, подтверждающими запись в БД.
+ * @throws {Object} - В случае ошибки выбрасывает объект ответа сервера с деталями ошибки.
  */
-export const sendQuestionsToRecordInBD = async (quizName, questions, errors) => {
+export const sendQuestionsToRecordInBD = async (quizName, questions, errors, id_user) => {
     try {
-        console.log('Отправка запроса для записи вопросов в БД:', { quizName, questions, errors });
+        console.log('Отправка запроса для записи вопросов в БД:', { quizName, questions, errors, id_user});
 
-        const response = await axios.post(`${BASE_URL}/api/createQuizWithQuestions`, {
+        const response = await axios.post(`${BASE_URL}/api/create-quiz`, {
             questions,
             quizName,
             errors,
+            id_user
         });
 
         console.log('Ответ от сервера:', response.data);
@@ -88,15 +92,19 @@ export const sendQuestionsToRecordInBD = async (quizName, questions, errors) => 
     }
 };
 
+
 /**
- * Проверяет соединение с базой данных.
- * @returns {Promise} - Результат проверки соединения.
+ * Проверяет соединение с базой данных через API.
+ * @returns {Promise<Object>} - Объект с результатом проверки или ошибкой.
+ * @property {string} [status] - Статус ответа ('success' или 'error').
+ * @property {string} [message] - Сообщение от сервера.
+ * @property {string} [error] - Описание ошибки, если она возникла.
  */
-export const checkConnectionWithBD = async () => {
+export const checkActivityServerAndBD = async () => {
     try {
         console.log('Проверка соединения с БД...');
 
-        const response = await axios.get(`${BASE_URL}/api/checkConnectionWithBD`);
+        const response = await axios.get(`${BASE_URL}/api/check-activity`);
 
         console.log('Ответ от сервера:', response.data);
 
@@ -109,7 +117,9 @@ export const checkConnectionWithBD = async () => {
             return { error: errorMessage };
         }
     } catch (error) {
-        console.error('Ошибка при проверке соединения с сервером:', error);
-        return { error: error.response || error };
+        const errorMessage = error.response?.data?.message || 'Ошибка при проверке соединения с сервером';
+        console.error(errorMessage);
+        return { error: errorMessage };
     }
 };
+

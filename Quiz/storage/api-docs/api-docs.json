@@ -1,0 +1,983 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Документация к серверу Quiz",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/": {},
+        "/api/check-activity": {
+            "get": {
+                "tags": [
+                    "QuizDatabase"
+                ],
+                "summary": "Проверка связи с базой данных",
+                "description": "Метод проверяет активность сервера и соединение с базой данных.",
+                "operationId": "10882c865081a3cd9540037a1147beff",
+                "responses": {
+                    "200": {
+                        "description": "Успешное подключение к БД",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Сервер активен, соединение с БД успешно установлено."
+                                        },
+                                        "server_status": {
+                                            "type": "string",
+                                            "example": "Активен"
+                                        },
+                                        "database_status": {
+                                            "type": "string",
+                                            "example": "Подключение к БД успешно"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка подключения к БД",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "oneOf": [
+                                        {
+                                            "properties": {
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "error"
+                                                },
+                                                "code": {
+                                                    "type": "string",
+                                                    "example": "DB_CONNECTION_ERROR"
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Ошибка подключения к БД."
+                                                },
+                                                "server_status": {
+                                                    "type": "string",
+                                                    "example": "Активен"
+                                                },
+                                                "database_status": {
+                                                    "type": "string",
+                                                    "example": "Ошибка подключения к БД"
+                                                },
+                                                "error": {
+                                                    "type": "string",
+                                                    "example": "Сообщение об ошибке"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        {
+                                            "properties": {
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "error"
+                                                },
+                                                "code": {
+                                                    "type": "string",
+                                                    "example": "UNKNOWN_ERROR"
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Неизвестная ошибка при подключении к БД."
+                                                },
+                                                "server_status": {
+                                                    "type": "string",
+                                                    "example": "Активен"
+                                                },
+                                                "database_status": {
+                                                    "type": "string",
+                                                    "example": "Неизвестная ошибка"
+                                                },
+                                                "error": {
+                                                    "type": "string",
+                                                    "example": "Сообщение об ошибке"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/search-quiz-errors": {
+            "post": {
+                "tags": [
+                    "CreatorQuiz"
+                ],
+                "summary": "Анализ викторины на ошибки",
+                "description": "Метод проверяет вопросы и название викторины на наличие ошибок и возвращает их список.",
+                "operationId": "4569bf5ffcc7ce4e1bd2a094e20852c8",
+                "requestBody": {
+                    "description": "Данные викторины для анализа",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "questions"
+                                ],
+                                "properties": {
+                                    "questions": {
+                                        "description": "Массив вопросов викторины",
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "id": {
+                                                    "description": "Уникальный идентификатор вопроса.",
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "question": {
+                                                    "description": "Текст вопроса. Может быть пустым или содержать `null`.",
+                                                    "type": "string",
+                                                    "example": "What is your name?"
+                                                },
+                                                "answers": {
+                                                    "description": "Массив вариантов ответов. Может содержать пустые строки или `null`.",
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "John"
+                                                    }
+                                                },
+                                                "correctAnswerIndex": {
+                                                    "description": "Индекс правильного ответа в массиве answers.",
+                                                    "type": "integer",
+                                                    "example": 0
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "quizName": {
+                                        "description": "Название викторины. Если отсутствует, используется пустая строка.",
+                                        "type": "string",
+                                        "example": "Тест по программированию"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Успешный анализ викторины",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "cosmetic_errors": {
+                                            "description": "Список косметических ошибок. Каждая ошибка содержит информацию о вопросе и типе ошибки.",
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id_question": {
+                                                        "description": "Уникальный идентификатор вопроса.",
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "errors": {
+                                                        "description": "Массив ошибок для данного вопроса.",
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "id_error": {
+                                                                    "description": "Уникальный идентификатор ошибки (1 — ошибка в вопросе, 2 — ошибка в ответе).",
+                                                                    "type": "integer",
+                                                                    "example": 1
+                                                                },
+                                                                "text_error": {
+                                                                    "description": "Описание ошибки.",
+                                                                    "type": "string",
+                                                                    "example": "В вопросе викторины обнаружены лишние пробелы."
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "minor_errors": {
+                                            "description": "Список незначительных ошибок. Каждая ошибка содержит информацию о вопросе и типе ошибки.",
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id_question": {
+                                                        "description": "Уникальный идентификатор вопроса.",
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "errors": {
+                                                        "description": "Массив ошибок для данного вопроса.",
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "id_error": {
+                                                                    "description": "Уникальный идентификатор ошибки (1 — незаполненная страница вопроса, 2 — незаполненный вариант ответа).",
+                                                                    "type": "integer",
+                                                                    "example": 1
+                                                                },
+                                                                "text_error": {
+                                                                    "description": "Описание ошибки.",
+                                                                    "type": "string",
+                                                                    "example": "Создана страница вопроса, но она не заполнена."
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "logical_errors": {
+                                            "description": "Список логических ошибок. Каждая ошибка содержит информацию о вопросе и типе ошибки.",
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id_question": {
+                                                        "description": "Уникальный идентификатор вопроса.",
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "errors": {
+                                                        "description": "Массив ошибок для данного вопроса.",
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "id_error": {
+                                                                    "description": "Уникальный идентификатор ошибки (1 — дублирование вопроса, 2 — дублирование ответа).",
+                                                                    "type": "integer",
+                                                                    "example": 1
+                                                                },
+                                                                "text_error": {
+                                                                    "description": "Описание ошибки.",
+                                                                    "type": "string",
+                                                                    "example": "Встречаются одинаковые вопросы в викторине: №1, №2."
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "critical_errors": {
+                                            "description": "Список критических ошибок. Каждая ошибка содержит информацию о вопросе и типе ошибки.",
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id_question": {
+                                                        "description": "Уникальный идентификатор вопроса.",
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "errors": {
+                                                        "description": "Массив ошибок для данного вопроса.",
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "id_error": {
+                                                                    "description": "Уникальный идентификатор ошибки (1 — null в тексте вопроса, 2 — недостаточное количество ответов, 3 — null в индексе правильного ответа, 4 — null в правильном ответе, 5 — пустой массив вопросов).",
+                                                                    "type": "integer",
+                                                                    "example": 1
+                                                                },
+                                                                "text_error": {
+                                                                    "description": "Описание ошибки.",
+                                                                    "type": "string",
+                                                                    "example": "Вопрос не должен быть null."
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "name_quiz_errors": {
+                                            "description": "Список ошибок в названии викторины. Каждая ошибка содержит информацию о типе ошибки и её описании.",
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id_error": {
+                                                        "description": "Уникальный идентификатор ошибки (1 — название слишком короткое, 2 — лишние пробелы).",
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "text_error": {
+                                                        "description": "Описание ошибки.",
+                                                        "type": "string",
+                                                        "example": "В названии викторины должно быть хотя бы 5 символов."
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Ошибка валидации",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Некорректные данные викторины."
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "questions": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The questions field is required."
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Произошла внутренняя ошибка сервера."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Сообщение об ошибке"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/fix-quiz-errors": {
+            "post": {
+                "tags": [
+                    "CreatorQuiz"
+                ],
+                "summary": "Исправление ошибок в викторине",
+                "description": "Метод исправляет ошибки в вопросах и названии викторины в зависимости от переданных меток. Возвращает либо исправленные данные, либо список ошибок.",
+                "operationId": "1d225979189631f9da117a53c6daf645",
+                "requestBody": {
+                    "description": "Данные викторины для исправления ошибок",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "questions",
+                                    "errors"
+                                ],
+                                "properties": {
+                                    "questions": {
+                                        "description": "Массив вопросов викторины",
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "id": {
+                                                    "description": "Уникальный идентификатор вопроса.",
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "question": {
+                                                    "description": "Текст вопроса. Может быть пустым или содержать `null`.",
+                                                    "type": "string",
+                                                    "example": "What is your name?"
+                                                },
+                                                "answers": {
+                                                    "description": "Массив вариантов ответов. Может содержать пустые строки или `null`.",
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "John"
+                                                    }
+                                                },
+                                                "correctAnswerIndex": {
+                                                    "description": "Индекс правильного ответа в массиве answers.",
+                                                    "type": "integer",
+                                                    "example": 0
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "quizName": {
+                                        "description": "Название викторины. Если отсутствует, используется пустая строка.",
+                                        "type": "string",
+                                        "example": "Тест по программированию"
+                                    },
+                                    "errors": {
+                                        "description": "Метки на исправление ошибок",
+                                        "properties": {
+                                            "cosmeticErrors": {
+                                                "description": "Метка для исправления косметических ошибок.",
+                                                "type": "boolean",
+                                                "example": true
+                                            },
+                                            "minorErrors": {
+                                                "description": "Метка для исправления несущественных ошибок.",
+                                                "type": "boolean",
+                                                "example": true
+                                            },
+                                            "logicalErrors": {
+                                                "description": "Метка для исправления логических ошибок.",
+                                                "type": "boolean",
+                                                "example": true
+                                            },
+                                            "cosmeticErrorQuizName": {
+                                                "description": "Метка для исправления косметических ошибок в названии викторины.",
+                                                "type": "boolean",
+                                                "example": true
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    "searchQuizErrors_flag": {
+                                        "description": "Метка для возвращения списка ошибок. Если `true`, метод возвращает список ошибок.",
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Успешное исправление ошибок",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "oneOf": [
+                                        {
+                                            "properties": {
+                                                "questions": {
+                                                    "description": "Исправленные вопросы викторины",
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "description": "Уникальный идентификатор вопроса.",
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "question": {
+                                                                "description": "Текст вопроса.",
+                                                                "type": "string",
+                                                                "example": "What is your name?"
+                                                            },
+                                                            "answers": {
+                                                                "description": "Массив вариантов ответов.",
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "string",
+                                                                    "example": "John"
+                                                                }
+                                                            },
+                                                            "correctAnswerIndex": {
+                                                                "description": "Индекс правильного ответа в массиве answers.",
+                                                                "type": "integer",
+                                                                "example": 0
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "quizName": {
+                                                    "description": "Исправленное название викторины.",
+                                                    "type": "string",
+                                                    "example": "Тест по программированию"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        {
+                                            "properties": {
+                                                "questions": {
+                                                    "description": "Исправленные вопросы викторины",
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "description": "Уникальный идентификатор вопроса.",
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "question": {
+                                                                "description": "Текст вопроса.",
+                                                                "type": "string",
+                                                                "example": "What is your name?"
+                                                            },
+                                                            "answers": {
+                                                                "description": "Массив вариантов ответов.",
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "string",
+                                                                    "example": "John"
+                                                                }
+                                                            },
+                                                            "correctAnswerIndex": {
+                                                                "description": "Индекс правильного ответа в массиве answers.",
+                                                                "type": "integer",
+                                                                "example": 0
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "quizName": {
+                                                    "description": "Исправленное название викторины.",
+                                                    "type": "string",
+                                                    "example": "Тест по программированию"
+                                                },
+                                                "errors": {
+                                                    "description": "Список ошибок викторины",
+                                                    "properties": {
+                                                        "cosmetic_errors": {
+                                                            "description": "Список косметических ошибок",
+                                                            "type": "array",
+                                                            "items": {
+                                                                "properties": {
+                                                                    "id_question": {
+                                                                        "description": "Уникальный идентификатор вопроса.",
+                                                                        "type": "integer",
+                                                                        "example": 1
+                                                                    },
+                                                                    "errors": {
+                                                                        "description": "Массив ошибок для данного вопроса.",
+                                                                        "type": "array",
+                                                                        "items": {
+                                                                            "properties": {
+                                                                                "id_error": {
+                                                                                    "description": "Уникальный идентификатор ошибки (1 — ошибка в вопросе, 2 — ошибка в ответе).",
+                                                                                    "type": "integer",
+                                                                                    "example": 1
+                                                                                },
+                                                                                "text_error": {
+                                                                                    "description": "Описание ошибки.",
+                                                                                    "type": "string",
+                                                                                    "example": "В вопросе викторины обнаружены лишние пробелы."
+                                                                                }
+                                                                            },
+                                                                            "type": "object"
+                                                                        }
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        },
+                                                        "minor_errors": {
+                                                            "description": "Список незначительных ошибок",
+                                                            "type": "array",
+                                                            "items": {
+                                                                "properties": {
+                                                                    "id_question": {
+                                                                        "description": "Уникальный идентификатор вопроса.",
+                                                                        "type": "integer",
+                                                                        "example": 1
+                                                                    },
+                                                                    "errors": {
+                                                                        "description": "Массив ошибок для данного вопроса.",
+                                                                        "type": "array",
+                                                                        "items": {
+                                                                            "properties": {
+                                                                                "id_error": {
+                                                                                    "description": "Уникальный идентификатор ошибки (1 — незаполненная страница вопроса, 2 — незаполненный вариант ответа).",
+                                                                                    "type": "integer",
+                                                                                    "example": 1
+                                                                                },
+                                                                                "text_error": {
+                                                                                    "description": "Описание ошибки.",
+                                                                                    "type": "string",
+                                                                                    "example": "Создана страница вопроса, но она не заполнена."
+                                                                                }
+                                                                            },
+                                                                            "type": "object"
+                                                                        }
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        },
+                                                        "logical_errors": {
+                                                            "description": "Список логических ошибок",
+                                                            "type": "array",
+                                                            "items": {
+                                                                "properties": {
+                                                                    "id_question": {
+                                                                        "description": "У уникальный идентификатор вопроса.",
+                                                                        "type": "integer",
+                                                                        "example": 1
+                                                                    },
+                                                                    "errors": {
+                                                                        "description": "Массив ошибок для данного вопроса.",
+                                                                        "type": "array",
+                                                                        "items": {
+                                                                            "properties": {
+                                                                                "id_error": {
+                                                                                    "description": "Уникальный идентификатор ошибки (1 — дублирование вопроса, 2 — дублирование ответа).",
+                                                                                    "type": "integer",
+                                                                                    "example": 1
+                                                                                },
+                                                                                "text_error": {
+                                                                                    "description": "Описание ошибки.",
+                                                                                    "type": "string",
+                                                                                    "example": "Встречаются одинаковые вопросы в викторине: №1, №2."
+                                                                                }
+                                                                            },
+                                                                            "type": "object"
+                                                                        }
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        },
+                                                        "critical_errors": {
+                                                            "description": "Список критических ошибок",
+                                                            "type": "array",
+                                                            "items": {
+                                                                "properties": {
+                                                                    "id_question": {
+                                                                        "description": "Уникальный идентификатор вопроса.",
+                                                                        "type": "integer",
+                                                                        "example": 1
+                                                                    },
+                                                                    "errors": {
+                                                                        "description": "Массив ошибок для данного вопроса.",
+                                                                        "type": "array",
+                                                                        "items": {
+                                                                            "properties": {
+                                                                                "id_error": {
+                                                                                    "description": "Уникальный идентификатор ошибки (1 — null в тексте вопроса, 2 — недостаточное количество ответов, 3 — null в индексе правильного ответа, 4 — null в правильном ответе, 5 — пустой массив вопросов).",
+                                                                                    "type": "integer",
+                                                                                    "example": 1
+                                                                                },
+                                                                                "text_error": {
+                                                                                    "description": "Описание ошибки.",
+                                                                                    "type": "string",
+                                                                                    "example": "Вопрос не должен быть null."
+                                                                                }
+                                                                            },
+                                                                            "type": "object"
+                                                                        }
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        },
+                                                        "name_quiz_errors": {
+                                                            "description": "Список ошибок в названии викторины",
+                                                            "type": "array",
+                                                            "items": {
+                                                                "properties": {
+                                                                    "id_error": {
+                                                                        "description": "Уникальный идентификатор ошибки (1 — название слишком короткое, 2 — лишние пробелы).",
+                                                                        "type": "integer",
+                                                                        "example": 1
+                                                                    },
+                                                                    "text_error": {
+                                                                        "description": "Описание ошибки.",
+                                                                        "type": "string",
+                                                                        "example": "В названии викторины должно быть хотя бы 5 символов."
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Ошибка валидации",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Некорректные данные викторины."
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "questions": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The questions field is required."
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Произошла внутренняя ошибка сервера."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Сообщение об ошибке"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/create-quiz": {
+            "post": {
+                "tags": [
+                    "CreatorQuiz"
+                ],
+                "summary": "Создание викторины",
+                "description": "Метод создает викторину, исправляет ошибки (если они есть) и сохраняет её в базу данных. После успешного создания данные отправляются на внешний сервер.",
+                "operationId": "c6ba386bfc1a4abd2742d1ef4e9e46c1",
+                "requestBody": {
+                    "description": "Данные викторины для создания",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "questions",
+                                    "errors",
+                                    "id_user"
+                                ],
+                                "properties": {
+                                    "questions": {
+                                        "description": "Массив вопросов викторины",
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "id": {
+                                                    "description": "Уникальный идентификатор вопроса.",
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "question": {
+                                                    "description": "Текст вопроса. Может быть пустым или содержать `null`.",
+                                                    "type": "string",
+                                                    "example": "What is your name?"
+                                                },
+                                                "answers": {
+                                                    "description": "Массив вариантов ответов. Может содержать пустые строки или `null`.",
+                                                    "type": "array",
+                                                    "items": {
+                                                        "description": "Текст ответа.",
+                                                        "type": "string",
+                                                        "example": "John"
+                                                    },
+                                                    "example": [
+                                                        "John",
+                                                        "Tom"
+                                                    ]
+                                                },
+                                                "correctAnswerIndex": {
+                                                    "description": "Индекс правильного ответа в массиве answers.",
+                                                    "type": "integer",
+                                                    "example": 0
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "quizName": {
+                                        "description": "Название викторины. Если отсутствует, используется пустая строка.",
+                                        "type": "string",
+                                        "example": "Тест по программированию"
+                                    },
+                                    "errors": {
+                                        "description": "Метки на исправление ошибок",
+                                        "properties": {
+                                            "cosmeticErrors": {
+                                                "description": "Метка для исправления косметических ошибок.",
+                                                "type": "boolean",
+                                                "example": true
+                                            },
+                                            "minorErrors": {
+                                                "description": "Метка для исправления несущественных ошибок.",
+                                                "type": "boolean",
+                                                "example": true
+                                            },
+                                            "logicalErrors": {
+                                                "description": "Метка для исправления логических ошибок.",
+                                                "type": "boolean",
+                                                "example": true
+                                            },
+                                            "cosmeticErrorQuizName": {
+                                                "description": "Метка для исправления косметических ошибок в названии викторины.",
+                                                "type": "boolean",
+                                                "example": true
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    "id_user": {
+                                        "description": "Уникальный идентификатор пользователя (UUID), создающего викторину.",
+                                        "type": "string",
+                                        "format": "uuid",
+                                        "example": "6f17c6d3-ed20-4e48-985a-f6d0848fe175"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Успешное создание викторины",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "description": "Статус операции.",
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "operation_index": {
+                                            "description": "Индекс операции.",
+                                            "type": "integer",
+                                            "example": 1
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Ошибка валидации",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Некорректные данные викторины."
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "questions": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The questions field is required."
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "description": "Статус операции.",
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "description": "Сообщение об ошибке.",
+                                            "type": "string",
+                                            "example": "Произошла ошибка при создании викторины."
+                                        },
+                                        "error": {
+                                            "description": "Детали ошибки.",
+                                            "type": "string",
+                                            "example": "Сообщение об ошибке"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "QuizDatabase",
+            "description": "QuizDatabase"
+        },
+        {
+            "name": "CreatorQuiz",
+            "description": "CreatorQuiz"
+        }
+    ]
+}

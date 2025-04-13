@@ -28,7 +28,7 @@ class CreateQuizRequest extends FormRequest
             'questions' => 'required|array', // Вопросы обязательны и должны быть массивом
             'questions.*.question' => 'required|string|max:350', // Текст вопроса обязателен
             'questions.*.answers' => 'required|array', // Ответы обязательны и должны быть массивом
-            'questions.*.correctAnswerIndex' => 'required|integer|min:1', // Индекс правильного ответа обязателен
+            'questions.*.correctAnswerIndex' => 'required|integer|min:0', // Индекс правильного ответа обязателен
         ];
     }
 

@@ -1,9 +1,11 @@
 import { createContext, useState } from 'react';
 
 // Контекст для вопросов
-export const QuestionContext = createContext();
+// eslint-disable-next-line react-refresh/only-export-components
+export const QuestionContext = createContext(undefined);
 
 // Провайдер для управления состоянием вопросов
+// eslint-disable-next-line react/prop-types
 export const QuestionProvider = ({ children }) => {
     const [questions, setQuestions] = useState([]);
 

@@ -2,6 +2,12 @@
 
 namespace App\Helpers;
 
+use App\Models\Quiz;
+use App\Models\QuizQuestion;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Ramsey\Uuid\Uuid;
+
 class CreatorQuizHelper
 {
 
@@ -539,22 +545,22 @@ class CreatorQuizHelper
 
             // Проверка на null для question
             if (is_null($question['question'])) {
-                $errors[] = ["id_error" => 1, "text_error" => "Вопрос не должен быть null"];
+                $errors[] = ["id_error" => 1, "text_error" => "Вопрос не должен быть null."];
             }
 
             // Проверка на количество ответов
             if (count($question['answers']) < 2) {
-                $errors[] = ["id_error" => 2, "text_error" => "Должно быть как минимум 2 ответа"];
+                $errors[] = ["id_error" => 2, "text_error" => "Должно быть как минимум 2 ответа."];
             }
 
             // Проверка на null для correctAnswerIndex
             if (is_null($question['correctAnswerIndex'])) {
-                $errors[] = ["id_error" => 3, "text_error" => "Индекс правильного ответа не может быть null"];
+                $errors[] = ["id_error" => 3, "text_error" => "Индекс правильного ответа не может быть null."];
             }
 
             if (!is_null($question['correctAnswerIndex'])) {
                 if (is_null($question['answers'][$question['correctAnswerIndex']])) {
-                    $errors[] = ["id_error" => 4, "text_error" => "Правильный ответ не может быть null"];
+                    $errors[] = ["id_error" => 4, "text_error" => "Правильный ответ не может быть null."];
                 }
             }
 
@@ -609,4 +615,53 @@ class CreatorQuizHelper
 
         return $errors;
     }
+
+
+
+    /**
+     * Сохраняет викторину и её вопросы в базу данных.
+     *
+     * Этот метод выполняет следующие действия:
+     * 1. Создаёт запись викторины в таблице `quizzes`, используя переданное название викторины.
+     * 2. Генерирует уникальный идентификатор для викторины с помощью `Uuid::uuid4()`.
+     * 3. Сохраняет каждый вопрос викторины в таблице `quiz_question_answers`, включая текст вопроса, правильный ответ и неправильные варианты ответов.
+     * 4. Использует транзакцию для обеспечения атомарности операций: если произойдёт ошибка при сохранении, все изменения будут отменены.
+     *
+     * @param string $quizName Название викторины, которое будет сохранено в таблице `quizzes`.
+     * @param array $questions Массив вопросов викторины, где каждый вопрос представлен в виде ассоциативного массива с ключами:
+     *                         - `question`: текст вопроса.
+     *                         - `answers`: массив вариантов ответов.
+     *                         - `correctAnswerIndex`: индекс правильного ответа в массиве `answers`.
+     * @return void Метод не возвращает значение, но сохраняет данные в базу данных.
+     */
+    public static function saveQuizToDatabase(string $quizName, array $questions): void
+    {
+        DB::transaction(function () use ($quizName, $questions) {
+            // Занесение в бд название викторины (табл. quizzes)
+            $quiz = Quiz::create([
+                'id_quiz' => Uuid::uuid4()->toString(),
+                'name_quiz' => $quizName,
+                'is_ready' => true,
+                'id_user' => null,
+            ]);
+            $id_quiz = $quiz->id_quiz;
+
+            // Занесение в бд вопросов викторины (табл. quiz_question_answers)
+            foreach ($questions as $question) {
+                Log::info("question: ", $question);
+                QuizQuestion::create([
+                    'id_quiz_question_answers' => Uuid::uuid4()->toString(),
+                    'text_question' => $question['question'],
+                    'correct_option' => $question['answers'][$question['correctAnswerIndex']],
+                    'wrong_option' => array_values(array_filter($question['answers'], function($answer) use ($question) {
+                        return $answer !== $question['answers'][$question['correctAnswerIndex']];
+                    })),
+                    'id_quiz' => $id_quiz,
+                ]);
+            }
+        });
+    }
+
+
+
 }

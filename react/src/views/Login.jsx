@@ -11,31 +11,33 @@ export default function Login() {
     const [errors, setErrors] = useState(null)
 
     const onSubmit = (ev) => {
-        ev.preventDefault()
+        ev.preventDefault();
         const payload = {
             login: loginRef.current.value,
             password: passwordRef.current.value,
-        }
-        setErrors(null)
+        };
+        setErrors(null);
         axiosClient.post('/login', payload)
             .then(({ data }) => {
                 setUser(data.user);
                 setToken(data.token);
             })
             .catch(err => {
-                const response = err.response;
-                if (response && response.status === 422) {
-                    if (response.data.errors) {
-                        setErrors(response.data.errors);
-                    } else {
-                        setErrors({
-                            login: [response.data.message]
-                        });
+                if (err.message === 'Network Error') {
+                    setErrors({ login: ['Технические проблемы с сервером. Пожалуйста, попробуйте позже.'] });
+                } else {
+                    const response = err.response;
+                    if (response && response.status === 422) {
+                        if (response.data.errors) {
+                            setErrors(response.data.errors);
+                        } else {
+                            setErrors({ login: [response.data.message] });
+                        }
                     }
                 }
             });
+    };
 
-    }
 
     return (
         <div className="login-container">
