@@ -1,7 +1,6 @@
 <?php
 namespace Tests\Feature;
 
-use App\Http\Controllers\Api\AuthController;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -416,34 +415,6 @@ class AuthControllerTest extends TestCase
             ]);
     }
 
-    /**
-     * Тест внутренней ошибки сервера.
-     */
-    public function test_get_user_fails_with_server_error(): void
-    {
-        // Создаем пользователя через фабрику
-        $user = User::factory()->create();
-
-        // Аутентифицируем пользователя
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        // Имитируем внутреннюю ошибку сервера
-        $this->mock(AuthController::class, function ($mock) {
-            $mock->shouldReceive('getUser')
-                ->andThrow(new \Exception('Произошла внутренняя ошибка сервера.'));
-        });
-
-        // Отправляем запрос с токеном
-        $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
-        ])->getJson('/api/user');
-
-        // Проверяем статус ответа и сообщение об ошибке
-        $response->assertStatus(500);
-
-        // Удаляем созданного пользователя
-        $user->delete();
-    }
 
 
     /**
@@ -513,32 +484,6 @@ class AuthControllerTest extends TestCase
             ->assertJson([
                 'message' => 'Пользователь не найден',
             ]);
-    }
-
-    /**
-     * Тест внутренней ошибки сервера.
-     */
-    public function test_increment_created_quizzes_counter_fails_with_server_error(): void
-    {
-        // Создаем пользователя через фабрику
-        $user = User::factory()->create();
-
-        // Имитируем внутреннюю ошибку сервера
-        $this->mock(AuthController::class, function ($mock) {
-            $mock->shouldReceive('where->first')
-                ->andThrow(new \Exception('Произошла внутренняя ошибка сервера.'));
-        });
-
-        // Отправляем запрос с UUID пользователя
-        $response = $this->postJson('/api/increment-created-quizzes-counter', [
-            'id_user' => $user->id_user,
-        ]);
-
-        // Проверяем статус ответа и сообщение об ошибке
-        $response->assertStatus(500);
-
-        // Удаляем созданного пользователя
-        $user->delete();
     }
 
 

@@ -4,21 +4,18 @@ namespace App\Services;
 
 use App\Helpers\CreatorQuizHelper;
 use App\Http\Requests\CreateQuizRequest;
-use App\Jobs\NotifyUserServerAboutUserQuiz;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+
+use Junges\Kafka\Facades\Kafka;
+
+use App\Jobs\NotifyUserServerAboutUserQuiz;
 use Illuminate\Support\Facades\Queue;
 
 class CreatorQuizService
 {
-    private $creatorQuizHelper;
-
-    public function __construct(CreatorQuizHelper $creatorQuizHelper)
-    {
-        $this->creatorQuizHelper = $creatorQuizHelper;
-    }
 
     /**
      * Проверяет активность сервера и подключение к базе данных.
@@ -716,10 +713,35 @@ class CreatorQuizService
             // Вызов метода для записи викторины в базу данных
             CreatorQuizHelper::saveQuizToDatabase($quizName, $questions);
 
-            // Отправка данных викторины на внешний сервер в фоновом режиме
-            Queue::push(new NotifyUserServerAboutUserQuiz([
-                'id_user' => $id_user
-            ]));
+//            // Отправка данных викторины на внешний сервер в фоновом режиме
+//            Queue::push(new NotifyUserServerAboutUserQuiz([
+//                'id_user' => $id_user
+//            ]));
+
+
+            // Использование сервиса Kafka
+            KafkaService::publish(
+                'localhost',              // Брокер
+                'quiz_created',          // Топик
+                ['id_user' => $id_user], // Тело сообщения
+            );
+
+
+//            try {
+//                Kafka::publish('localhost')
+//                    ->onTopic('quiz_created')
+//                    ->withBody(['id_user' => $id_user])
+//                    ->withConfigOptions([
+//                        'queue.buffering.max.ms' => 500,
+//                        'enable.idempotence' => 'true',
+//                    ])
+//                    ->send();
+//            } catch (\Exception $e) {
+//                Log::error('Kafka publish failed', [
+//                    'error' => $e->getMessage(),
+//                    'trace' => $e->getTraceAsString(),
+//                ]);
+//            }
 
             // Возвращаем успешный ответ
             return response()->json(['status' => 'success', 'operation_index' => 1], 201);
