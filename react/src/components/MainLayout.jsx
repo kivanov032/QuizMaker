@@ -7,6 +7,7 @@ export default function MainLayout() {
     const { user, token, setUser, setToken, getStoredToken } = useStateContext();
     const navigate = useNavigate();
 
+
     useEffect(() => {
         console.log("Я в useEffect в MainLayout");
 
@@ -31,6 +32,30 @@ export default function MainLayout() {
             }
         }
     }, [navigate, setToken, setUser, user, token, getStoredToken]);
+
+    useEffect(() => {
+        const token = localStorage.getItem('ACCESS_TOKEN');
+        const expiresAt = localStorage.getItem('EXPIRES_AT');
+
+        if (token && expiresAt) {
+            const now = Date.now();
+            const expires = new Date(expiresAt).getTime();
+            const timeout = expires - now;
+
+            if (timeout > 0) {
+                const timer = setTimeout(() => {
+                    console.log("Токен истёк. Удаляем его из localStorage.");
+                    handleLogout();
+                }, timeout);
+
+                return () => clearTimeout(timer);
+            } else {
+                console.log("Срок действия токена уже истёк.");
+                handleLogout();
+            }
+        }
+    }, []);
+
 
     // Обработчик выхода
     const onLogout = async (ev) => {

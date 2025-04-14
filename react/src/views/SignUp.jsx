@@ -24,6 +24,8 @@ export default function SignUp() {
             .then(({data}) => {
                 setUser(data.user)
                 setToken(data.token)
+                localStorage.setItem('ACCESS_TOKEN', data.token);
+                localStorage.setItem('EXPIRES_AT', data.expires_at);
             })
             .catch(err => {
                 const response = err.response;

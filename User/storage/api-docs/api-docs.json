@@ -187,13 +187,28 @@
                                                     "type": "string",
                                                     "format": "email",
                                                     "example": "user@example.com"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2025-04-13T23:23:19.000000Z"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2025-04-13T23:23:19.000000Z"
                                                 }
                                             },
                                             "type": "object"
                                         },
                                         "token": {
                                             "type": "string",
-                                            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                                            "example": "1|abcdef1234567890"
+                                        },
+                                        "expires_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2025-04-14T12:30:00Z"
                                         }
                                     },
                                     "type": "object"
@@ -319,23 +334,43 @@
                                         "user": {
                                             "properties": {
                                                 "id_user": {
-                                                    "type": "integer",
-                                                    "example": 1
+                                                    "type": "string",
+                                                    "example": "b9649790-f696-4aa0-9d40-dcfdddfbd9ec"
                                                 },
                                                 "login": {
                                                     "type": "string",
-                                                    "example": "testuser"
+                                                    "example": "qwerty"
                                                 },
                                                 "email": {
                                                     "type": "string",
-                                                    "example": "user@example.com"
+                                                    "example": "qwerty@example.com"
+                                                },
+                                                "created_quizzes_counter": {
+                                                    "type": "integer",
+                                                    "example": 0
+                                                },
+                                                "taken_quizzes_counter": {
+                                                    "type": "integer",
+                                                    "example": 0
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "example": "2025-04-13T21:28:50.000000Z"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "example": "2025-04-13T21:28:50.000000Z"
                                                 }
                                             },
                                             "type": "object"
                                         },
                                         "token": {
                                             "type": "string",
-                                            "example": "1|abcdef1234567890"
+                                            "example": "20|ySOWySAojPSFajGYD58PKtJcgLctMvZRYhwjuerG61e0c9b5"
+                                        },
+                                        "expires_at": {
+                                            "type": "string",
+                                            "example": "2025-04-13T23:14:16.000000Z"
                                         }
                                     },
                                     "type": "object"
@@ -410,14 +445,19 @@
                 "description": "Метод удаляет текущий токен доступа пользователя, завершая сессию.",
                 "operationId": "ad65cbbd4e9f201619eae184a5961a98",
                 "responses": {
-                    "204": {
+                    "200": {
                         "description": "Успешный выход",
                         "content": {
                             "application/json": {
                                 "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Успешный выход"
+                                        }
+                                    },
                                     "type": "object"
-                                },
-                                "example": []
+                                }
                             }
                         }
                     },

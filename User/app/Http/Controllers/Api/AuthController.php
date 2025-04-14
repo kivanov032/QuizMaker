@@ -159,8 +159,11 @@ class AuthController extends Controller
      *                 @OA\Property(property="id_user", type="string", format="uuid", example="550e8400-e29b-41d4-a716-446655440000"),
      *                 @OA\Property(property="login", type="string", example="user123"),
      *                 @OA\Property(property="email", type="string", format="email", example="user@example.com"),
+     *                 @OA\Property(property="created_at", type="string", format="date-time", example="2025-04-13T23:23:19.000000Z"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time", example="2025-04-13T23:23:19.000000Z")
      *             ),
-     *             @OA\Property(property="token", type="string", example="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."),
+     *             @OA\Property(property="token", type="string", example="1|abcdef1234567890"),
+     *             @OA\Property(property="expires_at", type="string", format="date-time", example="2025-04-14T12:30:00Z"),
      *         ),
      *     ),
      *     @OA\Response(
@@ -197,10 +200,10 @@ class AuthController extends Controller
      * )
      *
      * @param SignupRequest $request Валидированный запрос с данными для регистрации.
-     * @return Response Ответ с данными пользователя и токеном.
+     * @return JsonResponse Ответ с данными пользователя и токеном.
      */
 
-    public function signup(SignupRequest $request): Response
+    public function signup(SignupRequest $request): JsonResponse
     {
         $data = $request->validated();
         //Log::info('Signup request received', ['data' => $request->all()]);
@@ -214,9 +217,16 @@ class AuthController extends Controller
             'password' => bcrypt($data['password']),
         ]);
 
-        $token = $user->createToken('main', ['*'], now()->addDays(2))->plainTextToken;
+        //$expiresAt = now()->addMinutes(1);
+        $expiresAt = now()->addDays(2);
 
-        return response(compact('user', 'token'));
+        $token = $user->createToken('main', ['*'], $expiresAt)->plainTextToken;
+
+        return response()->json([
+            'user' => $user,
+            'token' => $token,
+            'expires_at' => $expiresAt->toISOString()
+        ]);
     }
 
 
@@ -253,20 +263,24 @@ class AuthController extends Controller
      *         )
      *     ),
      *     @OA\Response(
-     *         response=200,
-     *         description="Успешная авторизация",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(
-     *                 property="user",
-     *                 type="object",
-     *                 @OA\Property(property="id_user", type="integer", example=1),
-     *                 @OA\Property(property="login", type="string", example="testuser"),
-     *                 @OA\Property(property="email", type="string", example="user@example.com"),
-     *             ),
-     *             @OA\Property(property="token", type="string", example="1|abcdef1234567890"),
-     *         )
-     *     ),
+     *          response=200,
+     *          description="Успешная авторизация",
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                  property="user",
+     *                  type="object",
+     *                  @OA\Property(property="id_user", type="string", example="b9649790-f696-4aa0-9d40-dcfdddfbd9ec"),
+     *                  @OA\Property(property="login", type="string", example="qwerty"),
+     *                  @OA\Property(property="email", type="string", example="qwerty@example.com"),
+     *                  @OA\Property(property="created_quizzes_counter", type="integer", example=0),
+     *                  @OA\Property(property="taken_quizzes_counter", type="integer", example=0),
+     *                  @OA\Property(property="created_at", type="string", example="2025-04-13T21:28:50.000000Z"),
+     *                  @OA\Property(property="updated_at", type="string", example="2025-04-13T21:28:50.000000Z")
+     *              ),
+     *              @OA\Property(property="token", type="string", example="20|ySOWySAojPSFajGYD58PKtJcgLctMvZRYhwjuerG61e0c9b5"),
+     *              @OA\Property(property="expires_at", type="string", example="2025-04-13T23:14:16.000000Z")
+     *          )
+     *      ),
      *     @OA\Response(
      *         response=422,
      *         description="Ошибка валидации",
@@ -295,23 +309,35 @@ class AuthController extends Controller
      * )
      *
      * @param LoginRequest $request Валидированный запрос с данными для входа.
-     * @return Response Ответ с данными пользователя и токеном или сообщение об ошибке.
+     * @return JsonResponse Ответ с данными пользователя, токеном и временем истечения токена или сообщение об ошибке.
      */
-    public function login(LoginRequest $request): Response
+    public function login(LoginRequest $request): JsonResponse
     {
         Log::info("Я в методе login");
         $credentials = $request->validated();
 
         if (!Auth::attempt($credentials)) {
-            return response([
+            return response()->json([
                 'message' => 'Логин или пароль не верны.'
             ], 422);
         }
 
         /** @var User $user */
         $user = Auth::user();
-        $token = $user->createToken('main', ['*'], now()->addDays(2))->plainTextToken;
-        return response(compact('user', 'token'));
+        // Создание токена с указанием времени окончания
+        $tokenResult = $user->createToken('main', ['*'], now()->addDays(2));
+        //$tokenResult = $user->createToken('main', ['*'], now()->addMinutes(1));
+        $token = $tokenResult->plainTextToken;
+
+        // Находим запись токена в базе, чтобы взять expires_at
+        $tokenModel = $user->tokens()->latest()->first(); // последний созданный токен
+        $expiresAt = optional($tokenModel->expires_at)->toISOString(); // ISO-строка или null
+
+        return response()->json([
+            'user' => $user,
+            'token' => $token,
+            'expires_at' => $expiresAt
+        ]);
     }
 
 
@@ -329,13 +355,13 @@ class AuthController extends Controller
      *     tags={"Authentication"},
      *     security={{"bearerAuth": {}}},
      *     @OA\Response(
-     *         response=204,
-     *         description="Успешный выход",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             example={}
-     *         )
-     *     ),
+     *          response=200,
+     *          description="Успешный выход",
+     *          @OA\JsonContent(
+     *              type="object",
+     *              @OA\Property(property="message", type="string", example="Успешный выход")
+     *          )
+     *      ),
      *     @OA\Response(
      *         response=401,
      *         description="Ошибка авторизации",
@@ -356,10 +382,10 @@ class AuthController extends Controller
      * )
      *
      * @param Request $request Запрос, содержащий данные пользователя.
-     * @return Response Пустой ответ с кодом 204 или сообщение об ошибке.
+     * @return JsonResponse Пустой ответ с кодом 204 или сообщение об ошибке.
      */
 
-    public function logout(Request $request): Response
+    public function logout(Request $request): JsonResponse
     {
         Log::info("Я в методе logout");
         /** @var User $user */
@@ -367,7 +393,9 @@ class AuthController extends Controller
         if ($user) {
             $user->currentAccessToken()->delete();
         }
-        return response('', 204);
+        return response()->json([
+            'message' => 'Успешный выход'
+        ], 200);
     }
 
 

@@ -8,7 +8,7 @@
         "php": "^8.4.4",
         "ext-pdo": "*",
         "accentinteractive/laravel-logcleaner": "^1.6",
-        "darkaonline/l5-swagger": "*",
+        "darkaonline/l5-swagger": "^9.0",
         "guzzlehttp/guzzle": "^7.9.2",
         "laravel/framework": "^12.1.1",
         "laravel/sanctum": "^v4.0.8",

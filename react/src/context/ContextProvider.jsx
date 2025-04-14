@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect  } from "react";
 
 const StateContext = createContext({
     user: null,
@@ -10,13 +10,22 @@ const StateContext = createContext({
 
 // eslint-disable-next-line react/prop-types
 export const ContextProvider = ({ children }) => {
-    const [user, setUser] = useState({});
-    const [token, setToken] = useState(null);
+
+    const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('USER_DATA')) || {});
+    const [token, setToken] = useState(localStorage.getItem('ACCESS_TOKEN'));
 
     // Функция для получения токена из localStorage
     const getStoredToken = () => {
         return localStorage.getItem('ACCESS_TOKEN');
     };
+
+    useEffect(() => {
+        if (user && token) {
+            // Сохраняем данные пользователя в localStorage при изменении
+            localStorage.setItem('USER_DATA', JSON.stringify(user));
+            localStorage.setItem('ACCESS_TOKEN', token);
+        }
+    }, [user, token]); // Срабатывает при изменении user или token
 
     return (
         <StateContext.Provider value={{

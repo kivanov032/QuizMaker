@@ -10,6 +10,7 @@ export default function Login() {
     const {setUser, setToken} = useStateContext();
     const [errors, setErrors] = useState(null)
 
+
     const onSubmit = (ev) => {
         ev.preventDefault();
         const payload = {
@@ -21,6 +22,8 @@ export default function Login() {
             .then(({ data }) => {
                 setUser(data.user);
                 setToken(data.token);
+                localStorage.setItem('ACCESS_TOKEN', data.token);
+                localStorage.setItem('EXPIRES_AT', data.expires_at);
             })
             .catch(err => {
                 if (err.message === 'Network Error') {
