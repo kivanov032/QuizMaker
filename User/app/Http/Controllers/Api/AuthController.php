@@ -67,7 +67,6 @@ class AuthController extends Controller
      *
      * @return JsonResponse Ответ с состоянием сервера и БД.
      */
-
     public function checkActivity(): \Illuminate\Http\JsonResponse
     {
         Log::info("Я в checkConnectionWithDB");
@@ -202,7 +201,6 @@ class AuthController extends Controller
      * @param SignupRequest $request Валидированный запрос с данными для регистрации.
      * @return JsonResponse Ответ с данными пользователя и токеном.
      */
-
     public function signup(SignupRequest $request): JsonResponse
     {
         $data = $request->validated();
@@ -218,14 +216,14 @@ class AuthController extends Controller
         ]);
 
         //$expiresAt = now()->addMinutes(1);
-        $expiresAt = now()->addDays(2);
+        //$expiresAt = now()->addDays(2);
 
-        $token = $user->createToken('main', ['*'], $expiresAt)->plainTextToken;
+        $token = $user->createToken('main', ['*'], now()->addDays(2))->plainTextToken;
+        //$token = $user->createToken('main', ['*'], now()->addMinutes(1))->plainTextToken;
 
         return response()->json([
             'user' => $user,
             'token' => $token,
-            'expires_at' => $expiresAt->toISOString()
         ]);
     }
 
@@ -335,8 +333,7 @@ class AuthController extends Controller
 
         return response()->json([
             'user' => $user,
-            'token' => $token,
-            'expires_at' => $expiresAt
+            'token' => $token
         ]);
     }
 
@@ -384,7 +381,6 @@ class AuthController extends Controller
      * @param Request $request Запрос, содержащий данные пользователя.
      * @return JsonResponse Пустой ответ с кодом 204 или сообщение об ошибке.
      */
-
     public function logout(Request $request): JsonResponse
     {
         Log::info("Я в методе logout");
@@ -449,11 +445,56 @@ class AuthController extends Controller
      */
     public function getUser(Request $request): JsonResponse
     {
+        $user = $request->user();
+
+        // Получаем текущий токен из базы
+        $token = $user->tokens()->where('id', $user->currentAccessToken()->id)->first();
+
+        if (!$token || $token->expires_at->isPast()) {
+            return response()->json(['message' => 'Token expired'], 401);
+        }
+
         return response()->json([
-            'user' => $request->user(),
+            'user' => $user,
             'message' => 'Токен действителен'
         ]);
     }
+
+
+
+
+
+
+    /**
+     * Проверяет действительность токена и, если необходимо, продлевает его.
+     */
+//    public function checkAndExtendToken(Request $request): JsonResponse
+//    {
+//        echo "==> Метод checkAndExtendToken вызван\n";
+//
+//        $user = $request->user();
+//        if (!$user) {
+//            echo "==> Пользователь не найден\n";
+//            return response()->json(['message' => 'Unauthorized'], 401);
+//        }
+//
+//        echo "==> Пользователь найден: {$user->id}\n";
+//
+//        // Просто создаем новый токен без условий, чтобы проверить, сработает ли вообще
+//        $tokenResult = $user->createToken('main', ['*'], now()->addMinutes(30));
+//
+//        echo "==> Новый токен создан. expires_at: " . $tokenResult->accessToken->expires_at . "\n";
+//
+//        return response()->json([
+//            'token' => $tokenResult->plainTextToken,
+//            'message' => 'Токен создан (тест)'
+//        ]);
+//    }
+
+
+
+
+
 
 
     /**

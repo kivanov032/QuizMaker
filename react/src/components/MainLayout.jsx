@@ -1,109 +1,108 @@
 import { Navigate, Outlet, useNavigate } from "react-router-dom";
 import { useStateContext } from "../context/ContextProvider.jsx";
 import axiosClient from "../axios-client.js";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function MainLayout() {
     const { user, token, setUser, setToken, getStoredToken } = useStateContext();
     const navigate = useNavigate();
-
+    const intervalRef = useRef(null);
+    const [loading, setLoading] = useState(true); // 👈 добавили флаг загрузки
 
     useEffect(() => {
         console.log("Я в useEffect в MainLayout");
 
-        // Проверяем, есть ли пользователь и токен в контексте
-        if (!user || !token) {
-            const storedToken = getStoredToken(); // Получаем токен из localStorage
-            if (storedToken) {
-                const checkToken = async () => {
-                    try {
-                        const { data } = await axiosClient.get('/user'); // Токен будет добавлен автоматически
-                        setUser(data.user);
+        const checkAndExtendToken = async () => {
+            const storedToken = getStoredToken();
+            if (!storedToken) {
+                navigate('/login');
+                return;
+            }
+
+            try {
+                const { data } = await axiosClient.get('/user');
+                console.log("Я в useEffect в checkToken");
+                setUser(data.user);
+                setToken(storedToken); // токен остаётся тем же
+            } catch (error) {
+                console.error("Ошибка при проверке токена:", error);
+                handleLogout();
+            } finally {
+                setLoading(false); // ✅ проверка завершилась
+            }
+        };
+
+        checkAndExtendToken();
+
+        // запускаем интервал только после успешного входа
+        if (!intervalRef.current && token) {
+            intervalRef.current = setInterval(async () => {
+                try {
+                    const { data } = await axiosClient.get('/check-and-extend-token');
+                    if (data.token) {
                         setToken(data.token);
-                    } catch (error) {
-                        console.error("Ошибка при проверке токена:", error);
+                    }
+                } catch (error) {
+                    console.warn("❌ Не удалось продлить токен:", error);
+                    if (error.response?.status === 401) {
                         handleLogout();
                     }
-                };
-
-                checkToken(); // Вызов функции для проверки токена
-            } else {
-                navigate('/login'); // Перенаправление на страницу входа, если токен отсутствует
-            }
+                }
+            }, 5 * 60 * 1000);
         }
-    }, [navigate, setToken, setUser, user, token, getStoredToken]);
 
-    useEffect(() => {
-        const token = localStorage.getItem('ACCESS_TOKEN');
-        const expiresAt = localStorage.getItem('EXPIRES_AT');
-
-        if (token && expiresAt) {
-            const now = Date.now();
-            const expires = new Date(expiresAt).getTime();
-            const timeout = expires - now;
-
-            if (timeout > 0) {
-                const timer = setTimeout(() => {
-                    console.log("Токен истёк. Удаляем его из localStorage.");
-                    handleLogout();
-                }, timeout);
-
-                return () => clearTimeout(timer);
-            } else {
-                console.log("Срок действия токена уже истёк.");
-                handleLogout();
+        return () => {
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+                intervalRef.current = null;
             }
-        }
+        };
     }, []);
 
-
-    // Обработчик выхода
     const onLogout = async (ev) => {
         ev.preventDefault();
-
         try {
             await axiosClient.post('/logout');
         } catch (error) {
             console.error("Ошибка при выходе:", error);
         } finally {
-            handleLogout(); // Вызов общей логики выхода
+            handleLogout();
         }
     };
 
-
-    // Общая логика выхода
     const handleLogout = () => {
         setUser({});
         setToken(null);
         localStorage.removeItem('ACCESS_TOKEN');
-        navigate('/login'); // Перенаправление после выхода
+        localStorage.removeItem('USER_DATA');
+        navigate('/login');
     };
 
-    // Перенаправление на страницу входа, если токен отсутствует
-    if (!token) {
-        return <Navigate to="/login" />;
-    }
-
-    // Обработчик клика для перенаправления на главную страницу
     const handleMainLayoutClick = () => {
         navigate("/");
     };
 
+    // 🟡 Пока загружаемся — ничего не показываем
+    if (loading) {
+        return <div>Загрузка...</div>; // можно заменить на спиннер
+    }
+
+    // 🟥 После загрузки — если всё-таки нет токена — редиректим
+    if (!token) {
+        return <Navigate to="/login" />;
+    }
+
     return (
         <div>
-            {/* Верхняя панель */}
             <header className="header">
                 <div className="header-left">
                     <span className="clickable-main" onClick={handleMainLayoutClick}>МЕНЮ</span>
                 </div>
-
                 <div className="header-right">
                     <span className="clickable">{user.login}</span>
                     <span onClick={onLogout} className="clickable logout">Выйти</span>
                 </div>
             </header>
-
-            {/* Основное содержимое */}
             <main className="main-content">
                 <Outlet />
             </main>

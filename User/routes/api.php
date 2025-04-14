@@ -20,6 +20,7 @@ Route::get('/check-activity', [AuthController::class, 'checkActivity']);
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'getUser']);
+//    Route::get('/check-and-extend-token', [AuthController::class, 'checkAndExtendToken']);
 });
 
 Route::post('/signup', [AuthController::class, 'signup']);

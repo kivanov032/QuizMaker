@@ -12,7 +12,7 @@ const StateContext = createContext({
 export const ContextProvider = ({ children }) => {
 
     const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('USER_DATA')) || {});
-    const [token, setToken] = useState(localStorage.getItem('ACCESS_TOKEN'));
+    const [token, setToken] = useState();
 
     // Функция для получения токена из localStorage
     const getStoredToken = () => {
