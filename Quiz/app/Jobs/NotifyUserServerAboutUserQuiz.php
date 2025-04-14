@@ -13,18 +13,21 @@ class NotifyUserServerAboutUserQuiz implements ShouldQueue
 {
     use InteractsWithQueue, Queueable, SerializesModels;
 
-    public $tries = 1; // Количество попыток
+    public int $tries = 1; // Количество попыток
 
-    protected $quizData;
+    protected array $quizData;
 
     // Константа для пути к API
-    private const API_PATH = '/api/increment-created-quizzes-counter';
+    private const string API_PATH = '/api/increment-created-quizzes-counter';
 
     public function __construct(array $quizData)
     {
         $this->quizData = $quizData;
     }
 
+    /**
+     * @throws \Exception
+     */
     public function handle(): void
     {
         try {

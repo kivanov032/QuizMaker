@@ -5,35 +5,64 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateQuizRequest;
 use App\Services\CreatorQuizService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class CreatorQuizController extends Controller
 {
     private CreatorQuizService $creatorQuizService;
 
+    /**
+     * Конструктор контроллера для создания экземпляра Сервиса
+     *
+     * @param CreatorQuizService $creatorQuizService
+     */
     public function __construct(CreatorQuizService $creatorQuizService)
     {
         $this->creatorQuizService = $creatorQuizService;
     }
 
-    public function checkActivity(Request $request): \Illuminate\Http\JsonResponse
+    /**
+     * Проверка активности сервера и подключения к базе данных.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function checkActivity(Request $request): JsonResponse
     {
         return $this->creatorQuizService->checkActivity();
     }
 
-    public function searchQuizErrors(Request $request): \Illuminate\Http\JsonResponse
+    /**
+     * Поиск ошибок в викторине.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function searchQuizErrors(Request $request): JsonResponse
     {
         return $this->creatorQuizService->searchQuizErrors($request);
     }
 
-    public function fixQuizErrors(Request $request): \Illuminate\Http\JsonResponse
+    /**
+     * Исправление ошибок в викторине.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function fixQuizErrors(Request $request): JsonResponse
     {
         return $this->creatorQuizService->fixQuizErrors($request);
     }
 
-    public function createQuiz(CreateQuizRequest $request): \Illuminate\Http\JsonResponse
+    /**
+     * Создание новой викторины.
+     *
+     * @param CreateQuizRequest $request Валидированный запрос с данными для создания викторины.
+     * @return JsonResponse
+     */
+    public function createQuiz(CreateQuizRequest $request): JsonResponse
     {
         return $this->creatorQuizService->createQuiz($request);
     }
 }
-

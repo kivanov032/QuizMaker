@@ -248,6 +248,24 @@
       <path value="$PROJECT_DIR$/Quiz/vendor/swagger-api/swagger-ui" />
       <path value="$PROJECT_DIR$/Quiz/vendor/nextapps/laravel-swagger-ui" />
       <path value="$PROJECT_DIR$/Quiz/vendor/predis/predis" />
+      <path value="$PROJECT_DIR$/Quiz/vendor/laravel-kafka/.github" />
+      <path value="$PROJECT_DIR$/Quiz/vendor/laravel-kafka/art" />
+      <path value="$PROJECT_DIR$/Quiz/vendor/laravel-kafka/config" />
+      <path value="$PROJECT_DIR$/Quiz/vendor/laravel-kafka/docs" />
+      <path value="$PROJECT_DIR$/Quiz/vendor/laravel-kafka/src" />
+      <path value="$PROJECT_DIR$/Quiz/vendor/laravel-kafka/tests" />
+      <path value="$PROJECT_DIR$/User/vendor/zircote/swagger-php" />
+      <path value="$PROJECT_DIR$/User/vendor/wotz/laravel-swagger-ui" />
+      <path value="$PROJECT_DIR$/User/vendor/nextapps/laravel-swagger-ui" />
+      <path value="$PROJECT_DIR$/User/vendor/laravel-kafka/art" />
+      <path value="$PROJECT_DIR$/User/vendor/laravel-kafka/.github" />
+      <path value="$PROJECT_DIR$/User/vendor/laravel-kafka/config" />
+      <path value="$PROJECT_DIR$/User/vendor/laravel-kafka/docs" />
+      <path value="$PROJECT_DIR$/User/vendor/laravel-kafka/src" />
+      <path value="$PROJECT_DIR$/User/vendor/laravel-kafka/tests" />
+      <path value="$PROJECT_DIR$/User/vendor/darkaonline/l5-swagger" />
+      <path value="$PROJECT_DIR$/User/vendor/doctrine/annotations" />
+      <path value="$PROJECT_DIR$/User/vendor/psr/cache" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.4" />
