@@ -1,13 +1,15 @@
 import { useNavigate } from "react-router-dom";
-import { checkActivityServerAndBD } from "../SenderQuiz.js";
+import {checkActivityServerAndBD} from "../SenderQuizCreating.js";
 import { useState } from "react";
 import "./MainPage.css";
+import {searchQuiz} from "../SenderQuizPassing.js";
 
 export default function MainPage() {
     const navigate = useNavigate();
-    const [searchQuery, setSearchQuery] = useState("");
+    const [quizName, setQuizName] = useState("");
 
-    const createQuiz = async () => {
+    //Нажатие кнопки на создание викторины
+    const handleCreateQuiz = async () => {
         try {
             const result = await checkActivityServerAndBD();
 
@@ -25,27 +27,43 @@ export default function MainPage() {
         }
     };
 
-    const handleSearch = () => {
-        console.log("Поиск по запросу:", searchQuery);
+    //Нажатие кнопки на поиск викторины по её названию
+    const handleSearchQuiz = async () => {
+        console.log("Поиск по запросу:", quizName);
+
+        try {
+            const response = await searchQuiz(quizName);
+            if (response.status === 'success') {
+                console.log("Операция успешна, индекс операции:", response.operation_index);
+            } else {
+                console.error("Ошибка при выполнении операции:", response);
+                alert("Техническая ошибка: невозможно создать викторину.");
+            }
+        } catch (error) {
+            console.error('Ошибка при отправке вопросов:', error);
+            alert("Техническая ошибка: невозможно создать викторину.");
+        }
+
     };
+
 
     return (
         <div className="main-page-container">
             <h2>Главная страница</h2>
 
-            <button className="create-quiz-button" onClick={createQuiz}>
+            <button className="create-quiz-button" onClick={handleCreateQuiz}>
                 Создать викторину
             </button>
 
             <div className="search-wrapper">
                 <input
                     type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    value={quizName}
+                    onChange={(e) => setQuizName(e.target.value)}
                     placeholder="Введите запрос"
                     className="search-input"
                 />
-                <button className="search-button" onClick={handleSearch}>
+                <button className="search-button" onClick={handleSearchQuiz}>
                     🔍
                 </button>
             </div>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateQuizRequest;
 use App\Services\CreatorQuizService;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -60,6 +61,7 @@ class CreatorQuizController extends Controller
      *
      * @param CreateQuizRequest $request Валидированный запрос с данными для создания викторины.
      * @return JsonResponse
+     * @throws Exception
      */
     public function createQuiz(CreateQuizRequest $request): JsonResponse
     {

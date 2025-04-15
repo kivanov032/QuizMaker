@@ -43,11 +43,11 @@ class Quiz extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'id_quiz', // Добавлено
+        'id_quiz',
         'name_quiz',
         'was_taken',
         'is_ready',
-        'id_user',
+        'login_user', // Изменено с id_user на login_user
     ];
 
     /**
@@ -61,9 +61,10 @@ class Quiz extends Model
 
     /**
      * Get the user that created the quiz.
+     * Теперь связь осуществляется по логину пользователя вместо ID
      */
     public function user()
     {
-        return $this->belongsTo(User::class, 'id_user');
+        return $this->belongsTo(User::class, 'login_user', 'login');
     }
 }

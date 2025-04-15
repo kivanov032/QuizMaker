@@ -488,14 +488,6 @@ class CreatorQuizHelperTest extends TestCase
         $this->assertEquals($expectedErrors5, $name_quiz_errors5);
     }
 
-    /**
-     * Тест на создание викторины.
-     */
-    public function test_saveQuizToDatabase(): void
-    {
-        //НАПИСАТЬ!!!!!!!!!!!!!!!!!!!!!!!!
-    }
-
 
 }
 

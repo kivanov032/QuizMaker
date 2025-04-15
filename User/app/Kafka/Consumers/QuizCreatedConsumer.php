@@ -27,9 +27,9 @@ class QuizCreatedConsumer
             ->withAutoCommit()
             ->withHandler(function ($message) {
                 try {
-                    $id_user = $message->getBody()['id_user'];
-                    Log::info("Получено сообщение из Kafka: ", ['id_user' => $id_user]);
-                    $this->authService->incrementQuizCounterForUser($id_user);
+                    $login = $message->getBody()['login'];
+                    Log::info("Получено сообщение из Kafka: ", ['login' => $login]);
+                    $this->authService->incrementQuizCounterForUser($login);
                 } catch (\Exception $e) {
                     Log::error("Ошибка при обработке сообщения: " . $e->getMessage());
                 }

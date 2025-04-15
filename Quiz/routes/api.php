@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\CreatorQuizController;
+use App\Http\Controllers\Api\PassingQuizController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,5 +19,10 @@ Route::post('/search-quiz-errors', [CreatorQuizController::class, 'searchQuizErr
 Route::post('/fix-quiz-errors', [CreatorQuizController::class, 'fixQuizErrors']);
 Route::post('/create-quiz', [CreatorQuizController::class, 'createQuiz']);
 Route::get('/check-activity', [CreatorQuizController::class, 'checkActivity']);
+
+Route::post('/search-quiz', [PassingQuizController::class, 'searchQuiz']);
+//Route::post('/fix-quiz-errors', [CreatorQuizController::class, 'fixQuizErrors']);
+//Route::post('/create-quiz', [CreatorQuizController::class, 'createQuiz']);
+//Route::get('/check-activity', [CreatorQuizController::class, 'checkActivity']);
 
 

@@ -1,7 +1,7 @@
 import  { useState, useContext, useEffect } from 'react';
 import {Outlet, Link, useNavigate} from "react-router-dom";
 import { QuestionContext } from '../context/QuestionContext';
-import {sendQuestionsToFixError, sendQuestionsToRecordInBD, sendQuestionsToSearchError} from "../SenderQuiz.js";
+import {sendQuestionsToFixError, sendQuestionsToRecordInBD, sendQuestionsToSearchError} from "../SenderQuizCreating.js";
 import "./CreatorLayout.css";
 import { useStateContext } from "../context/ContextProvider.jsx";
 
@@ -44,7 +44,6 @@ export default function CreatorLayout() {
     // }
 
     //Хук для автоматического обновления состояния expandedSections при изменении quizErrors.
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
         console.log(user.id_user)
 

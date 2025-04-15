@@ -876,11 +876,11 @@
                                         },
                                         "type": "object"
                                     },
-                                    "id_user": {
-                                        "description": "Уникальный идентификатор пользователя (UUID), создающего викторину.",
+                                    "login_user": {
+                                        "description": "Логин пользователя, создающего викторину.",
                                         "type": "string",
-                                        "format": "uuid",
-                                        "example": "6f17c6d3-ed20-4e48-985a-f6d0848fe175"
+                                        "format": "string",
+                                        "example": "k12345a"
                                     }
                                 },
                                 "type": "object"
@@ -968,6 +968,144 @@
                     }
                 }
             }
+        },
+        "/api/search-quiz": {
+            "post": {
+                "tags": [
+                    "PassingQuiz"
+                ],
+                "summary": "Поиск викторин по названию",
+                "description": "Метод выполняет поиск викторин по части названия (регистронезависимый).",
+                "operationId": "18e85f797c1eefb603a3ec3dc5b8e430",
+                "requestBody": {
+                    "description": "Параметры поиска",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name_quiz"
+                                ],
+                                "properties": {
+                                    "name_quiz": {
+                                        "description": "Название или часть названия викторины для поиска",
+                                        "type": "string",
+                                        "example": "Тест по программированию"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Успешный поиск",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "quizzes": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id_quiz": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "name_quiz": {
+                                                        "type": "string",
+                                                        "example": "История Древнего мира"
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "example": "Тест по древней истории"
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2025-04-10T12:00:00Z"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Найдены следующие викторины"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Викторины не найдены",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Викторины не найдены"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Ошибка валидации",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Параметр поиска обязателен"
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "name_quiz": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The name_quiz field is required."
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Произошла внутренняя ошибка сервера"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Сообщение об ошибке"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "tags": [
@@ -978,6 +1116,10 @@
         {
             "name": "CreatorQuiz",
             "description": "CreatorQuiz"
+        },
+        {
+            "name": "PassingQuiz",
+            "description": "PassingQuiz"
         }
     ]
 }

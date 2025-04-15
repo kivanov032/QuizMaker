@@ -8,7 +8,6 @@ use App\Http\Requests\SignupRequest;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -69,7 +68,7 @@ class AuthController extends Controller
      */
     public function checkActivity(): \Illuminate\Http\JsonResponse
     {
-        Log::info("Я в checkConnectionWithDB");
+        Log::info("Я в checkActivity");
         $serverStatus = 'Активен';
         try {
             DB::connection()->getPdo();
@@ -386,9 +385,7 @@ class AuthController extends Controller
         Log::info("Я в методе logout");
         /** @var User $user */
         $user = $request->user();
-        if ($user) {
-            $user->currentAccessToken()->delete();
-        }
+        $user?->currentAccessToken()->delete();
         return response()->json([
             'message' => 'Успешный выход'
         ], 200);
@@ -463,8 +460,6 @@ class AuthController extends Controller
 
 
 
-
-
     /**
      * Проверяет действительность токена и, если необходимо, продлевает его.
      */
@@ -492,33 +487,27 @@ class AuthController extends Controller
 //    }
 
 
-
-
-
-
-
     /**
      * Увеличивает счетчик созданных викторин для пользователя.
      *
-     * Принимает UUID пользователя, находит его в системе и увеличивает счетчик созданных викторин.
+     * Принимает логин пользователя, находит его в системе и увеличивает счетчик созданных викторин.
      * Возвращает обновленные данные пользователя и сообщение об успешном обновлении.
      *
      * @OA\Post(
      *     path="/api/increment-created-quizzes-counter",
      *     summary="Увеличение счетчика созданных викторин",
-     *     description="Метод принимает UUID пользователя, находит его в системе и увеличивает счетчик созданных викторин.",
+     *     description="Метод принимает логин пользователя, находит его в системе и увеличивает счетчик созданных викторин.",
      *     tags={"User"},
      *     @OA\RequestBody(
      *         required=true,
      *         description="Данные для обновления счетчика",
      *         @OA\JsonContent(
-     *             required={"id_user"},
+     *             required={"login"},
      *             @OA\Property(
-     *                 property="id_user",
+     *                 property="login",
      *                 type="string",
-     *                 format="uuid",
-     *                 example="50f65337-8506-466a-9502-b4003ff9fab2",
-     *                 description="UUID пользователя, для которого нужно увеличить счетчик."
+     *                 example="k12345a",
+     *                 description="Логин пользователя, для которого нужно увеличить счетчик."
      *             ),
      *         )
      *     ),
@@ -530,7 +519,7 @@ class AuthController extends Controller
      *             @OA\Property(
      *                 property="user",
      *                 type="object",
-     *                 @OA\Property(property="id_user", type="string", example="550e8400-e29b-41d4-a716-446655440000"),
+     *                 @OA\Property(property="login", type="string", example="ivan_2025"),
      *                 @OA\Property(property="created_quizzes_counter", type="integer", example=5),
      *             ),
      *             @OA\Property(property="message", type="string", example="Счетчик созданных викторин успешно обновлен"),
@@ -551,8 +540,8 @@ class AuthController extends Controller
      *             type="object",
      *             @OA\Property(property="message", type="string", example="Неверные данные."),
      *             @OA\Property(property="errors", type="object",
-     *                 @OA\Property(property="id_user", type="array",
-     *                     @OA\Items(type="string", example="The id_user field is required.")
+     *                 @OA\Property(property="login", type="array",
+     *                     @OA\Items(type="string", example="The login field is required.")
      *                 ),
      *             ),
      *         )
@@ -568,21 +557,21 @@ class AuthController extends Controller
      *     )
      * )
      *
-     * @param Request $request Запрос, содержащий UUID пользователя.
+     * @param Request $request Запрос, содержащий логин пользователя.
      * @return JsonResponse Ответ с обновленными данными пользователя или сообщение об ошибке.
      */
     public function incrementCreatedQuizzesCounter(Request $request): JsonResponse
     {
         // Валидация входящих данных
         $request->validate([
-            'id_user' => 'required|uuid',
+            'login' => 'required|string',
         ]);
 
         // Получаем id_user из запроса
-        $id_user = $request->input('id_user');
+        $login = $request->input('login');
 
         // Находим пользователя по id_user
-        $user = User::where('id_user', $id_user)->first();
+        $user = User::where('login', $login)->first();
 
         // Проверяем, существует ли пользователь
         if (!$user) {

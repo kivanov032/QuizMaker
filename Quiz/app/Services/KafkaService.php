@@ -18,7 +18,7 @@ class KafkaService
      */
     public static function publish(string $broker, string $topic, array $body, array $config = []): bool {
         $defaultConfig = [
-            'queue.buffering.max.ms' => 500,
+            'queue.buffering.max.ms' => 300,
             'enable.idempotence' => 'true',
         ];
 

@@ -6,18 +6,17 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
+ * @extends Factory<User>
  */
 class UserFactory extends Factory
 {
     /**
-     * Define the model's default state.
+     * Определяет состояние модели по умолчанию.
      *
      * @return array<string, mixed>
      */
-
     protected $model = User::class;
-    public function definition()
+    public function definition(): array
     {
         return [
             'id_user' => $this->faker->uuid(),
@@ -28,17 +27,4 @@ class UserFactory extends Factory
             'taken_quizzes_counter' => 0,
         ];
     }
-
-    /**
-     * Indicate that the model's email address should be unverified.
-     *
-     * @return static
-     */
-    public function unverified()
-    {
-        return $this->state(fn (array $attributes) => [
-            'email_verified_at' => null,
-        ]);
-    }
 }
-

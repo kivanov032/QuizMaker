@@ -36,11 +36,11 @@ class NotifyUserServerAboutUserQuiz implements ShouldQueue
             $url = $baseUrl . self::API_PATH; // Формируем полный URL
 
             $response = Http::post($url, [
-                'id_user' => $this->quizData['id_user']
+                'login' => $this->quizData['login']
             ]);
 
             if ($response->successful()) {
-                Log::info('Сервер успешно оповещён о создании викторины пользователем: ' . $this->quizData['id_user']);
+                Log::info('Сервер успешно оповещён о создании викторины пользователем: ' . $this->quizData['login']);
             } else {
                 Log::error('Ошибка при оповещении сервера User о создании викторины пользователем: ' . $response->body());
                 throw new \Exception('Ошибка внешнего сервера: ' . $response->status());

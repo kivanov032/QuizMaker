@@ -13,7 +13,7 @@
                 ],
                 "summary": "Проверка связи с базой данных",
                 "description": "Метод проверяет активность сервера и соединение с базой данных.",
-                "operationId": "e20bc4215240359a49725c235b227847",
+                "operationId": "e81194338d09ff2beb29132e0fd890e0",
                 "responses": {
                     "200": {
                         "description": "Успешное подключение к БД",
@@ -122,7 +122,7 @@
                 ],
                 "summary": "Регистрация нового пользователя",
                 "description": "Метод регистрирует нового пользователя, создаёт UUID, хэширует пароль и возвращает данные пользователя с токеном авторизации.",
-                "operationId": "48a0b4ecc3aea3ea77a436069d27484c",
+                "operationId": "f886d970a4e3497817841e1dc8ca2348",
                 "requestBody": {
                     "description": "Данные для регистрации",
                     "required": true,
@@ -295,7 +295,7 @@
                 ],
                 "summary": "Авторизация пользователя",
                 "description": "Метод проверяет данные пользователя и в случае успешной аутентификации возвращает токен.",
-                "operationId": "bf7b6ccf4a0d27d65da4f1d7026ae580",
+                "operationId": "222b2625838e3c57e017987f73598fda",
                 "requestBody": {
                     "description": "Данные для входа",
                     "required": true,
@@ -443,7 +443,7 @@
                 ],
                 "summary": "Выход пользователя из системы",
                 "description": "Метод удаляет текущий токен доступа пользователя, завершая сессию.",
-                "operationId": "cb245e1b801c75529797eeba29d74a8f",
+                "operationId": "ad65cbbd4e9f201619eae184a5961a98",
                 "responses": {
                     "200": {
                         "description": "Успешный выход",
@@ -512,7 +512,7 @@
                 ],
                 "summary": "Получение информации о пользователе",
                 "description": "Метод возвращает данные текущего аутентифицированного пользователя и сообщение о действительности токена.",
-                "operationId": "d30b0eb20d15e56c7a08994e32827eb0",
+                "operationId": "f016c0659a1d971af16fc5430fb93b55",
                 "responses": {
                     "200": {
                         "description": "Успешное получение данных",
@@ -597,8 +597,8 @@
                     "User"
                 ],
                 "summary": "Увеличение счетчика созданных викторин",
-                "description": "Метод принимает UUID пользователя, находит его в системе и увеличивает счетчик созданных викторин.",
-                "operationId": "4fe0d980ed3cf0867102387e28ee2bc6",
+                "description": "Метод принимает логин пользователя, находит его в системе и увеличивает счетчик созданных викторин.",
+                "operationId": "7f0fb502f6892662b0cf70acb09cebdb",
                 "requestBody": {
                     "description": "Данные для обновления счетчика",
                     "required": true,
@@ -606,14 +606,13 @@
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "id_user"
+                                    "login"
                                 ],
                                 "properties": {
-                                    "id_user": {
-                                        "description": "UUID пользователя, для которого нужно увеличить счетчик.",
+                                    "login": {
+                                        "description": "Логин пользователя, для которого нужно увеличить счетчик.",
                                         "type": "string",
-                                        "format": "uuid",
-                                        "example": "50f65337-8506-466a-9502-b4003ff9fab2"
+                                        "example": "k12345a"
                                     }
                                 },
                                 "type": "object"
@@ -630,9 +629,9 @@
                                     "properties": {
                                         "user": {
                                             "properties": {
-                                                "id_user": {
+                                                "login": {
                                                     "type": "string",
-                                                    "example": "550e8400-e29b-41d4-a716-446655440000"
+                                                    "example": "ivan_2025"
                                                 },
                                                 "created_quizzes_counter": {
                                                     "type": "integer",
@@ -679,11 +678,11 @@
                                         },
                                         "errors": {
                                             "properties": {
-                                                "id_user": {
+                                                "login": {
                                                     "type": "array",
                                                     "items": {
                                                         "type": "string",
-                                                        "example": "The id_user field is required."
+                                                        "example": "The login field is required."
                                                     }
                                                 }
                                             },

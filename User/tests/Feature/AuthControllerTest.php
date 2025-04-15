@@ -431,14 +431,14 @@ class AuthControllerTest extends TestCase
 
         // Отправляем запрос с UUID пользователя
         $response = $this->postJson('/api/increment-created-quizzes-counter', [
-            'id_user' => $user->id_user,
+            'login' => $user->login,
         ]);
 
         // Проверяем статус ответа и структуру JSON
         $response->assertStatus(200)
             ->assertJson([
                 'user' => [
-                    'id_user' => $user->id_user,
+                    'login' => $user->login,
                     'created_quizzes_counter' => 6,
                 ],
                 'message' => 'Счетчик созданных викторин успешно обновлен',
@@ -449,34 +449,34 @@ class AuthControllerTest extends TestCase
     }
 
     /**
-     * Тест ошибки при отсутствии UUID пользователя.
+     * Тест ошибки при отсутствии логина пользователя.
      */
     public function test_increment_created_quizzes_counter_fails_without_user_id(): void
     {
-        // Отправляем запрос без UUID пользователя
+        // Отправляем запрос без логина пользователя
         $response = $this->postJson('/api/increment-created-quizzes-counter', []);
 
         // Проверяем статус ответа и сообщение об ошибке
         $response->assertStatus(422)
             ->assertJson([
-                'message' => 'Поле id user обязательно для заполнения.',
+                'message' => 'Поле login обязательно для заполнения.',
                 'errors' => [
-                    'id_user' => ['Поле id user обязательно для заполнения.'],
+                    'login' => ['Поле login обязательно для заполнения.'],
                 ],
             ]);
     }
 
     /**
-     * Тест ошибки при несуществующем UUID пользователя.
+     * Тест ошибки при несуществующем логине пользователя.
      */
     public function test_increment_created_quizzes_counter_fails_with_invalid_user_id(): void
     {
-        // Генерируем случайный UUID
-        $randomUuid = Str::uuid();
+        // Генерируем случайный логин
+        $login = "ЧайникСАмбицией";
 
         // Отправляем запрос с несуществующим UUID
         $response = $this->postJson('/api/increment-created-quizzes-counter', [
-            'id_user' => $randomUuid,
+            'login' => $login,
         ]);
 
         // Проверяем статус ответа и сообщение об ошибке
