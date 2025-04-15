@@ -15,8 +15,22 @@ use Illuminate\Support\Str;
 
 use Illuminate\Support\Facades\DB;
 
+    /**
+     * @OA\Components(
+     *     @OA\SecurityScheme(
+     *         securityScheme="bearerAuth",
+     *         type="http",
+     *         scheme="bearer",
+     *         bearerFormat="JWT",
+     *         in="header",
+     *         name="Authorization",
+     *         description="Введите токен в формате: Bearer {your_token}"
+     *     )
+     * )
+     */
 class AuthController extends Controller
 {
+
 
     /**
      * Проверяет активность сервера и подключение к базе данных.
@@ -117,35 +131,25 @@ class AuthController extends Controller
      *         required=true,
      *         description="Данные для регистрации",
      *         @OA\JsonContent(
-     *             required={"login", "email", "password", "password_confirmation"},
-     *             @OA\Property(
-     *                 property="login",
-     *                 type="string",
-     *                 example="user123",
-     *                 description="Логин пользователя. Должен быть уникальным и содержать не более 55 символов."
-     *             ),
-     *             @OA\Property(
-     *                 property="email",
-     *                 type="string",
-     *                 format="email",
-     *                 example="user@example.com",
-     *                 description="Email пользователя. Должен быть уникальным и соответствовать формату email."
-     *             ),
-     *             @OA\Property(
-     *                 property="password",
-     *                 type="string",
-     *                 format="password",
-     *                 example="12345678A!",
-     *                 description="Пароль пользователя. Должен содержать минимум 8 символов, включая буквы и символы."
-     *             ),
-     *             @OA\Property(
-     *                 property="password_confirmation",
-     *                 type="string",
-     *                 format="password",
-     *                 example="12345678A!",
-     *                 description="Подтверждение пароля. Должно совпадать с полем password."
-     *             ),
-     *         ),
+     *             oneOf={
+     *                 @OA\Schema(
+     *                     description="Успешный пример запроса",
+     *                     required={"login", "email", "password", "password_confirmation"},
+     *                     @OA\Property(property="login", type="string", example="user123"),
+     *                     @OA\Property(property="email", type="string", format="email", example="user@example.com"),
+     *                     @OA\Property(property="password", type="string", format="password", example="12345678A!"),
+     *                     @OA\Property(property="password_confirmation", type="string", format="password", example="12345678A!")
+     *                 ),
+     *                 @OA\Schema(
+     *                     description="Пример с ошибками валидации",
+     *                     required={"login", "email", "password", "password_confirmation"},
+     *                     @OA\Property(property="login", type="string", example=""),
+     *                     @OA\Property(property="email", type="string", format="email", example="user"),
+     *                     @OA\Property(property="password", type="string", format="password", example="12345678A!"),
+     *                     @OA\Property(property="password_confirmation", type="string", format="password", example="")
+     *                 )
+     *             }
+     *         )
      *     ),
      *     @OA\Response(
      *         response=200,
@@ -162,7 +166,6 @@ class AuthController extends Controller
      *                 @OA\Property(property="updated_at", type="string", format="date-time", example="2025-04-13T23:23:19.000000Z")
      *             ),
      *             @OA\Property(property="token", type="string", example="1|abcdef1234567890"),
-     *             @OA\Property(property="expires_at", type="string", format="date-time", example="2025-04-14T12:30:00Z"),
      *         ),
      *     ),
      *     @OA\Response(
@@ -170,19 +173,16 @@ class AuthController extends Controller
      *         description="Ошибка валидации",
      *         @OA\JsonContent(
      *             type="object",
-     *             @OA\Property(property="message", type="string", example="The given data was invalid."),
+     *             @OA\Property(property="message", type="string", example="Поле login обязательно для заполнения. (and 1 more error)"),
      *             @OA\Property(property="errors", type="object",
      *                 @OA\Property(property="login", type="array",
-     *                     @OA\Items(type="string", example="The login field is required.")
+     *                     @OA\Items(type="string", example="Поле login уже занято.")
      *                 ),
      *                 @OA\Property(property="email", type="array",
-     *                     @OA\Items(type="string", example="The email field is required.")
+     *                     @OA\Items(type="string", example="Поле email уже занято.")
      *                 ),
      *                 @OA\Property(property="password", type="array",
-     *                     @OA\Items(type="string", example="The password field is required.")
-     *                 ),
-     *                 @OA\Property(property="password_confirmation", type="array",
-     *                     @OA\Items(type="string", example="The password confirmation field is required.")
+     *                     @OA\Items(type="string", example="Поле password обязательно для заполнения.")
      *                 ),
      *             ),
      *         ),
@@ -192,10 +192,12 @@ class AuthController extends Controller
      *         description="Внутренняя ошибка сервера",
      *         @OA\JsonContent(
      *             type="object",
-     *             @OA\Property(property="message", type="string", example="Internal Server Error"),
-     *             @OA\Property(property="error", type="string", example="Сообщение об ошибке"),
-     *         ),
-     *     ),
+     *             example={
+     *                 "message": "Internal Server Error",
+     *                 "error": "SQLSTATE[HY000] [2002] Connection refused"
+     *             }
+     *         )
+     *     )
      * )
      *
      * @param SignupRequest $request Валидированный запрос с данными для регистрации.
@@ -226,6 +228,30 @@ class AuthController extends Controller
             'token' => $token,
         ]);
     }
+//    public function signup(SignupRequest $request): JsonResponse
+//    {
+//        $data = $request->validated();
+//        Log::info("Я в методе signup");
+//
+//        // Сохраняем данные временно в session или Redis
+//        session([
+//            'signup_login' => $data['login'],
+//            'signup_email' => $data['email'],
+//            'signup_password' => $data['password'],
+//        ]);
+//
+//        // Отправка кода
+//        $code = MailHelper::generateVerificationCode();
+//        CodeConfirmation::createRecord($data['email'], $code);
+//        Mail::to($data['email'])->send(new CodeConfirmationMail(['message' => $code]));
+//
+//        return response()->json([
+//            'status' => 'success',
+//            'message' => 'Код отправлен на почту',
+//        ]);
+//    }
+
+
 
 
     /**
@@ -276,7 +302,6 @@ class AuthController extends Controller
      *                  @OA\Property(property="updated_at", type="string", example="2025-04-13T21:28:50.000000Z")
      *              ),
      *              @OA\Property(property="token", type="string", example="20|ySOWySAojPSFajGYD58PKtJcgLctMvZRYhwjuerG61e0c9b5"),
-     *              @OA\Property(property="expires_at", type="string", example="2025-04-13T23:14:16.000000Z")
      *          )
      *      ),
      *     @OA\Response(
@@ -284,26 +309,28 @@ class AuthController extends Controller
      *         description="Ошибка валидации",
      *         @OA\JsonContent(
      *             type="object",
-     *             @OA\Property(property="message", type="string", example="Логин или пароль не верны."),
+     *             @OA\Property(property="message", type="string", example="Поле login обязательно для заполнения. (and 1 more error)"),
      *             @OA\Property(property="errors", type="object",
      *                 @OA\Property(property="login", type="array",
-     *                     @OA\Items(type="string", example="The login field is required.")
+     *                     @OA\Items(type="string", example="Поле login обязательно для заполнения.")
      *                 ),
      *                 @OA\Property(property="password", type="array",
-     *                     @OA\Items(type="string", example="The password field is required.")
+     *                     @OA\Items(type="string", example="Поле password обязательно для заполнения.")
      *                 ),
      *             ),
      *         )
      *     ),
      *     @OA\Response(
-     *         response=500,
-     *         description="Внутренняя ошибка сервера",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="message", type="string", example="Произошла внутренняя ошибка сервера."),
-     *             @OA\Property(property="error", type="string", example="Сообщение об ошибке"),
-     *         )
-     *     )
+     *          response=500,
+     *          description="Внутренняя ошибка сервера",
+     *          @OA\JsonContent(
+     *              type="object",
+     *              example={
+     *                  "message": "Internal Server Error",
+     *                  "error": "SQLSTATE[HY000] [2002] Connection refused"
+     *              }
+     *          )
+     *      )
      * )
      *
      * @param LoginRequest $request Валидированный запрос с данными для входа.
@@ -368,18 +395,20 @@ class AuthController extends Controller
      *         )
      *     ),
      *     @OA\Response(
-     *         response=500,
-     *         description="Внутренняя ошибка сервера",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="message", type="string", example="Произошла внутренняя ошибка сервера."),
-     *             @OA\Property(property="error", type="string", example="Сообщение об ошибке"),
-     *         )
-     *     )
+     *           response=500,
+     *           description="Внутренняя ошибка сервера",
+     *           @OA\JsonContent(
+     *               type="object",
+     *               example={
+     *                   "message": "Internal Server Error",
+     *                   "error": "SQLSTATE[HY000] [2002] Connection refused"
+     *               }
+     *           )
+     *       )
      * )
      *
      * @param Request $request Запрос, содержащий данные пользователя.
-     * @return JsonResponse Пустой ответ с кодом 204 или сообщение об ошибке.
+     * @return JsonResponse Пустой ответ с кодом 200 или сообщение об ошибке.
      */
     public function logout(Request $request): JsonResponse
     {

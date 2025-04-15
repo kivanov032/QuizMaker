@@ -129,38 +129,70 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "required": [
-                                    "login",
-                                    "email",
-                                    "password",
-                                    "password_confirmation"
-                                ],
-                                "properties": {
-                                    "login": {
-                                        "description": "Логин пользователя. Должен быть уникальным и содержать не более 55 символов.",
-                                        "type": "string",
-                                        "example": "user123"
+                                "oneOf": [
+                                    {
+                                        "description": "Успешный пример запроса",
+                                        "required": [
+                                            "login",
+                                            "email",
+                                            "password",
+                                            "password_confirmation"
+                                        ],
+                                        "properties": {
+                                            "login": {
+                                                "type": "string",
+                                                "example": "user123"
+                                            },
+                                            "email": {
+                                                "type": "string",
+                                                "format": "email",
+                                                "example": "user@example.com"
+                                            },
+                                            "password": {
+                                                "type": "string",
+                                                "format": "password",
+                                                "example": "12345678A!"
+                                            },
+                                            "password_confirmation": {
+                                                "type": "string",
+                                                "format": "password",
+                                                "example": "12345678A!"
+                                            }
+                                        },
+                                        "type": "object"
                                     },
-                                    "email": {
-                                        "description": "Email пользователя. Должен быть уникальным и соответствовать формату email.",
-                                        "type": "string",
-                                        "format": "email",
-                                        "example": "user@example.com"
-                                    },
-                                    "password": {
-                                        "description": "Пароль пользователя. Должен содержать минимум 8 символов, включая буквы и символы.",
-                                        "type": "string",
-                                        "format": "password",
-                                        "example": "12345678A!"
-                                    },
-                                    "password_confirmation": {
-                                        "description": "Подтверждение пароля. Должно совпадать с полем password.",
-                                        "type": "string",
-                                        "format": "password",
-                                        "example": "12345678A!"
+                                    {
+                                        "description": "Пример с ошибками валидации",
+                                        "required": [
+                                            "login",
+                                            "email",
+                                            "password",
+                                            "password_confirmation"
+                                        ],
+                                        "properties": {
+                                            "login": {
+                                                "type": "string",
+                                                "example": ""
+                                            },
+                                            "email": {
+                                                "type": "string",
+                                                "format": "email",
+                                                "example": "user"
+                                            },
+                                            "password": {
+                                                "type": "string",
+                                                "format": "password",
+                                                "example": "12345678A!"
+                                            },
+                                            "password_confirmation": {
+                                                "type": "string",
+                                                "format": "password",
+                                                "example": ""
+                                            }
+                                        },
+                                        "type": "object"
                                     }
-                                },
-                                "type": "object"
+                                ]
                             }
                         }
                     }
@@ -204,11 +236,6 @@
                                         "token": {
                                             "type": "string",
                                             "example": "1|abcdef1234567890"
-                                        },
-                                        "expires_at": {
-                                            "type": "string",
-                                            "format": "date-time",
-                                            "example": "2025-04-14T12:30:00Z"
                                         }
                                     },
                                     "type": "object"
@@ -224,7 +251,7 @@
                                     "properties": {
                                         "message": {
                                             "type": "string",
-                                            "example": "The given data was invalid."
+                                            "example": "Поле login обязательно для заполнения. (and 1 more error)"
                                         },
                                         "errors": {
                                             "properties": {
@@ -232,28 +259,21 @@
                                                     "type": "array",
                                                     "items": {
                                                         "type": "string",
-                                                        "example": "The login field is required."
+                                                        "example": "Поле login уже занято."
                                                     }
                                                 },
                                                 "email": {
                                                     "type": "array",
                                                     "items": {
                                                         "type": "string",
-                                                        "example": "The email field is required."
+                                                        "example": "Поле email уже занято."
                                                     }
                                                 },
                                                 "password": {
                                                     "type": "array",
                                                     "items": {
                                                         "type": "string",
-                                                        "example": "The password field is required."
-                                                    }
-                                                },
-                                                "password_confirmation": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "type": "string",
-                                                        "example": "The password confirmation field is required."
+                                                        "example": "Поле password обязательно для заполнения."
                                                     }
                                                 }
                                             },
@@ -270,17 +290,11 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Internal Server Error"
-                                        },
-                                        "error": {
-                                            "type": "string",
-                                            "example": "Сообщение об ошибке"
-                                        }
-                                    },
                                     "type": "object"
+                                },
+                                "example": {
+                                    "message": "Internal Server Error",
+                                    "error": "SQLSTATE[HY000] [2002] Connection refused"
                                 }
                             }
                         }
@@ -367,10 +381,6 @@
                                         "token": {
                                             "type": "string",
                                             "example": "20|ySOWySAojPSFajGYD58PKtJcgLctMvZRYhwjuerG61e0c9b5"
-                                        },
-                                        "expires_at": {
-                                            "type": "string",
-                                            "example": "2025-04-13T23:14:16.000000Z"
                                         }
                                     },
                                     "type": "object"
@@ -386,7 +396,7 @@
                                     "properties": {
                                         "message": {
                                             "type": "string",
-                                            "example": "Логин или пароль не верны."
+                                            "example": "Поле login обязательно для заполнения. (and 1 more error)"
                                         },
                                         "errors": {
                                             "properties": {
@@ -394,14 +404,14 @@
                                                     "type": "array",
                                                     "items": {
                                                         "type": "string",
-                                                        "example": "The login field is required."
+                                                        "example": "Поле login обязательно для заполнения."
                                                     }
                                                 },
                                                 "password": {
                                                     "type": "array",
                                                     "items": {
                                                         "type": "string",
-                                                        "example": "The password field is required."
+                                                        "example": "Поле password обязательно для заполнения."
                                                     }
                                                 }
                                             },
@@ -418,17 +428,11 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Произошла внутренняя ошибка сервера."
-                                        },
-                                        "error": {
-                                            "type": "string",
-                                            "example": "Сообщение об ошибке"
-                                        }
-                                    },
                                     "type": "object"
+                                },
+                                "example": {
+                                    "message": "Internal Server Error",
+                                    "error": "SQLSTATE[HY000] [2002] Connection refused"
                                 }
                             }
                         }
@@ -482,17 +486,11 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Произошла внутренняя ошибка сервера."
-                                        },
-                                        "error": {
-                                            "type": "string",
-                                            "example": "Сообщение об ошибке"
-                                        }
-                                    },
                                     "type": "object"
+                                },
+                                "example": {
+                                    "message": "Internal Server Error",
+                                    "error": "SQLSTATE[HY000] [2002] Connection refused"
                                 }
                             }
                         }
@@ -951,6 +949,18 @@
                         }
                     }
                 }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "description": "Введите токен в формате: Bearer {your_token}",
+                "name": "Authorization",
+                "in": "header",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
             }
         }
     },

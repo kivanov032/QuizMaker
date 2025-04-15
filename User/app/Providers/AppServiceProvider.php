@@ -2,33 +2,24 @@
 
 namespace App\Providers;
 
-use App\Helpers\CreatorQuizHelper;
-use App\Services\CreatorQuizService;
+use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
     /**
      * Register any application services.
-     *
-     * @return void
      */
-    public function register()
+    public function register(): void
     {
-        $this->app->singleton(CreatorQuizService::class, function ($app) {
-            return new CreatorQuizService(
-                $app->make(CreatorQuizHelper::class)
-            );
-        });
+        //
     }
 
     /**
      * Bootstrap any application services.
-     *
-     * @return void
      */
-    public function boot()
+    public function boot(): void
     {
-        //
+        Vite::prefetch(concurrency: 3);
     }
 }

@@ -284,4 +284,41 @@ class MailSenderController
         ], 200);
     }
 
+
+    public function signupConfirmed(Request $request): JsonResponse
+    {
+        $email = $request->input('email');
+        Log::info("Я в методе signupConfirmed", ['email' => $email]);
+
+        // Можно добавить проверку — существует ли подтверждённый код
+        $login = session('signup_login');
+        $password = session('signup_password');
+
+        if (!$login || !$password) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Сессия истекла. Повторите регистрацию.',
+            ], 400);
+        }
+
+        $uuid = Str::uuid();
+
+        /** @var User $user */
+        $user = User::create([
+            'id_user' => $uuid,
+            'login' => $login,
+            'email' => $email,
+            'password' => bcrypt($password),
+        ]);
+
+        $token = $user->createToken('main', ['*'], now()->addDays(2))->plainTextToken;
+
+        return response()->json([
+            'user' => $user,
+            'token' => $token,
+            'expires_at' => now()->addDays(2)->toISOString(),
+        ]);
+    }
+
+
 }

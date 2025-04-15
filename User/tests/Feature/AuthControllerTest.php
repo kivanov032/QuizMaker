@@ -333,7 +333,7 @@ class AuthControllerTest extends TestCase
             ->postJson('/api/logout');
 
         // Проверяем статус ответа
-        $response->assertStatus(204);
+        $response->assertStatus(200);
 
         // Удаляем созданного пользователя
         $user->delete();
@@ -358,31 +358,46 @@ class AuthControllerTest extends TestCase
     /**
      * Тест успешного получения данных пользователя.
      */
-    public function test_get_user_successful_with_valid_token(): void
+    public function test_get_user_successful_with_valid_token()
     {
-        // Создаем пользователя через фабрику
-        $user = User::factory()->create();
-        $token = $user->createToken('main')->plainTextToken;
+        // Создаём пользователя
+        $user = User::factory()->create([
+            'email' => 'newuser@example.com',
+            'login' => 'newuser',
+        ]);
 
-        // Отправляем запрос с токеном
+        // Устанавливаем время истечения токена так же, как в signup
+        $expiresAt = now()->addDays(2);
+
+        // Создаём токен
+        $token = $user->createToken('main', ['*'], $expiresAt)->plainTextToken;
+
+        // Делаем запрос с заголовком авторизации
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
         ])->getJson('/api/user');
 
-        // Проверяем статус ответа и структуру JSON
+        // Проверяем ответ
         $response->assertStatus(200)
-            ->assertJson([
+            ->assertJsonFragment([
                 'user' => [
                     'id_user' => $user->id_user,
-                    'login' => $user->login,
-                    'email' => $user->email,
+                    'email' => 'newuser@example.com',
+                    'login' => 'newuser',
+                    'created_quizzes_counter' => 0,
+                    'taken_quizzes_counter' => 0,
+                    'created_at' => $user->created_at->toISOString(),
+                    'updated_at' => $user->updated_at->toISOString(),
                 ],
                 'message' => 'Токен действителен',
             ]);
 
-        // Удаляем созданного пользователя
+        // Чистим пользователя
         $user->delete();
     }
+
+
+
 
     /**
      * Тест ошибки при отсутствии токена.
