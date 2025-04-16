@@ -11,9 +11,19 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Random\RandomException;
+use App\Http\Requests\SendMailCodeRequest;
+use App\Http\Requests\ConfirmCodeRequest;
+use App\Services\MailSenderService;
 
 class MailSenderController
 {
+
+    protected MailSenderService $service;
+
+    public function __construct(MailSenderService $service)
+    {
+        $this->service = $service;
+    }
 
     /**
      * Отправляет письмо с кодом подтверждения на указанный email.
@@ -68,7 +78,7 @@ class MailSenderController
      *             @OA\Property(
      *                 property="message",
      *                 type="string",
-     *                 example="The email field is required.",
+     *                 example="Поле email обязательно для заполнения.",
      *                 description="Сообщение об ошибке валидации."
      *             ),
      *             @OA\Property(
@@ -79,7 +89,7 @@ class MailSenderController
      *                     type="array",
      *                     @OA\Items(
      *                         type="string",
-     *                         example="The email field is required."
+     *                         example="Поле email обязательно для заполнения."
      *                     )
      *                 ),
      *             ),
@@ -106,42 +116,15 @@ class MailSenderController
      *     )
      * )
      *
-     * @param Request $request Валидированный запрос с email пользователя.
+     * @param SendMailCodeRequest $request Валидированный запрос с email пользователя.
      * @return JsonResponse Ответ с результатом отправки письма.
      * @throws RandomException
      */
-
-    public function sendMailForCodeConfirmation(Request $request): JsonResponse
+    public function sendMailForCodeConfirmation(SendMailCodeRequest $request): JsonResponse
     {
-        $request->validate([
-            'email' => 'required|email',
-        ]);
-        $email = $request->input('email');
-        Log::info("Полученные данные в метод SendMailForCodeConfirmation:", ['email' => $email]);
-
-        $codeConfirmation = MailHelper::generateVerificationCode();
-        $codeConfirmationRecord = CodeConfirmation::createRecord($email, $codeConfirmation);
-
-        $userData = [
-            'message' => $codeConfirmationRecord->code_confirmation,
-        ];
-
-        try {
-            Mail::to($email)->send(new CodeConfirmationMail($userData));
-            Log::info("Письмо отправлено на адрес: " . $email);
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Сообщение успешно доставлено пользователю.',
-            ], 200);
-        } catch (\Exception $e) {
-            Log::error("Ошибка отправки письма: " . $e->getMessage());
-
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Ошибка отправки письма.',
-            ], 500);
-        }
+        return $this->service->send($request->input('email'));
     }
+
 
     /**
      * Подтверждает код подтверждения.
@@ -213,7 +196,7 @@ class MailSenderController
      *             @OA\Property(
      *                 property="message",
      *                 type="string",
-     *                 example="The input code must be 6 digits.",
+     *                 example="Поле input code должно быть не меньше 6 символов.",
      *                 description="Сообщение об ошибке валидации."
      *             ),
      *             @OA\Property(
@@ -224,7 +207,7 @@ class MailSenderController
      *                     type="array",
      *                     @OA\Items(
      *                         type="string",
-     *                         example="The input code must be 6 digits."
+     *                         example="Поле input code должно быть не меньше 6 символов."
      *                     ),
      *                 ),
      *             ),
@@ -251,38 +234,14 @@ class MailSenderController
      *     )
      * )
      *
-     * @param Request $request Валидированный запрос с кодом подтверждения.
+     * @param ConfirmCodeRequest $request Валидированный запрос с кодом подтверждения.
      * @return JsonResponse Ответ со статусом подтверждения или сообщение об ошибке.
      */
-
-    public function confirmCode(Request $request): JsonResponse
+    public function confirmCode(ConfirmCodeRequest $request): JsonResponse
     {
-        $request->validate([
-            'input_code' => 'required|max:6|min:6|regex:/^\d+$/',
-        ]);
-        $input_code = $request->input('input_code');
-        Log::info("Полученные данные в метод confirmCode:", ['input_code' => $input_code]);
-        $result = CodeConfirmation::findValidCode($input_code);
-
-        if (!$result) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Неверный код подтверждения.',
-            ], 400);
-        }
-
-        if ($result['status'] === 'error') {
-            return response()->json([
-                'status' => 'error',
-                'message' => $result['message'],
-            ], 400);
-        }
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Код подтверждения верен.',
-        ], 200);
+        return $this->service->confirm($request->input('input_code'));
     }
+
 
 
 

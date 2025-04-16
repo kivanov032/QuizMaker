@@ -6,115 +6,6 @@
     },
     "paths": {
         "/api/": {},
-        "/api/check-activity": {
-            "get": {
-                "tags": [
-                    "UserDatabase"
-                ],
-                "summary": "Проверка связи с базой данных",
-                "description": "Метод проверяет активность сервера и соединение с базой данных.",
-                "operationId": "e81194338d09ff2beb29132e0fd890e0",
-                "responses": {
-                    "200": {
-                        "description": "Успешное подключение к БД",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "status": {
-                                            "type": "string",
-                                            "example": "success"
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Сервер активен, соединение с БД успешно установлено."
-                                        },
-                                        "server_status": {
-                                            "type": "string",
-                                            "example": "Активен"
-                                        },
-                                        "database_status": {
-                                            "type": "string",
-                                            "example": "Подключение к БД успешно"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Ошибка подключения к БД",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "oneOf": [
-                                        {
-                                            "properties": {
-                                                "status": {
-                                                    "type": "string",
-                                                    "example": "error"
-                                                },
-                                                "code": {
-                                                    "type": "string",
-                                                    "example": "DB_CONNECTION_ERROR"
-                                                },
-                                                "message": {
-                                                    "type": "string",
-                                                    "example": "Ошибка подключения к БД."
-                                                },
-                                                "server_status": {
-                                                    "type": "string",
-                                                    "example": "Активен"
-                                                },
-                                                "database_status": {
-                                                    "type": "string",
-                                                    "example": "Ошибка подключения к БД"
-                                                },
-                                                "error": {
-                                                    "type": "string",
-                                                    "example": "Сообщение об ошибке"
-                                                }
-                                            },
-                                            "type": "object"
-                                        },
-                                        {
-                                            "properties": {
-                                                "status": {
-                                                    "type": "string",
-                                                    "example": "error"
-                                                },
-                                                "code": {
-                                                    "type": "string",
-                                                    "example": "UNKNOWN_ERROR"
-                                                },
-                                                "message": {
-                                                    "type": "string",
-                                                    "example": "Неизвестная ошибка при подключении к БД."
-                                                },
-                                                "server_status": {
-                                                    "type": "string",
-                                                    "example": "Активен"
-                                                },
-                                                "database_status": {
-                                                    "type": "string",
-                                                    "example": "Неизвестная ошибка"
-                                                },
-                                                "error": {
-                                                    "type": "string",
-                                                    "example": "Сообщение об ошибке"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
         "/api/validate-signup": {
             "post": {
                 "tags": [
@@ -446,13 +337,13 @@
                                     "login": {
                                         "description": "Логин пользователя. Должен существовать в системе.",
                                         "type": "string",
-                                        "example": "user123"
+                                        "example": "qwerty"
                                     },
                                     "password": {
                                         "description": "Пароль пользователя. Должен соответствовать сохранённому в системе.",
                                         "type": "string",
                                         "format": "password",
-                                        "example": "12345678A!"
+                                        "example": "qwerty123/"
                                     }
                                 },
                                 "type": "object"
@@ -642,17 +533,36 @@
                                     "properties": {
                                         "user": {
                                             "properties": {
-                                                "id": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "name": {
+                                                "id_user": {
                                                     "type": "string",
-                                                    "example": "Иван Иванов"
+                                                    "format": "uuid",
+                                                    "example": "b9649790-f696-4aa0-9d40-dcfdddfbd9ec"
+                                                },
+                                                "login": {
+                                                    "type": "string",
+                                                    "example": "qwerty"
                                                 },
                                                 "email": {
                                                     "type": "string",
-                                                    "example": "user@example.com"
+                                                    "example": "qwerty@example.com"
+                                                },
+                                                "created_quizzes_counter": {
+                                                    "type": "integer",
+                                                    "example": 0
+                                                },
+                                                "taken_quizzes_counter": {
+                                                    "type": "integer",
+                                                    "example": 0
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2025-04-13T21:28:50.000000Z"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2025-04-13T21:28:50.000000Z"
                                                 }
                                             },
                                             "type": "object"
@@ -675,7 +585,7 @@
                                     "properties": {
                                         "message": {
                                             "type": "string",
-                                            "example": "Необходима авторизация."
+                                            "example": "Не авторизован."
                                         }
                                     },
                                     "type": "object"
@@ -688,17 +598,11 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Произошла внутренняя ошибка сервера."
-                                        },
-                                        "error": {
-                                            "type": "string",
-                                            "example": "Сообщение об ошибке"
-                                        }
-                                    },
                                     "type": "object"
+                                },
+                                "example": {
+                                    "message": "Internal Server Error",
+                                    "error": "SQLSTATE[HY000] [2002] Connection refused"
                                 }
                             }
                         }
@@ -709,133 +613,6 @@
                         "bearerAuth": []
                     }
                 ]
-            }
-        },
-        "/api/increment-created-quizzes-counter": {
-            "post": {
-                "tags": [
-                    "User"
-                ],
-                "summary": "Увеличение счетчика созданных викторин",
-                "description": "Метод принимает UUID пользователя, находит его в системе и увеличивает счетчик созданных викторин.",
-                "operationId": "7f0fb502f6892662b0cf70acb09cebdb",
-                "requestBody": {
-                    "description": "Данные для обновления счетчика",
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "id_user"
-                                ],
-                                "properties": {
-                                    "id_user": {
-                                        "description": "UUID пользователя, для которого нужно увеличить счетчик.",
-                                        "type": "string",
-                                        "format": "uuid",
-                                        "example": "50f65337-8506-466a-9502-b4003ff9fab2"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Успешное обновление счетчика",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "user": {
-                                            "properties": {
-                                                "id_user": {
-                                                    "type": "string",
-                                                    "example": "550e8400-e29b-41d4-a716-446655440000"
-                                                },
-                                                "created_quizzes_counter": {
-                                                    "type": "integer",
-                                                    "example": 5
-                                                }
-                                            },
-                                            "type": "object"
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Счетчик созданных викторин успешно обновлен"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Пользователь не найден",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Пользователь не найден"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Ошибка валидации",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Неверные данные."
-                                        },
-                                        "errors": {
-                                            "properties": {
-                                                "id_user": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "type": "string",
-                                                        "example": "The id_user field is required."
-                                                    }
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Внутренняя ошибка сервера",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Произошла внутренняя ошибка сервера."
-                                        },
-                                        "error": {
-                                            "type": "string",
-                                            "example": "Сообщение об ошибке"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                }
             }
         },
         "/api/send-mail-for-code-confirmation": {
@@ -900,7 +677,7 @@
                                         "message": {
                                             "description": "Сообщение об ошибке валидации.",
                                             "type": "string",
-                                            "example": "The email field is required."
+                                            "example": "Поле email обязательно для заполнения."
                                         },
                                         "errors": {
                                             "properties": {
@@ -908,7 +685,7 @@
                                                     "type": "array",
                                                     "items": {
                                                         "type": "string",
-                                                        "example": "The email field is required."
+                                                        "example": "Поле email обязательно для заполнения."
                                                     }
                                                 }
                                             },
@@ -1028,7 +805,7 @@
                                         "message": {
                                             "description": "Сообщение об ошибке валидации.",
                                             "type": "string",
-                                            "example": "The input code must be 6 digits."
+                                            "example": "Поле input code должно быть не меньше 6 символов."
                                         },
                                         "errors": {
                                             "properties": {
@@ -1036,7 +813,7 @@
                                                     "type": "array",
                                                     "items": {
                                                         "type": "string",
-                                                        "example": "The input code must be 6 digits."
+                                                        "example": "Поле input code должно быть не меньше 6 символов."
                                                     }
                                                 }
                                             },
@@ -1072,6 +849,259 @@
                     }
                 }
             }
+        },
+        "/api/check-activity": {
+            "get": {
+                "tags": [
+                    "UserDatabase"
+                ],
+                "summary": "Проверка связи с базой данных",
+                "description": "Метод проверяет активность сервера и соединение с базой данных.",
+                "operationId": "8d608cd051fe6ef362cc6ab0f7511013",
+                "responses": {
+                    "200": {
+                        "description": "Успешное подключение к БД",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Сервер активен, соединение с БД успешно установлено."
+                                        },
+                                        "server_status": {
+                                            "type": "string",
+                                            "example": "Активен"
+                                        },
+                                        "database_status": {
+                                            "type": "string",
+                                            "example": "Подключение к БД успешно"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка подключения к БД",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "oneOf": [
+                                        {
+                                            "properties": {
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "error"
+                                                },
+                                                "code": {
+                                                    "type": "string",
+                                                    "example": "DB_CONNECTION_ERROR"
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Ошибка подключения к БД."
+                                                },
+                                                "server_status": {
+                                                    "type": "string",
+                                                    "example": "Активен"
+                                                },
+                                                "database_status": {
+                                                    "type": "string",
+                                                    "example": "Ошибка подключения к БД"
+                                                },
+                                                "error": {
+                                                    "type": "string",
+                                                    "example": "Сообщение об ошибке"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        {
+                                            "properties": {
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "error"
+                                                },
+                                                "code": {
+                                                    "type": "string",
+                                                    "example": "UNKNOWN_ERROR"
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Неизвестная ошибка при подключении к БД."
+                                                },
+                                                "server_status": {
+                                                    "type": "string",
+                                                    "example": "Активен"
+                                                },
+                                                "database_status": {
+                                                    "type": "string",
+                                                    "example": "Неизвестная ошибка"
+                                                },
+                                                "error": {
+                                                    "type": "string",
+                                                    "example": "Сообщение об ошибке"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/increment-created-quizzes-counter": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Увеличение счетчика созданных викторин",
+                "description": "Метод принимает UUID пользователя, находит его в системе и увеличивает счетчик созданных викторин.",
+                "operationId": "843ef56654fd92e8b0aaf4271cd23e7e",
+                "requestBody": {
+                    "description": "Данные для обновления счетчика",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "id_user"
+                                ],
+                                "properties": {
+                                    "id_user": {
+                                        "description": "UUID пользователя, для которого нужно увеличить счетчик.",
+                                        "type": "string",
+                                        "format": "uuid",
+                                        "example": "50f65337-8506-466a-9502-b4003ff9fab2"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Успешное обновление счетчика",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "user": {
+                                            "properties": {
+                                                "id_user": {
+                                                    "type": "string",
+                                                    "format": "uuid",
+                                                    "example": "d8dd125c-3670-4d87-a946-14b9067d7ede"
+                                                },
+                                                "login": {
+                                                    "type": "string",
+                                                    "example": "test"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "test@example.com"
+                                                },
+                                                "created_quizzes_counter": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "taken_quizzes_counter": {
+                                                    "type": "integer",
+                                                    "example": 0
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2025-04-13T23:42:12.000000Z"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2025-04-13T23:42:12.000000Z"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Счетчик созданных викторин успешно обновлен"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Пользователь не найден",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Пользователь не найден"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Ошибка валидации",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Поле id user должно быть действительным UUID."
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "id_user": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "Поле id user должно быть действительным UUID."
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                },
+                                "example": {
+                                    "message": "Internal Server Error",
+                                    "error": "SQLSTATE[HY000] [2002] Connection refused"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -1088,12 +1118,12 @@
     },
     "tags": [
         {
-            "name": "UserDatabase",
-            "description": "UserDatabase"
-        },
-        {
             "name": "Authentication",
             "description": "Authentication"
+        },
+        {
+            "name": "UserDatabase",
+            "description": "UserDatabase"
         },
         {
             "name": "User",

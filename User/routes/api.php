@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\MailSenderController;
+use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\SystemController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,7 +20,7 @@ use Illuminate\Support\Facades\Route;
 
 
 
-Route::get('/check-activity', [AuthController::class, 'checkActivity']);
+Route::get('/check-activity', [SystemController::class, 'checkActivity']);
 
 //Route::middleware(['auth:sanctum', 'delete.token'])->group(function () {
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -31,7 +33,7 @@ Route::post('/validate-signup', [AuthController::class, 'validateSignup']);
 Route::post('/signup', [AuthController::class, 'signup']);
 Route::post('/login', [AuthController::class, 'login']);
 
-Route::post('/increment-created-quizzes-counter', [AuthController::class, 'incrementCreatedQuizzesCounter']);
+Route::post('/increment-created-quizzes-counter', [UserController::class, 'incrementCreatedQuizzesCounter']);
 
 //Route::post('/signup-confirmed', [AuthController::class, 'signupConfirmed']);
 Route::post('/send-mail-for-code-confirmation', [MailSenderController::class, 'sendMailForCodeConfirmation']);

@@ -12,6 +12,9 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use App\Services\AuthService;
+use Illuminate\Validation\ValidationException;
+
 
 use Illuminate\Support\Facades\DB;
 
@@ -31,88 +34,13 @@ use Illuminate\Support\Facades\DB;
 class AuthController extends Controller
 {
 
+    protected AuthService $authService;
 
-    /**
-     * Проверяет активность сервера и подключение к базе данных.
-     *
-     *
-     * @OA\Get(
-     *      path="/api/check-activity",
-     *      summary="Проверка связи с базой данных",
-     *      description="Метод проверяет активность сервера и соединение с базой данных.",
-     *      tags={"UserDatabase"},
-     *      @OA\Response(
-     *          response=200,
-     *          description="Успешное подключение к БД",
-     *          @OA\JsonContent(
-     *              type="object",
-     *              @OA\Property(property="status", type="string", example="success"),
-     *              @OA\Property(property="message", type="string", example="Сервер активен, соединение с БД успешно установлено."),
-     *              @OA\Property(property="server_status", type="string", example="Активен"),
-     *              @OA\Property(property="database_status", type="string", example="Подключение к БД успешно"),
-     *          )
-     *      ),
-     *      @OA\Response(
-     *          response=500,
-     *          description="Ошибка подключения к БД",
-     *          @OA\JsonContent(
-     *              oneOf={
-     *                  @OA\Schema(
-     *                      @OA\Property(property="status", type="string", example="error"),
-     *                      @OA\Property(property="code", type="string", example="DB_CONNECTION_ERROR"),
-     *                      @OA\Property(property="message", type="string", example="Ошибка подключения к БД."),
-     *                      @OA\Property(property="server_status", type="string", example="Активен"),
-     *                      @OA\Property(property="database_status", type="string", example="Ошибка подключения к БД"),
-     *                      @OA\Property(property="error", type="string", example="Сообщение об ошибке"),
-     *                  ),
-     *                  @OA\Schema(
-     *                      @OA\Property(property="status", type="string", example="error"),
-     *                      @OA\Property(property="code", type="string", example="UNKNOWN_ERROR"),
-     *                      @OA\Property(property="message", type="string", example="Неизвестная ошибка при подключении к БД."),
-     *                      @OA\Property(property="server_status", type="string", example="Активен"),
-     *                      @OA\Property(property="database_status", type="string", example="Неизвестная ошибка"),
-     *                      @OA\Property(property="error", type="string", example="Сообщение об ошибке"),
-     *                  )
-     *              }
-     *          )
-     *      )
-     *  )
-     *
-     *
-     * @return JsonResponse Ответ с состоянием сервера и БД.
-     */
-    public function checkActivity(): \Illuminate\Http\JsonResponse
+    public function __construct(AuthService $authService)
     {
-        Log::info("Я в checkConnectionWithDB");
-        $serverStatus = 'Активен';
-        try {
-            DB::connection()->getPdo();
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Сервер активен, соединение с БД успешно установлено.',
-                'server_status' => $serverStatus,
-                'database_status' => 'Подключение к БД успешно',
-            ], 200);
-        } catch (\PDOException $e) {
-            return response()->json([
-                'status' => 'error',
-                'code' => 'DB_CONNECTION_ERROR',
-                'message' => 'Ошибка подключения к БД.',
-                'server_status' => $serverStatus,
-                'database_status' => 'Ошибка подключения к БД',
-                'error' => $e->getMessage(),
-            ], 500);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'code' => 'UNKNOWN_ERROR',
-                'message' => 'Неизвестная ошибка при подключении к БД.',
-                'server_status' => $serverStatus,
-                'database_status' => 'Неизвестная ошибка',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
+        $this->authService = $authService;
     }
+
 
     /**
      * Проверяет введённые данные при регистрации.
@@ -181,13 +109,7 @@ class AuthController extends Controller
      */
     public function validateSignup(SignupRequest $request): JsonResponse
     {
-        $data = $request->validated();
-        //Log::info("Проверка данных регистрации", ['data' => $data]);
-
-        // Здесь просто возвращаем успешный ответ, если все данные корректны
-        return response()->json([
-            'message' => 'Данные прошли проверку.',
-        ]);
+        return response()->json($this->authService->validateSignup($request));
     }
 
 
@@ -282,28 +204,7 @@ class AuthController extends Controller
      */
     public function signup(SignupRequest $request): JsonResponse
     {
-        $data = $request->validated();
-        //Log::info('Signup request received', ['data' => $request->all()]);
-        Log::info("Я в методе signup");
-        $uuid = Str::uuid();
-        /** @var User $user */
-        $user = User::create([
-            'id_user' => $uuid,
-            'login' => $data['login'],
-            'email' => $data['email'],
-            'password' => bcrypt($data['password']),
-        ]);
-
-        //$expiresAt = now()->addMinutes(1);
-        //$expiresAt = now()->addDays(2);
-
-        $token = $user->createToken('main', ['*'], now()->addDays(2))->plainTextToken;
-        //$token = $user->createToken('main', ['*'], now()->addMinutes(1))->plainTextToken;
-
-        return response()->json([
-            'user' => $user,
-            'token' => $token,
-        ]);
+        return response()->json($this->authService->signup($request));
     }
 
 
@@ -329,14 +230,14 @@ class AuthController extends Controller
      *             @OA\Property(
      *                 property="login",
      *                 type="string",
-     *                 example="user123",
+     *                 example="qwerty",
      *                 description="Логин пользователя. Должен существовать в системе."
      *             ),
      *             @OA\Property(
      *                 property="password",
      *                 type="string",
      *                 format="password",
-     *                 example="12345678A!",
+     *                 example="qwerty123/",
      *                 description="Пароль пользователя. Должен соответствовать сохранённому в системе."
      *             ),
      *         )
@@ -393,30 +294,11 @@ class AuthController extends Controller
      */
     public function login(LoginRequest $request): JsonResponse
     {
-        Log::info("Я в методе login");
-        $credentials = $request->validated();
-
-        if (!Auth::attempt($credentials)) {
-            return response()->json([
-                'message' => 'Логин или пароль не верны.'
-            ], 422);
+        try {
+            return response()->json($this->authService->login($request));
+        } catch (ValidationException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
         }
-
-        /** @var User $user */
-        $user = Auth::user();
-        // Создание токена с указанием времени окончания
-        $tokenResult = $user->createToken('main', ['*'], now()->addDays(2));
-        //$tokenResult = $user->createToken('main', ['*'], now()->addMinutes(1));
-        $token = $tokenResult->plainTextToken;
-
-        // Находим запись токена в базе, чтобы взять expires_at
-        $tokenModel = $user->tokens()->latest()->first(); // последний созданный токен
-        $expiresAt = optional($tokenModel->expires_at)->toISOString(); // ISO-строка или null
-
-        return response()->json([
-            'user' => $user,
-            'token' => $token
-        ]);
     }
 
 
@@ -467,15 +349,8 @@ class AuthController extends Controller
      */
     public function logout(Request $request): JsonResponse
     {
-        Log::info("Я в методе logout");
-        /** @var User $user */
-        $user = $request->user();
-        if ($user) {
-            $user->currentAccessToken()->delete();
-        }
-        return response()->json([
-            'message' => 'Успешный выход'
-        ], 200);
+        $this->authService->logout($request);
+        return response()->json(['message' => 'Успешный выход']);
     }
 
 
@@ -498,9 +373,13 @@ class AuthController extends Controller
      *             @OA\Property(
      *                 property="user",
      *                 type="object",
-     *                 @OA\Property(property="id", type="integer", example=1),
-     *                 @OA\Property(property="name", type="string", example="Иван Иванов"),
-     *                 @OA\Property(property="email", type="string", example="user@example.com"),
+     *                 @OA\Property(property="id_user", type="string", format="uuid", example="b9649790-f696-4aa0-9d40-dcfdddfbd9ec"),
+     *                 @OA\Property(property="login", type="string", example="qwerty"),
+     *                 @OA\Property(property="email", type="string", example="qwerty@example.com"),
+     *                 @OA\Property(property="created_quizzes_counter", type="integer", example=0),
+     *                 @OA\Property(property="taken_quizzes_counter", type="integer", example=0),
+     *                 @OA\Property(property="created_at", type="string", format="date-time", example="2025-04-13T21:28:50.000000Z"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time", example="2025-04-13T21:28:50.000000Z"),
      *             ),
      *             @OA\Property(property="message", type="string", example="Токен действителен"),
      *         )
@@ -510,7 +389,7 @@ class AuthController extends Controller
      *         description="Неавторизованный доступ",
      *         @OA\JsonContent(
      *             type="object",
-     *             @OA\Property(property="message", type="string", example="Необходима авторизация."),
+     *             @OA\Property(property="message", type="string", example="Не авторизован.")
      *         )
      *     ),
      *     @OA\Response(
@@ -518,8 +397,10 @@ class AuthController extends Controller
      *         description="Внутренняя ошибка сервера",
      *         @OA\JsonContent(
      *             type="object",
-     *             @OA\Property(property="message", type="string", example="Произошла внутренняя ошибка сервера."),
-     *             @OA\Property(property="error", type="string", example="Сообщение об ошибке"),
+     *             example={
+     *                 "message": "Internal Server Error",
+     *                 "error": "SQLSTATE[HY000] [2002] Connection refused"
+     *             }
      *         )
      *     )
      * )
@@ -529,19 +410,11 @@ class AuthController extends Controller
      */
     public function getUser(Request $request): JsonResponse
     {
-        $user = $request->user();
-
-        // Получаем текущий токен из базы
-        $token = $user->tokens()->where('id', $user->currentAccessToken()->id)->first();
-
-        if (!$token || $token->expires_at->isPast()) {
-            return response()->json(['message' => 'Token expired'], 401);
+        try {
+            return response()->json($this->authService->getUser($request));
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 401);
         }
-
-        return response()->json([
-            'user' => $user,
-            'message' => 'Токен действителен'
-        ]);
     }
 
 
@@ -575,113 +448,6 @@ class AuthController extends Controller
 //        ]);
 //    }
 
-
-
-
-
-
-
-    /**
-     * Увеличивает счетчик созданных викторин для пользователя.
-     *
-     * Принимает UUID пользователя, находит его в системе и увеличивает счетчик созданных викторин.
-     * Возвращает обновленные данные пользователя и сообщение об успешном обновлении.
-     *
-     * @OA\Post(
-     *     path="/api/increment-created-quizzes-counter",
-     *     summary="Увеличение счетчика созданных викторин",
-     *     description="Метод принимает UUID пользователя, находит его в системе и увеличивает счетчик созданных викторин.",
-     *     tags={"User"},
-     *     @OA\RequestBody(
-     *         required=true,
-     *         description="Данные для обновления счетчика",
-     *         @OA\JsonContent(
-     *             required={"id_user"},
-     *             @OA\Property(
-     *                 property="id_user",
-     *                 type="string",
-     *                 format="uuid",
-     *                 example="50f65337-8506-466a-9502-b4003ff9fab2",
-     *                 description="UUID пользователя, для которого нужно увеличить счетчик."
-     *             ),
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Успешное обновление счетчика",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(
-     *                 property="user",
-     *                 type="object",
-     *                 @OA\Property(property="id_user", type="string", example="550e8400-e29b-41d4-a716-446655440000"),
-     *                 @OA\Property(property="created_quizzes_counter", type="integer", example=5),
-     *             ),
-     *             @OA\Property(property="message", type="string", example="Счетчик созданных викторин успешно обновлен"),
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="Пользователь не найден",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="message", type="string", example="Пользователь не найден"),
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=422,
-     *         description="Ошибка валидации",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="message", type="string", example="Неверные данные."),
-     *             @OA\Property(property="errors", type="object",
-     *                 @OA\Property(property="id_user", type="array",
-     *                     @OA\Items(type="string", example="The id_user field is required.")
-     *                 ),
-     *             ),
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Внутренняя ошибка сервера",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="message", type="string", example="Произошла внутренняя ошибка сервера."),
-     *             @OA\Property(property="error", type="string", example="Сообщение об ошибке"),
-     *         )
-     *     )
-     * )
-     *
-     * @param Request $request Запрос, содержащий UUID пользователя.
-     * @return JsonResponse Ответ с обновленными данными пользователя или сообщение об ошибке.
-     */
-    public function incrementCreatedQuizzesCounter(Request $request): JsonResponse
-    {
-        // Валидация входящих данных
-        $request->validate([
-            'id_user' => 'required|uuid',
-        ]);
-
-        // Получаем id_user из запроса
-        $id_user = $request->input('id_user');
-
-        // Находим пользователя по id_user
-        $user = User::where('id_user', $id_user)->first();
-
-        // Проверяем, существует ли пользователь
-        if (!$user) {
-            return response()->json(['message' => 'Пользователь не найден'], 404);
-        }
-
-        // Увеличиваем счетчик созданных викторин
-        $user->increment('created_quizzes_counter');
-
-        // Возвращаем обновленные данные пользователя
-        return response()->json([
-            'user' => $user,
-            'message' => 'Счетчик созданных викторин успешно обновлен',
-        ]);
-    }
 
 
 }
