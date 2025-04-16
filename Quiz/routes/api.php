@@ -21,8 +21,11 @@ Route::post('/create-quiz', [CreatorQuizController::class, 'createQuiz']);
 Route::get('/check-activity', [CreatorQuizController::class, 'checkActivity']);
 
 Route::post('/search-quiz', [PassingQuizController::class, 'searchQuiz']);
-//Route::post('/fix-quiz-errors', [CreatorQuizController::class, 'fixQuizErrors']);
-//Route::post('/create-quiz', [CreatorQuizController::class, 'createQuiz']);
-//Route::get('/check-activity', [CreatorQuizController::class, 'checkActivity']);
+Route::post('/download-quiz-questions', [PassingQuizController::class, 'downloadQuizQuestions']);
+Route::post('/check-quiz-answers', [PassingQuizController::class, 'checkQuizAnswers']);
+
+
+
+
 
 

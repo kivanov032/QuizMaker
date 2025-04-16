@@ -7,7 +7,7 @@ export default function MainLayout() {
     const { user, token, setUser, setToken, getStoredToken } = useStateContext();
     const navigate = useNavigate();
     const intervalRef = useRef(null);
-    const [loading, setLoading] = useState(true); // 👈 добавили флаг загрузки
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         console.log("Я в useEffect в MainLayout");
@@ -28,7 +28,7 @@ export default function MainLayout() {
                 console.error("Ошибка при проверке токена:", error);
                 handleLogout();
             } finally {
-                setLoading(false); // ✅ проверка завершилась
+                setLoading(false); // Проверка завершилась
             }
         };
 
@@ -87,7 +87,7 @@ export default function MainLayout() {
         return <div>Загрузка...</div>; // можно заменить на спиннер
     }
 
-    // 🟥 После загрузки — если всё-таки нет токена — редиректим
+    // После загрузки — если всё-таки нет токена — редиректим
     if (!token) {
         return <Navigate to="/login" />;
     }

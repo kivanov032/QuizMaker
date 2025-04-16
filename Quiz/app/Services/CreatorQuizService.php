@@ -624,7 +624,7 @@ class CreatorQuizService
      *                 @OA\Property(property="cosmeticErrorQuizName", type="boolean", example=true, description="Метка для исправления косметических ошибок в названии викторины.")
      *             ),
      *             @OA\Property(
-     *                 property="login_user",
+     *                 property="login",
      *                 type="string",
      *                 format="string",
      *                 example="k12345a",
@@ -677,7 +677,7 @@ class CreatorQuizService
         $questions = $data['questions']; // Массив вопросов
         $quizName = $data['quizName'] ?? ''; // Название викторины; если quizName отсутствует или null, используем пустую строку
         $errors = $data['errors']; // Массив меток на исправление ошибок
-        $login_user = $data['login_user']; // Логин пользователя
+        $login = $data['login']; // Логин пользователя
 
         Log::info("Полученные данные в метод createQuizWithQuestions:", $data);
 
@@ -712,7 +712,7 @@ class CreatorQuizService
 
         try {
             // Вызов метода для записи викторины в базу данных
-            CreatorQuizHelper::saveQuizToDatabase($quizName, $questions, $login_user);
+            CreatorQuizHelper::saveQuizToDatabase($quizName, $questions, $login);
 
 //            // Отправка данных викторины на внешний сервер в фоновом режиме
 //            Queue::push(new NotifyUserServerAboutUserQuiz([
@@ -726,7 +726,7 @@ class CreatorQuizService
                 KafkaService::publish(
                     'localhost',
                     'quiz_created',
-                    ['login' => $login_user]
+                    ['login' => $login]
                 );
             } catch (Exception $kafkaException) {
                 Log::error('Ошибка Kafka: ' . $kafkaException->getMessage());

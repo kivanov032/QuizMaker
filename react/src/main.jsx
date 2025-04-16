@@ -5,12 +5,15 @@ import './index.css'
 import {StrictMode} from "react";
 import { QuestionProvider } from './context/QuestionContext.jsx';
 import {ContextProvider} from "./context/ContextProvider.jsx";
+import {QuizProvider} from "./context/QuizContext.jsx";
 
 createRoot(document.getElementById('root')).render(
     <StrictMode>
         <ContextProvider>
             <QuestionProvider>
-                <RouterProvider router={router} />
+                <QuizProvider>
+                    <RouterProvider router={router} />
+                </QuizProvider>
             </QuestionProvider>
         </ContextProvider>
     </StrictMode>

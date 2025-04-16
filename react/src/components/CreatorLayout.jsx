@@ -156,7 +156,7 @@ export default function CreatorLayout() {
         try {
             console.log(user.id_user)
             checkboxes.minorErrors = true;
-            const response = await sendQuestionsToRecordInBD(quizName, questions, checkboxes, user.id_user);
+            const response = await sendQuestionsToRecordInBD(quizName, questions, checkboxes, user.login);
             if (response.status === 'success') {
                 console.log("Операция успешна, индекс операции:", response.operation_index);
                 alert("Викторина успешно создана!")
