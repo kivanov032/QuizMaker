@@ -41,6 +41,8 @@ export default function PassQuizQuestion() {
         if (nextQuestion <= quizQuestions.length) {
             navigate(`/passQuiz/${nextQuestion}`);
         } else {
+            console.log("userAnswers:", userAnswers)
+            console.log("АААААААААААААААА!!!!!!!!!!1")
             navigate('/passQuiz/quizResult');
         }
     };

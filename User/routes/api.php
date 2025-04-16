@@ -40,4 +40,3 @@ Route::post('/send-mail-for-code-confirmation', [MailSenderController::class, 's
 Route::post('/confirm-code', [MailSenderController::class, 'confirmCode']);
 
 
-

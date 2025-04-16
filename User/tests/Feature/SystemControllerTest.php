@@ -23,16 +23,16 @@ class SystemControllerTest extends TestCase
         $this->mock(UserController::class, function ($mock) use ($user) {
             $mock->shouldReceive('where')
                 ->once()
-                ->with('id_user', $user->id_user)
+                ->with('login', $user->login)
                 ->andReturnSelf();
             $mock->shouldReceive('first')
                 ->once()
-                ->andReturn($user); // Возвращаем пользователя для успешного запроса
+                ->andReturn($user);
         });
 
         // Отправляем запрос с UUID пользователя
         $response = $this->postJson('/api/increment-created-quizzes-counter', [
-            'id_user' => $user->id_user,
+            'login' => $user->login,
         ]);
 
         // Проверяем, что статус ответа 200 (успешно)

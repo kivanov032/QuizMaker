@@ -97,7 +97,7 @@ class UserController extends Controller
      * @param Request $request Запрос, содержащий UUID пользователя.
      * @return JsonResponse Ответ с обновленными данными пользователя или сообщение об ошибке.
      */
-    public function incrementCreatedQuizzesCounter(Request $request)
+    public function incrementCreatedQuizzesCounter(Request $request): JsonResponse
     {
         return $this->userService->incrementCreatedQuizzesCounter($request);
     }

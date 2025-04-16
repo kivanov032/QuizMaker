@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 
 export default function PassQuizLayout() {
     const navigate = useNavigate();
-    const { quiz, setQuizQuestions } = useQuizContext();
+    const { quiz, setQuizQuestions, resetUserAnswers } = useQuizContext();
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -22,7 +22,9 @@ export default function PassQuizLayout() {
 
                 if (status === 200) {
                     setQuizQuestions(data.questions);
+                    resetUserAnswers()
                     console.log(data.questions)
+                    console.log("Я тууууууут!!!!!!!!!!!!1111")
                     navigate(`/passQuiz/1`);
                 } else {
                     handleResultError(status);

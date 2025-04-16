@@ -27,6 +27,7 @@ export default function QuizResults() {
                 if (status === 200) {
                     setResults(data);
                     console.log("data: ", data)
+                    console.log("quizQuestions", quizQuestions)
                 } else {
                     handleResultError(status);
                 }
@@ -120,7 +121,7 @@ export default function QuizResults() {
                                     className={`detail-item ${detail.status === 'Right' ? 'correct' : 'incorrect'}`}
                                 >
                                     <div className="question-text">
-                                        Вопрос {index + 1}
+                                        Вопрос {index + 1}: {quizQuestions[index].question || 'Текст вопроса не найден'}
                                     </div>
                                     <div className="user-answer">
                                         {detail.status === 'Not Entered'
@@ -128,7 +129,7 @@ export default function QuizResults() {
                                             : `Ваш ответ: ${detail.userAnswer}`
                                         }
                                     </div>
-                                    {detail.status !== 'Right' && (  // Показываем правильный ответ для ЛЮБОГО некорректного статуса
+                                    {detail.status !== 'Right' && (
                                         <div className="correct-answer">
                                             Правильный ответ: {detail.correctAnswer}
                                         </div>
@@ -141,7 +142,7 @@ export default function QuizResults() {
                         <div className="navigation-buttons" style={{
                             display: 'flex',
                             justifyContent: 'center',
-                            margin: '30px 0'  // Отступ сверху и снизу 30px
+                            margin: '30px 0'
                         }}>
                             <button
                                 onClick={handleHomeButtonClick}

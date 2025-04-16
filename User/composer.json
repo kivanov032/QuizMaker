@@ -17,7 +17,6 @@
         "nextapps/laravel-swagger-ui": "*",
         "nunomaduro/collision": "^v8.6.1",
         "tightenco/ziggy": "^2.0",
-        "tymon/jwt-auth": "^2.2",
         "wotz/laravel-swagger-ui": "*"
     },
     "require-dev": {

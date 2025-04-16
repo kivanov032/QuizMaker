@@ -715,9 +715,9 @@ class CreatorQuizService
             CreatorQuizHelper::saveQuizToDatabase($quizName, $questions, $login);
 
 //            // Отправка данных викторины на внешний сервер в фоновом режиме
-//            Queue::push(new NotifyUserServerAboutUserQuiz([
-//                'login' => $login_user
-//            ]));
+            Queue::push(new NotifyUserServerAboutUserQuiz([
+                'login' => $login
+            ]));
 
 
             // Использование сервиса Kafka

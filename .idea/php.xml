@@ -378,6 +378,9 @@
       <path value="$PROJECT_DIR$/User/vendor/laravel-kafka/src" />
       <path value="$PROJECT_DIR$/User/vendor/laravel-kafka/tests" />
       <path value="$PROJECT_DIR$/User/vendor/predis/predis" />
+      <path value="$PROJECT_DIR$/User/vendor/tightenco/ziggy" />
+      <path value="$PROJECT_DIR$/User/vendor/laravel/breeze" />
+      <path value="$PROJECT_DIR$/User/vendor/inertiajs/inertia-laravel" />
       <path value="$PROJECT_DIR$/User/vendor/swagger-api/swagger-ui" />
     </include_path>
   </component>

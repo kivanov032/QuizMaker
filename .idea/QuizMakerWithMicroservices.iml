@@ -260,6 +260,8 @@
       <excludeFolder url="file://$MODULE_DIR$/User/vendor/zircote/swagger-php" />
       <excludeFolder url="file://$MODULE_DIR$/User/vendor/predis/predis" />
       <excludeFolder url="file://$MODULE_DIR$/User/vendor/swagger-api/swagger-ui" />
+      <excludeFolder url="file://$MODULE_DIR$/User/vendor/inertiajs/inertia-laravel" />
+      <excludeFolder url="file://$MODULE_DIR$/User/vendor/laravel/breeze" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

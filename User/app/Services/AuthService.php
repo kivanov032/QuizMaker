@@ -74,4 +74,17 @@ class AuthService
         return ['user' => $user, 'message' => 'Токен действителен'];
     }
 
+
+    public function incrementQuizCounterForUser(string $login): void
+    {
+        Log::info("Incrementing quiz counter for user: {$login}");
+        $user = User::where('login', $login)->first();
+
+        if (!$user) {
+            throw new \Exception('Пользователь не найден');
+        }
+
+        $user->increment('created_quizzes_counter');
+    }
+
 }
