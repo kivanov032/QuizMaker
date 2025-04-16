@@ -7,6 +7,9 @@ import MainLayout from "./components/MainLayout.jsx";
 import Login from "./views/Login.jsx";
 import SignUp from "./views/SignUp.jsx";
 import MainPage from "./views/MainPage.jsx";
+import PassQuizLayout from "./components/PassQuizLayout.jsx";
+import PassQuizQuestion from "./views/PassQuizQuestion.jsx";
+import QuizResults from "./views/QuizResults.jsx";
 
 const router = createBrowserRouter([
     {
@@ -41,6 +44,20 @@ const router = createBrowserRouter([
                         element: <CreatorQuestion />
                     },
                 ]
+            },
+            {
+                path: '/passQuiz',
+                element: <PassQuizLayout />,
+                children: [
+                    {
+                        path: '/passQuiz/:id',
+                        element: <PassQuizQuestion />
+                    },
+                    {
+                        path: '/passQuiz/quizResult',
+                        element: <QuizResults />
+                    },
+                ],
             },
         ]
     },

@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { QuestionContext } from '../context/QuestionContext';
-import "./creatorQuestion.css";
+import "./CreatorQuestion.css";
 
 export default function CreatorQuestion() {
     const { id } = useParams();

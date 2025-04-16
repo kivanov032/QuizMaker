@@ -71,6 +71,16 @@ return [
             'after_commit' => false,
         ],
 
+        'kafka' => [
+            'driver' => 'kafka',
+            'host' => env('KAFKA_HOST', 'localhost'),
+            'port' => env('KAFKA_PORT', 9092),
+            'topic' => env('KAFKA_TOPIC', 'default'),
+            'consumer_group' => env('KAFKA_CONSUMER_GROUP', 'default'),
+            'consumer_timeout_ms' => env('KAFKA_CONSUMER_TIMEOUT_MS', 100),
+            'consumer_auto_commit' => env('KAFKA_CONSUMER_AUTO_COMMIT', true),
+        ],
+
     ],
 
     /*

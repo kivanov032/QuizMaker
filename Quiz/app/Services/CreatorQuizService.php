@@ -4,21 +4,19 @@ namespace App\Services;
 
 use App\Helpers\CreatorQuizHelper;
 use App\Http\Requests\CreateQuizRequest;
-use App\Jobs\NotifyUserServerAboutUserQuiz;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+
+use Junges\Kafka\Facades\Kafka;
+
+use App\Jobs\NotifyUserServerAboutUserQuiz;
 use Illuminate\Support\Facades\Queue;
 
 class CreatorQuizService
 {
-    private $creatorQuizHelper;
-
-    public function __construct(CreatorQuizHelper $creatorQuizHelper)
-    {
-        $this->creatorQuizHelper = $creatorQuizHelper;
-    }
 
     /**
      * Проверяет активность сервера и подключение к базе данных.
@@ -91,7 +89,7 @@ class CreatorQuizService
                 'database_status' => 'Ошибка подключения к БД',
                 'error' => $e->getMessage(),
             ], 500);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'status' => 'error',
                 'code' => 'UNKNOWN_ERROR',
@@ -576,7 +574,7 @@ class CreatorQuizService
      *
      * Метод принимает данные викторины, включая вопросы, название и метки на исправление ошибок.
      * Если ошибки присутствуют, они исправляются перед сохранением викторины в базу данных.
-     * После успешного создания викторины, данные отправляются на внешний сервер в фоновом режиме.
+     * После успешного создания викторины происходит оповещение сервера User через кафку.
      *
      * @OA\Post(
      *     path="/api/create-quiz",
@@ -626,11 +624,11 @@ class CreatorQuizService
      *                 @OA\Property(property="cosmeticErrorQuizName", type="boolean", example=true, description="Метка для исправления косметических ошибок в названии викторины.")
      *             ),
      *             @OA\Property(
-     *                 property="id_user",
+     *                 property="login",
      *                 type="string",
-     *                 format="uuid",
-     *                 example="6f17c6d3-ed20-4e48-985a-f6d0848fe175",
-     *                 description="Уникальный идентификатор пользователя (UUID), создающего викторину."
+     *                 format="string",
+     *                 example="k12345a",
+     *                 description="Логин пользователя, создающего викторину."
      *             )
      *         )
      *     ),
@@ -679,7 +677,7 @@ class CreatorQuizService
         $questions = $data['questions']; // Массив вопросов
         $quizName = $data['quizName'] ?? ''; // Название викторины; если quizName отсутствует или null, используем пустую строку
         $errors = $data['errors']; // Массив меток на исправление ошибок
-        $id_user = $data['id_user']; // ID пользователя
+        $login = $data['login']; // Логин пользователя
 
         Log::info("Полученные данные в метод createQuizWithQuestions:", $data);
 
@@ -714,16 +712,30 @@ class CreatorQuizService
 
         try {
             // Вызов метода для записи викторины в базу данных
-            CreatorQuizHelper::saveQuizToDatabase($quizName, $questions);
+            CreatorQuizHelper::saveQuizToDatabase($quizName, $questions, $login);
 
-            // Отправка данных викторины на внешний сервер в фоновом режиме
-            Queue::push(new NotifyUserServerAboutUserQuiz([
-                'id_user' => $id_user
-            ]));
+//            // Отправка данных викторины на внешний сервер в фоновом режиме
+//            Queue::push(new NotifyUserServerAboutUserQuiz([
+//                'login' => $login_user
+//            ]));
+
+
+            // Использование сервиса Kafka
+            // Отправка в Kafka в отдельном try-catch
+            try {
+                KafkaService::publish(
+                    'localhost',
+                    'quiz_created',
+                    ['login' => $login]
+                );
+            } catch (Exception $kafkaException) {
+                Log::error('Ошибка Kafka: ' . $kafkaException->getMessage());
+                // Не прерываем выполнение, только логируем
+            }
 
             // Возвращаем успешный ответ
             return response()->json(['status' => 'success', 'operation_index' => 1], 201);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Ошибка при создании викторины: ' . $e->getMessage());
 
             // Возвращаем ошибку

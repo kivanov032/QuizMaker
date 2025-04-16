@@ -13,18 +13,21 @@ class NotifyUserServerAboutUserQuiz implements ShouldQueue
 {
     use InteractsWithQueue, Queueable, SerializesModels;
 
-    public $tries = 1; // Количество попыток
+    public int $tries = 1; // Количество попыток
 
-    protected $quizData;
+    protected array $quizData;
 
     // Константа для пути к API
-    private const API_PATH = '/api/increment-created-quizzes-counter';
+    private const string API_PATH = '/api/increment-created-quizzes-counter';
 
     public function __construct(array $quizData)
     {
         $this->quizData = $quizData;
     }
 
+    /**
+     * @throws \Exception
+     */
     public function handle(): void
     {
         try {
@@ -33,11 +36,11 @@ class NotifyUserServerAboutUserQuiz implements ShouldQueue
             $url = $baseUrl . self::API_PATH; // Формируем полный URL
 
             $response = Http::post($url, [
-                'id_user' => $this->quizData['id_user']
+                'login' => $this->quizData['login']
             ]);
 
             if ($response->successful()) {
-                Log::info('Сервер успешно оповещён о создании викторины пользователем: ' . $this->quizData['id_user']);
+                Log::info('Сервер успешно оповещён о создании викторины пользователем: ' . $this->quizData['login']);
             } else {
                 Log::error('Ошибка при оповещении сервера User о создании викторины пользователем: ' . $response->body());
                 throw new \Exception('Ошибка внешнего сервера: ' . $response->status());

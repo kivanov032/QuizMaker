@@ -69,19 +69,19 @@ export const sendQuestionsToFixError = async (quizName, questions, errors) => {
  * @param {string} quizName - Название викторины. Должно быть уникальным и не пустым.
  * @param {Array<Object>} questions - Список вопросов. Каждый вопрос должен быть объектом с полями, соответствующими структуре вопроса.
  * @param {Object} errors - Объект, содержащий флаги ошибок для обработки.
- * @param {number} id_user - Идентификатор пользователя, создающего викторину.
+ * @param {number} login - Логин пользователя, создающего викторину.
  * @returns {Promise<Object>} - Ответ от сервера. В случае успеха возвращает объект с данными, подтверждающими запись в БД.
  * @throws {Object} - В случае ошибки выбрасывает объект ответа сервера с деталями ошибки.
  */
-export const sendQuestionsToRecordInBD = async (quizName, questions, errors, id_user) => {
+export const sendQuestionsToRecordInBD = async (quizName, questions, errors, login) => {
     try {
-        console.log('Отправка запроса для записи вопросов в БД:', { quizName, questions, errors, id_user});
+        console.log('Отправка запроса для записи вопросов в БД:', { quizName, questions, errors, login});
 
         const response = await axios.post(`${BASE_URL}/api/create-quiz`, {
             questions,
             quizName,
             errors,
-            id_user
+            login
         });
 
         console.log('Ответ от сервера:', response.data);

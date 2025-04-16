@@ -876,11 +876,11 @@
                                         },
                                         "type": "object"
                                     },
-                                    "id_user": {
-                                        "description": "Уникальный идентификатор пользователя (UUID), создающего викторину.",
+                                    "login": {
+                                        "description": "Логин пользователя, создающего викторину.",
                                         "type": "string",
-                                        "format": "uuid",
-                                        "example": "6f17c6d3-ed20-4e48-985a-f6d0848fe175"
+                                        "format": "string",
+                                        "example": "k12345a"
                                     }
                                 },
                                 "type": "object"
@@ -968,6 +968,492 @@
                     }
                 }
             }
+        },
+        "/api/search-quiz": {
+            "post": {
+                "tags": [
+                    "PassingQuiz"
+                ],
+                "summary": "Поиск викторин по названию",
+                "description": "Метод выполняет поиск викторин по части названия (регистронезависимый).",
+                "operationId": "18e85f797c1eefb603a3ec3dc5b8e430",
+                "requestBody": {
+                    "description": "Параметры поиска",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "quizName"
+                                ],
+                                "properties": {
+                                    "quizName": {
+                                        "description": "Название или часть названия викторины для поиска",
+                                        "type": "string",
+                                        "example": "Тест по программированию"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Успешный поиск",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "quizzes": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id_quiz": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "name_quiz": {
+                                                        "type": "string",
+                                                        "example": "История Древнего мира"
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "example": "Тест по древней истории"
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2025-04-10T12:00:00Z"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Найдены следующие викторины"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Викторины не найдены",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Викторины не найдены"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Ошибка валидации",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Параметр поиска обязателен"
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "quizName": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The quizName field is required."
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Произошла внутренняя ошибка сервера"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Сообщение об ошибке"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/download-quiz-questions": {
+            "post": {
+                "tags": [
+                    "PassingQuiz"
+                ],
+                "summary": "Загрузка вопросов викторины",
+                "description": "Метод возвращает все вопросы для указанной викторины в перемешанном порядке с перемешанными вариантами ответов.",
+                "operationId": "a8b6dac777c62a76435b02e38a6ad29b",
+                "requestBody": {
+                    "description": "UUID викторины",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "id_quiz"
+                                ],
+                                "properties": {
+                                    "id_quiz": {
+                                        "description": "Уникальный идентификатор викторины в формате UUID",
+                                        "type": "string",
+                                        "format": "uuid",
+                                        "example": "593d3cf4-4aa7-438a-9e36-f7733cfcf473"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Успешный запрос",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "questions": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "description": "Порядковый номер вопроса",
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "question": {
+                                                        "description": "Текст вопроса",
+                                                        "type": "string",
+                                                        "example": "What is your name?"
+                                                    },
+                                                    "answers": {
+                                                        "description": "Массив перемешанных вариантов ответов",
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string",
+                                                            "example": "John"
+                                                        }
+                                                    },
+                                                    "correctAnswerIndex": {
+                                                        "description": "Индекс правильного ответа в массиве answers (начинается с 0)",
+                                                        "type": "integer",
+                                                        "example": 0
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Найдены следующие вопросы викторины"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Вопросы не найдены",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Вопросы викторины не найдены"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Ошибка валидации",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "id_quiz": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The id quiz field is required."
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Произошла внутренняя ошибка сервера."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Сообщение об ошибке"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/check-quiz-answers": {
+            "post": {
+                "tags": [
+                    "PassingQuiz"
+                ],
+                "summary": "Проверка ответов викторины",
+                "description": "Метод проверяет ответы пользователя на соответствие правильным ответам викторины и возвращает детализированный отчет с расширенной статистикой.",
+                "operationId": "e014c66163cbcec00e61c51f8a4be838",
+                "requestBody": {
+                    "description": "Данные для проверки ответов",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "userAnswers",
+                                    "quizQuestions",
+                                    "id_quiz"
+                                ],
+                                "properties": {
+                                    "userAnswers": {
+                                        "description": "Ассоциативный массив ответов пользователя (ключ - ID вопроса, значение - индекс выбранного ответа)",
+                                        "type": "object",
+                                        "example": {
+                                            "question1": 0,
+                                            "question2": 2
+                                        }
+                                    },
+                                    "quizQuestions": {
+                                        "description": "Массив вопросов викторины с правильными ответами",
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string",
+                                                    "example": "question1"
+                                                },
+                                                "correctAnswerIndex": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "answers": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "Вариант ответа"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "id_quiz": {
+                                        "description": "UUID викторины",
+                                        "type": "string",
+                                        "format": "uuid",
+                                        "example": "550e8400-e29b-41d4-a716-446655440000"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Успешная проверка ответов",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "results": {
+                                            "description": "Детализированные результаты по каждому вопросу",
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "properties": {
+                                                    "status": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "Right",
+                                                            "Wrong",
+                                                            "Not Entered"
+                                                        ]
+                                                    },
+                                                    "userAnswer": {
+                                                        "type": "string",
+                                                        "nullable": true
+                                                    },
+                                                    "correctAnswer": {
+                                                        "type": "string",
+                                                        "nullable": true
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Результаты проверки ответов"
+                                        },
+                                        "summary": {
+                                            "description": "Расширенная статистика по результатам",
+                                            "properties": {
+                                                "totalQuestions": {
+                                                    "description": "Общее количество вопросов",
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "correctAnswers": {
+                                                    "description": "Количество правильных ответов",
+                                                    "type": "integer",
+                                                    "example": 7
+                                                },
+                                                "wrongAnswers": {
+                                                    "description": "Количество неправильных ответов",
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "skippedQuestions": {
+                                                    "description": "Количество пропущенных вопросов",
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "scorePercentage": {
+                                                    "description": "Процент правильных ответов",
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 70
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Ошибка валидации",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "userAnswers": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The userAnswers field is required."
+                                                    }
+                                                },
+                                                "quizQuestions": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The quizQuestions field is required."
+                                                    }
+                                                },
+                                                "id_quiz": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The id_quiz field is required."
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Произошла внутренняя ошибка сервера."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Сообщение об ошибке"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "tags": [
@@ -978,6 +1464,10 @@
         {
             "name": "CreatorQuiz",
             "description": "CreatorQuiz"
+        },
+        {
+            "name": "PassingQuiz",
+            "description": "PassingQuiz"
         }
     ]
 }

@@ -14,6 +14,8 @@
       <sourceFolder url="file://$MODULE_DIR$/User/tests" isTestSource="true" packagePrefix="Tests\" />
       <sourceFolder url="file://$MODULE_DIR$/User/tests/Feature" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/User/tests/Unit" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/Quiz/vendor/laravel-kafka/src" isTestSource="false" packagePrefix="Junges\Kafka\" />
+      <sourceFolder url="file://$MODULE_DIR$/Quiz/vendor/swagger-api/swagger-ui" isTestSource="true" packagePrefix="Swagger\Ui\" />
       <excludeFolder url="file://$MODULE_DIR$/Quiz/vendor/accentinteractive/laravel-logcleaner" />
       <excludeFolder url="file://$MODULE_DIR$/Quiz/vendor/brick/math" />
       <excludeFolder url="file://$MODULE_DIR$/Quiz/vendor/carbonphp/carbon-doctrine-types" />
@@ -238,6 +240,26 @@
       <excludeFolder url="file://$MODULE_DIR$/User/vendor/vlucas/phpdotenv" />
       <excludeFolder url="file://$MODULE_DIR$/User/vendor/voku/portable-ascii" />
       <excludeFolder url="file://$MODULE_DIR$/User/vendor/webmozart/assert" />
+      <excludeFolder url="file://$MODULE_DIR$/Quiz/vendor/laravel-kafka/.github" />
+      <excludeFolder url="file://$MODULE_DIR$/Quiz/vendor/laravel-kafka/art" />
+      <excludeFolder url="file://$MODULE_DIR$/Quiz/vendor/laravel-kafka/config" />
+      <excludeFolder url="file://$MODULE_DIR$/Quiz/vendor/laravel-kafka/docs" />
+      <excludeFolder url="file://$MODULE_DIR$/Quiz/vendor/laravel-kafka/src" />
+      <excludeFolder url="file://$MODULE_DIR$/Quiz/vendor/laravel-kafka/tests" />
+      <excludeFolder url="file://$MODULE_DIR$/User/vendor/darkaonline/l5-swagger" />
+      <excludeFolder url="file://$MODULE_DIR$/User/vendor/doctrine/annotations" />
+      <excludeFolder url="file://$MODULE_DIR$/User/vendor/laravel-kafka/.github" />
+      <excludeFolder url="file://$MODULE_DIR$/User/vendor/laravel-kafka/art" />
+      <excludeFolder url="file://$MODULE_DIR$/User/vendor/laravel-kafka/config" />
+      <excludeFolder url="file://$MODULE_DIR$/User/vendor/laravel-kafka/docs" />
+      <excludeFolder url="file://$MODULE_DIR$/User/vendor/laravel-kafka/src" />
+      <excludeFolder url="file://$MODULE_DIR$/User/vendor/laravel-kafka/tests" />
+      <excludeFolder url="file://$MODULE_DIR$/User/vendor/nextapps/laravel-swagger-ui" />
+      <excludeFolder url="file://$MODULE_DIR$/User/vendor/psr/cache" />
+      <excludeFolder url="file://$MODULE_DIR$/User/vendor/wotz/laravel-swagger-ui" />
+      <excludeFolder url="file://$MODULE_DIR$/User/vendor/zircote/swagger-php" />
+      <excludeFolder url="file://$MODULE_DIR$/User/vendor/predis/predis" />
+      <excludeFolder url="file://$MODULE_DIR$/User/vendor/swagger-api/swagger-ui" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

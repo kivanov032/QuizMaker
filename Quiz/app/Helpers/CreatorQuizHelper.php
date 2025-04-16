@@ -617,7 +617,6 @@ class CreatorQuizHelper
     }
 
 
-
     /**
      * Сохраняет викторину и её вопросы в базу данных.
      *
@@ -632,17 +631,18 @@ class CreatorQuizHelper
      *                         - `question`: текст вопроса.
      *                         - `answers`: массив вариантов ответов.
      *                         - `correctAnswerIndex`: индекс правильного ответа в массиве `answers`.
+     * @param string $login_user Логин пользователя, который создаёт викторину
      * @return void Метод не возвращает значение, но сохраняет данные в базу данных.
      */
-    public static function saveQuizToDatabase(string $quizName, array $questions): void
+    public static function saveQuizToDatabase(string $quizName, array $questions, string $login_user): void
     {
-        DB::transaction(function () use ($quizName, $questions) {
+        DB::transaction(function () use ($quizName, $questions, $login_user) {
             // Занесение в бд название викторины (табл. quizzes)
             $quiz = Quiz::create([
                 'id_quiz' => Uuid::uuid4()->toString(),
                 'name_quiz' => $quizName,
                 'is_ready' => true,
-                'id_user' => null,
+                'login_user' => $login_user,
             ]);
             $id_quiz = $quiz->id_quiz;
 

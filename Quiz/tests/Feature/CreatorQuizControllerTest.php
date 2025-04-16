@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\Quiz;
+use App\Models\QuizQuestion;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
@@ -392,14 +394,14 @@ class CreatorQuizControllerTest extends TestCase
             'logicalErrors' => false,
             'cosmeticErrorQuizName' => false,
         ];
-        $id_user = '6f17c6d3-ed20-4e48-985a-f6d0848fe175';
+        $login = 'k12345a';
 
         // Вызов метода
         $response = $this->postJson('/api/create-quiz', [
             'quizName' => $quizName,
             'questions' => $questions,
             'errors' => $errors,
-            'id_user' => $id_user,
+            'login' => $login,
         ]);
 
         // Проверка статуса ответа и структуры JSON
@@ -431,14 +433,14 @@ class CreatorQuizControllerTest extends TestCase
             'logicalErrors' => false,
             'cosmeticErrorQuizName' => true,
         ];
-        $id_user = '6f17c6d3-ed20-4e48-985a-f6d0848fe175';
+        $login = 'k12345a';
 
         // Вызов метода
         $response = $this->postJson('/api/create-quiz', [
             'quizName' => $quizName,
             'questions' => $questions,
             'errors' => $errors,
-            'id_user' => $id_user,
+            'login' => $login,
         ]);
 
         // Проверка статуса ответа и структуры JSON
@@ -463,14 +465,14 @@ class CreatorQuizControllerTest extends TestCase
             'logicalErrors' => false,
             'cosmeticErrorQuizName' => false,
         ];
-        $id_user = '6f17c6d3-ed20-4e48-985a-f6d0848fe175';
+        $login = 'k12345a';
 
         // Вызов метода
         $response = $this->postJson('/api/create-quiz', [
             'quizName' => $quizName,
             'questions' => $questions,
             'errors' => $errors,
-            'id_user' => $id_user,
+            'login' => $login,
         ]);
 
         // Проверка статуса ответа и структуры JSON
