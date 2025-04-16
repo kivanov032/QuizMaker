@@ -35,21 +35,21 @@ export default function MainLayout() {
         checkAndExtendToken();
 
         // запускаем интервал только после успешного входа
-        if (!intervalRef.current && token) {
-            intervalRef.current = setInterval(async () => {
-                try {
-                    const { data } = await axiosClient.get('/check-and-extend-token');
-                    if (data.token) {
-                        setToken(data.token);
-                    }
-                } catch (error) {
-                    console.warn("❌ Не удалось продлить токен:", error);
-                    if (error.response?.status === 401) {
-                        handleLogout();
-                    }
-                }
-            }, 5 * 60 * 1000);
-        }
+        // if (!intervalRef.current && token) {
+        //     intervalRef.current = setInterval(async () => {
+        //         try {
+        //             const { data } = await axiosClient.get('/check-and-extend-token');
+        //             if (data.token) {
+        //                 setToken(data.token);
+        //             }
+        //         } catch (error) {
+        //             console.warn("Не удалось продлить токен:", error);
+        //             if (error.response?.status === 401) {
+        //                 handleLogout();
+        //             }
+        //         }
+        //     }, 5 * 60 * 1000);
+        // }
 
         return () => {
             if (intervalRef.current) {

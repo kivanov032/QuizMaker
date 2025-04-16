@@ -410,7 +410,7 @@ class AuthControllerTest extends TestCase
         // Проверяем статус ответа и сообщение об ошибке
         $response->assertStatus(401)
             ->assertJson([
-                'message' => 'Unauthenticated.',
+                'message' => 'Не авторизован.',
             ]);
     }
 
@@ -427,7 +427,7 @@ class AuthControllerTest extends TestCase
         // Проверяем статус ответа и сообщение об ошибке
         $response->assertStatus(401)
             ->assertJson([
-                'message' => 'Unauthenticated.',
+                'message' => 'Не авторизован.',
             ]);
     }
 

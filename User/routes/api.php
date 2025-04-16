@@ -27,12 +27,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
 //    Route::get('/check-and-extend-token', [AuthController::class, 'checkAndExtendToken']);
 });
 
+Route::post('/validate-signup', [AuthController::class, 'validateSignup']);
 Route::post('/signup', [AuthController::class, 'signup']);
 Route::post('/login', [AuthController::class, 'login']);
 
-//Route::post('/increment-created-quizzes-counter', [AuthController::class, 'incrementCreatedQuizzesCounter']);
+Route::post('/increment-created-quizzes-counter', [AuthController::class, 'incrementCreatedQuizzesCounter']);
 
-Route::post('/signup-confirmed', [AuthController::class, 'signupConfirmed']);
+//Route::post('/signup-confirmed', [AuthController::class, 'signupConfirmed']);
 Route::post('/send-mail-for-code-confirmation', [MailSenderController::class, 'sendMailForCodeConfirmation']);
 Route::post('/confirm-code', [MailSenderController::class, 'confirmCode']);
 

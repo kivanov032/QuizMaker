@@ -114,6 +114,83 @@ class AuthController extends Controller
         }
     }
 
+    /**
+     * Проверяет введённые данные при регистрации.
+     *
+     * Метод принимает данные для регистрации, валидирует их и возвращает успешный ответ
+     * с сообщением, если все данные корректны.
+     *
+     * @OA\Post(
+     *     path="/api/validate-signup",
+     *     summary="Проверка данных для регистрации",
+     *     description="Метод проверяет корректность данных, предоставленных пользователем при регистрации.",
+     *     tags={"Authentication"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="Данные для проверки регистрации",
+     *         @OA\JsonContent(
+     *             required={"login", "email", "password", "password_confirmation"},
+     *             @OA\Property(property="login", type="string", example="user123"),
+     *             @OA\Property(property="email", type="string", format="email", example="user@example.com"),
+     *             @OA\Property(property="password", type="string", format="password", example="12345678A!"),
+     *             @OA\Property(property="password_confirmation", type="string", format="password", example="12345678A!")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Данные прошли проверку",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Данные прошли проверку.")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Ошибка валидации",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Поле login обязательно для заполнения."),
+     *             @OA\Property(property="errors", type="object",
+     *                 @OA\Property(property="login", type="array",
+     *                     @OA\Items(type="string", example="Поле login обязательно для заполнения.")
+     *                 ),
+     *                 @OA\Property(property="email", type="array",
+     *                     @OA\Items(type="string", example="Поле email обязательно для заполнения.")
+     *                 ),
+     *                 @OA\Property(property="password", type="array",
+     *                     @OA\Items(type="string", example="Поле password обязательно для заполнения.")
+     *                 ),
+     *             ),
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Внутренняя ошибка сервера",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             example={
+     *                 "message": "Internal Server Error",
+     *                 "error": "SQLSTATE[HY000] [2002] Connection refused"
+     *             }
+     *         )
+     *     )
+     * )
+     *
+     * @param SignupRequest $request Валидированный запрос с данными для регистрации.
+     * @return JsonResponse Ответ с сообщением о результатах валидации данных.
+     */
+    public function validateSignup(SignupRequest $request): JsonResponse
+    {
+        $data = $request->validated();
+        //Log::info("Проверка данных регистрации", ['data' => $data]);
+
+        // Здесь просто возвращаем успешный ответ, если все данные корректны
+        return response()->json([
+            'message' => 'Данные прошли проверку.',
+        ]);
+    }
+
+
 
     /**
      * Регистрирует нового пользователя.
@@ -228,28 +305,6 @@ class AuthController extends Controller
             'token' => $token,
         ]);
     }
-//    public function signup(SignupRequest $request): JsonResponse
-//    {
-//        $data = $request->validated();
-//        Log::info("Я в методе signup");
-//
-//        // Сохраняем данные временно в session или Redis
-//        session([
-//            'signup_login' => $data['login'],
-//            'signup_email' => $data['email'],
-//            'signup_password' => $data['password'],
-//        ]);
-//
-//        // Отправка кода
-//        $code = MailHelper::generateVerificationCode();
-//        CodeConfirmation::createRecord($data['email'], $code);
-//        Mail::to($data['email'])->send(new CodeConfirmationMail(['message' => $code]));
-//
-//        return response()->json([
-//            'status' => 'success',
-//            'message' => 'Код отправлен на почту',
-//        ]);
-//    }
 
 
 
