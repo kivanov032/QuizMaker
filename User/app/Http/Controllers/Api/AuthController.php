@@ -5,18 +5,11 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\SignupRequest;
-use App\Models\User;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 use App\Services\AuthService;
 use Illuminate\Validation\ValidationException;
-
-
-use Illuminate\Support\Facades\DB;
 
     /**
      * @OA\Components(
@@ -112,8 +105,6 @@ class AuthController extends Controller
         return response()->json($this->authService->validateSignup($request));
     }
 
-
-
     /**
      * Регистрирует нового пользователя.
      *
@@ -208,8 +199,6 @@ class AuthController extends Controller
     }
 
 
-
-
     /**
      * Авторизует пользователя.
      *
@@ -230,14 +219,14 @@ class AuthController extends Controller
      *             @OA\Property(
      *                 property="login",
      *                 type="string",
-     *                 example="qwerty",
+     *                 example="user123",
      *                 description="Логин пользователя. Должен существовать в системе."
      *             ),
      *             @OA\Property(
      *                 property="password",
      *                 type="string",
      *                 format="password",
-     *                 example="qwerty123/",
+     *                 example="12345678A!",
      *                 description="Пароль пользователя. Должен соответствовать сохранённому в системе."
      *             ),
      *         )
@@ -354,6 +343,7 @@ class AuthController extends Controller
     }
 
 
+
     /**
      * Получает информацию о текущем аутентифицированном пользователе.
      *
@@ -412,19 +402,17 @@ class AuthController extends Controller
     {
         try {
             return response()->json($this->authService->getUser($request));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 401);
         }
     }
 
+}
 
 
-
-
-
-    /**
-     * Проверяет действительность токена и, если необходимо, продлевает его.
-     */
+/**
+ * Проверяет действительность токена и, если необходимо, продлевает его.
+ */
 //    public function checkAndExtendToken(Request $request): JsonResponse
 //    {
 //        echo "==> Метод checkAndExtendToken вызван\n";
@@ -447,7 +435,3 @@ class AuthController extends Controller
 //            'message' => 'Токен создан (тест)'
 //        ]);
 //    }
-
-
-
-}

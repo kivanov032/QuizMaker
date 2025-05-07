@@ -19,25 +19,24 @@ class UserController extends Controller
     /**
      * Увеличивает счетчик созданных викторин для пользователя.
      *
-     * Принимает UUID пользователя, находит его в системе и увеличивает счетчик созданных викторин.
+     * Принимает логин пользователя, находит его в системе и увеличивает счетчик созданных викторин.
      * Возвращает обновленные данные пользователя и сообщение об успешном обновлении.
      *
      * @OA\Post(
      *     path="/api/increment-created-quizzes-counter",
      *     summary="Увеличение счетчика созданных викторин",
-     *     description="Метод принимает UUID пользователя, находит его в системе и увеличивает счетчик созданных викторин.",
+     *     description="Метод принимает логин пользователя, находит его в системе и увеличивает счетчик созданных викторин.",
      *     tags={"User"},
      *     @OA\RequestBody(
      *         required=true,
      *         description="Данные для обновления счетчика",
      *         @OA\JsonContent(
-     *             required={"id_user"},
+     *             required={"login"},
      *             @OA\Property(
-     *                 property="id_user",
+     *                 property="login",
      *                 type="string",
-     *                 format="uuid",
-     *                 example="50f65337-8506-466a-9502-b4003ff9fab2",
-     *                 description="UUID пользователя, для которого нужно увеличить счетчик."
+     *                 example="test_user",
+     *                 description="Логин пользователя, для которого нужно увеличить счетчик."
      *             ),
      *         )
      *     ),
@@ -61,7 +60,7 @@ class UserController extends Controller
      *         )
      *     ),
      *     @OA\Response(
-     *         response=400,
+     *         response=404,
      *         description="Пользователь не найден",
      *         @OA\JsonContent(
      *             type="object",
@@ -73,10 +72,10 @@ class UserController extends Controller
      *         description="Ошибка валидации",
      *         @OA\JsonContent(
      *             type="object",
-     *             @OA\Property(property="message", type="string", example="Поле id user должно быть действительным UUID."),
+     *             @OA\Property(property="message", type="string", example="Поле login обязательно для заполнения."),
      *             @OA\Property(property="errors", type="object",
-     *                 @OA\Property(property="id_user", type="array",
-     *                     @OA\Items(type="string", example="Поле id user должно быть действительным UUID.")
+     *                 @OA\Property(property="login", type="array",
+     *                     @OA\Items(type="string", example="Поле login обязательно для заполнения.")
      *                 ),
      *             ),
      *         )
@@ -94,7 +93,7 @@ class UserController extends Controller
      *     )
      * )
      *
-     * @param Request $request Запрос, содержащий UUID пользователя.
+     * @param Request $request Запрос, содержащий логин пользователя.
      * @return JsonResponse Ответ с обновленными данными пользователя или сообщение об ошибке.
      */
     public function incrementCreatedQuizzesCounter(Request $request): JsonResponse

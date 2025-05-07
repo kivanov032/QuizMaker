@@ -6,115 +6,6 @@
     },
     "paths": {
         "/api/": {},
-        "/api/check-activity": {
-            "get": {
-                "tags": [
-                    "QuizDatabase"
-                ],
-                "summary": "Проверка связи с базой данных",
-                "description": "Метод проверяет активность сервера и соединение с базой данных.",
-                "operationId": "10882c865081a3cd9540037a1147beff",
-                "responses": {
-                    "200": {
-                        "description": "Успешное подключение к БД",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "status": {
-                                            "type": "string",
-                                            "example": "success"
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Сервер активен, соединение с БД успешно установлено."
-                                        },
-                                        "server_status": {
-                                            "type": "string",
-                                            "example": "Активен"
-                                        },
-                                        "database_status": {
-                                            "type": "string",
-                                            "example": "Подключение к БД успешно"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Ошибка подключения к БД",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "oneOf": [
-                                        {
-                                            "properties": {
-                                                "status": {
-                                                    "type": "string",
-                                                    "example": "error"
-                                                },
-                                                "code": {
-                                                    "type": "string",
-                                                    "example": "DB_CONNECTION_ERROR"
-                                                },
-                                                "message": {
-                                                    "type": "string",
-                                                    "example": "Ошибка подключения к БД."
-                                                },
-                                                "server_status": {
-                                                    "type": "string",
-                                                    "example": "Активен"
-                                                },
-                                                "database_status": {
-                                                    "type": "string",
-                                                    "example": "Ошибка подключения к БД"
-                                                },
-                                                "error": {
-                                                    "type": "string",
-                                                    "example": "Сообщение об ошибке"
-                                                }
-                                            },
-                                            "type": "object"
-                                        },
-                                        {
-                                            "properties": {
-                                                "status": {
-                                                    "type": "string",
-                                                    "example": "error"
-                                                },
-                                                "code": {
-                                                    "type": "string",
-                                                    "example": "UNKNOWN_ERROR"
-                                                },
-                                                "message": {
-                                                    "type": "string",
-                                                    "example": "Неизвестная ошибка при подключении к БД."
-                                                },
-                                                "server_status": {
-                                                    "type": "string",
-                                                    "example": "Активен"
-                                                },
-                                                "database_status": {
-                                                    "type": "string",
-                                                    "example": "Неизвестная ошибка"
-                                                },
-                                                "error": {
-                                                    "type": "string",
-                                                    "example": "Сообщение об ошибке"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
         "/api/search-quiz-errors": {
             "post": {
                 "tags": [
@@ -122,7 +13,7 @@
                 ],
                 "summary": "Анализ викторины на ошибки",
                 "description": "Метод проверяет вопросы и название викторины на наличие ошибок и возвращает их список.",
-                "operationId": "4569bf5ffcc7ce4e1bd2a094e20852c8",
+                "operationId": "a6079cdcd77ec85fa71e7c7315b01c90",
                 "requestBody": {
                     "description": "Данные викторины для анализа",
                     "required": true,
@@ -398,7 +289,7 @@
                 ],
                 "summary": "Исправление ошибок в викторине",
                 "description": "Метод исправляет ошибки в вопросах и названии викторины в зависимости от переданных меток. Возвращает либо исправленные данные, либо список ошибок.",
-                "operationId": "1d225979189631f9da117a53c6daf645",
+                "operationId": "d641f7182481dacd1da7bd0658ad9262",
                 "requestBody": {
                     "description": "Данные викторины для исправления ошибок",
                     "required": true,
@@ -795,7 +686,7 @@
                 ],
                 "summary": "Создание викторины",
                 "description": "Метод создает викторину, исправляет ошибки (если они есть) и сохраняет её в базу данных. После успешного создания данные отправляются на внешний сервер.",
-                "operationId": "c6ba386bfc1a4abd2742d1ef4e9e46c1",
+                "operationId": "84ab55208dfaaf0304fec6e0db85ee70",
                 "requestBody": {
                     "description": "Данные викторины для создания",
                     "required": true,
@@ -976,7 +867,7 @@
                 ],
                 "summary": "Поиск викторин по названию",
                 "description": "Метод выполняет поиск викторин по части названия (регистронезависимый).",
-                "operationId": "18e85f797c1eefb603a3ec3dc5b8e430",
+                "operationId": "7a7a4c3a4c1a6712122bc892cc8aa5e5",
                 "requestBody": {
                     "description": "Параметры поиска",
                     "required": true,
@@ -1107,14 +998,14 @@
                 }
             }
         },
-        "/api/download-quiz-questions": {
+        "/api/get-quiz-questions": {
             "post": {
                 "tags": [
                     "PassingQuiz"
                 ],
                 "summary": "Загрузка вопросов викторины",
                 "description": "Метод возвращает все вопросы для указанной викторины в перемешанном порядке с перемешанными вариантами ответов.",
-                "operationId": "a8b6dac777c62a76435b02e38a6ad29b",
+                "operationId": "b63cf7b0c1ae3d88c2ddca6eca0a1b92",
                 "requestBody": {
                     "description": "UUID викторины",
                     "required": true,
@@ -1259,7 +1150,7 @@
                 ],
                 "summary": "Проверка ответов викторины",
                 "description": "Метод проверяет ответы пользователя на соответствие правильным ответам викторины и возвращает детализированный отчет с расширенной статистикой.",
-                "operationId": "e014c66163cbcec00e61c51f8a4be838",
+                "operationId": "10db4047c12e829ce1480a483c2ad540",
                 "requestBody": {
                     "description": "Данные для проверки ответов",
                     "required": true,
@@ -1454,13 +1345,118 @@
                     }
                 }
             }
+        },
+        "/api/check-activity": {
+            "get": {
+                "tags": [
+                    "QuizDatabase"
+                ],
+                "summary": "Проверка связи с базой данных",
+                "description": "Метод проверяет активность сервера и соединение с базой данных.",
+                "operationId": "8d608cd051fe6ef362cc6ab0f7511013",
+                "responses": {
+                    "200": {
+                        "description": "Успешное подключение к БД",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Сервер активен, соединение с БД успешно установлено."
+                                        },
+                                        "server_status": {
+                                            "type": "string",
+                                            "example": "Активен"
+                                        },
+                                        "database_status": {
+                                            "type": "string",
+                                            "example": "Подключение к БД успешно"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка подключения к БД",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "oneOf": [
+                                        {
+                                            "properties": {
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "error"
+                                                },
+                                                "code": {
+                                                    "type": "string",
+                                                    "example": "DB_CONNECTION_ERROR"
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Ошибка подключения к БД."
+                                                },
+                                                "server_status": {
+                                                    "type": "string",
+                                                    "example": "Активен"
+                                                },
+                                                "database_status": {
+                                                    "type": "string",
+                                                    "example": "Ошибка подключения к БД"
+                                                },
+                                                "error": {
+                                                    "type": "string",
+                                                    "example": "Сообщение об ошибке"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        {
+                                            "properties": {
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "error"
+                                                },
+                                                "code": {
+                                                    "type": "string",
+                                                    "example": "UNKNOWN_ERROR"
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Неизвестная ошибка при подключении к БД."
+                                                },
+                                                "server_status": {
+                                                    "type": "string",
+                                                    "example": "Активен"
+                                                },
+                                                "database_status": {
+                                                    "type": "string",
+                                                    "example": "Неизвестная ошибка"
+                                                },
+                                                "error": {
+                                                    "type": "string",
+                                                    "example": "Сообщение об ошибке"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "tags": [
-        {
-            "name": "QuizDatabase",
-            "description": "QuizDatabase"
-        },
         {
             "name": "CreatorQuiz",
             "description": "CreatorQuiz"
@@ -1468,6 +1464,10 @@
         {
             "name": "PassingQuiz",
             "description": "PassingQuiz"
+        },
+        {
+            "name": "QuizDatabase",
+            "description": "QuizDatabase"
         }
     ]
 }

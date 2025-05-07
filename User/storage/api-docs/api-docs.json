@@ -337,13 +337,13 @@
                                     "login": {
                                         "description": "Логин пользователя. Должен существовать в системе.",
                                         "type": "string",
-                                        "example": "qwerty"
+                                        "example": "user123"
                                     },
                                     "password": {
                                         "description": "Пароль пользователя. Должен соответствовать сохранённому в системе.",
                                         "type": "string",
                                         "format": "password",
-                                        "example": "qwerty123/"
+                                        "example": "12345678A!"
                                     }
                                 },
                                 "type": "object"
@@ -965,7 +965,7 @@
                     "User"
                 ],
                 "summary": "Увеличение счетчика созданных викторин",
-                "description": "Метод принимает UUID пользователя, находит его в системе и увеличивает счетчик созданных викторин.",
+                "description": "Метод принимает логин пользователя, находит его в системе и увеличивает счетчик созданных викторин.",
                 "operationId": "843ef56654fd92e8b0aaf4271cd23e7e",
                 "requestBody": {
                     "description": "Данные для обновления счетчика",
@@ -974,14 +974,13 @@
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "id_user"
+                                    "login"
                                 ],
                                 "properties": {
-                                    "id_user": {
-                                        "description": "UUID пользователя, для которого нужно увеличить счетчик.",
+                                    "login": {
+                                        "description": "Логин пользователя, для которого нужно увеличить счетчик.",
                                         "type": "string",
-                                        "format": "uuid",
-                                        "example": "50f65337-8506-466a-9502-b4003ff9fab2"
+                                        "example": "test_user"
                                     }
                                 },
                                 "type": "object"
@@ -1042,7 +1041,7 @@
                             }
                         }
                     },
-                    "400": {
+                    "404": {
                         "description": "Пользователь не найден",
                         "content": {
                             "application/json": {
@@ -1066,15 +1065,15 @@
                                     "properties": {
                                         "message": {
                                             "type": "string",
-                                            "example": "Поле id user должно быть действительным UUID."
+                                            "example": "Поле login обязательно для заполнения."
                                         },
                                         "errors": {
                                             "properties": {
-                                                "id_user": {
+                                                "login": {
                                                     "type": "array",
                                                     "items": {
                                                         "type": "string",
-                                                        "example": "Поле id user должно быть действительным UUID."
+                                                        "example": "Поле login обязательно для заполнения."
                                                     }
                                                 }
                                             },

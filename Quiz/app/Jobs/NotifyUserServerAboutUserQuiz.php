@@ -14,11 +14,9 @@ class NotifyUserServerAboutUserQuiz implements ShouldQueue
     use InteractsWithQueue, Queueable, SerializesModels;
 
     public int $tries = 1; // Количество попыток
+    protected array $quizData; // Данные для отправки через очередь
 
-    protected array $quizData;
-
-    // Константа для пути к API
-    private const string API_PATH = '/api/increment-created-quizzes-counter';
+    private const string API_PATH = '/api/increment-created-quizzes-counter'; // Константа для пути к API
 
     public function __construct(array $quizData)
     {
@@ -33,7 +31,7 @@ class NotifyUserServerAboutUserQuiz implements ShouldQueue
         try {
             // Получаем базовый URL из переменной окружения
             $baseUrl = env('USER_API_BASE_URL');
-            $url = $baseUrl . self::API_PATH; // Формируем полный URL
+            $url = $baseUrl.self::API_PATH; // Формируем полный URL
 
             $response = Http::post($url, [
                 'login' => $this->quizData['login']

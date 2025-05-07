@@ -7,28 +7,25 @@ use App\Http\Requests\LoginRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class AuthService
 {
 
+    // Проверка данных при регистрации
     public function validateSignup(SignupRequest $request): array
     {
         return ['message' => 'Данные прошли проверку.'];
     }
 
+    // Регистрация нового пользователя.
     public function signup(SignupRequest $request): array
     {
         $data = $request->validated();
-        Log::info("Я в методе signup");
-
-        $uuid = Str::uuid();
 
         $user = User::create([
-            'id_user' => $uuid,
+            'id_user' => Str::uuid(),
             'login' => $data['login'],
             'email' => $data['email'],
             'password' => bcrypt($data['password']),
@@ -39,12 +36,13 @@ class AuthService
         return ['user' => $user, 'token' => $token];
     }
 
+    // Авторизация пользователя
     public function login(LoginRequest $request): array
     {
-        $credentials = $request->validated();
-
-        if (!Auth::attempt($credentials)) {
-            throw ValidationException::withMessages(['login' => 'Логин или пароль не верны.']);
+        if (!Auth::attempt($request->validated())) {
+            throw ValidationException::withMessages([
+                'login' => 'Логин или пароль не верны.'
+            ]);
         }
 
         $user = Auth::user();
@@ -53,6 +51,7 @@ class AuthService
         return ['user' => $user, 'token' => $token];
     }
 
+    // Выход пользователя из системы
     public function logout(Request $request): void
     {
         $user = $request->user();
@@ -61,10 +60,10 @@ class AuthService
         }
     }
 
+    // Получение информации о текущем аутентифицированном пользователе.
     public function getUser(Request $request): array
     {
         $user = $request->user();
-
         $token = $user->tokens()->where('id', $user->currentAccessToken()->id)->first();
 
         if (!$token || $token->expires_at->isPast()) {
@@ -73,18 +72,4 @@ class AuthService
 
         return ['user' => $user, 'message' => 'Токен действителен'];
     }
-
-
-    public function incrementQuizCounterForUser(string $login): void
-    {
-        Log::info("Incrementing quiz counter for user: {$login}");
-        $user = User::where('login', $login)->first();
-
-        if (!$user) {
-            throw new \Exception('Пользователь не найден');
-        }
-
-        $user->increment('created_quizzes_counter');
-    }
-
 }

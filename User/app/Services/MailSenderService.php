@@ -2,35 +2,31 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Log;
+use App\Http\Requests\ConfirmCodeConfirmationRequest;
+use App\Http\Requests\SendCodeConfirmationRequest;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\CodeConfirmationMail;
 use App\Helpers\MailHelper;
-use App\Models\CodeConfirmation;
 use Illuminate\Http\JsonResponse;
 
 class MailSenderService
 {
-    public function send(string $email): JsonResponse
+    // Отправка кода подтверждения на почту
+    public function sendCode(SendCodeConfirmationRequest $request): JsonResponse
     {
-        Log::info("Полученные данные в метод send:", ['email' => $email]);
+        $email = $request->input('email');
 
-        $code = MailHelper::generateVerificationCode();
-        $record = CodeConfirmation::createRecord($email, $code);
-
-        $data = ['message' => $record->code_confirmation];
+        $code = MailHelper::generateCodeConfirmation(); // Генерация случайного 6-значного кода
+        $record = MailHelper::createCodeConfirmation($email, $code); // Занесение данного кода в бд
+        $data = ['message' => $record->code_confirmation]; // Формирование запрос для его отправки по почте
 
         try {
-            Mail::to($email)->send(new CodeConfirmationMail($data));
-            Log::info("Письмо отправлено на адрес: $email");
-
+            Mail::to($email)->send(new CodeConfirmationMail($data));  // Отправка кода подтверждения на почту
             return response()->json([
                 'status' => 'success',
                 'message' => 'Сообщение успешно доставлено пользователю.',
             ], 200);
         } catch (\Exception $e) {
-            Log::error("Ошибка отправки письма: " . $e->getMessage());
-
             return response()->json([
                 'status' => 'error',
                 'message' => 'Ошибка отправки письма.',
@@ -38,18 +34,23 @@ class MailSenderService
         }
     }
 
-    public function confirm(string $input_code): JsonResponse
+    // Подтверждение кода подтверждения
+    public function confirmCode(ConfirmCodeConfirmationRequest $request): JsonResponse
     {
-        Log::info("Полученные данные в метод confirm:", ['input_code' => $input_code]);
-        $result = CodeConfirmation::findValidCode($input_code);
+        $email = $request->input('email');
+        $input_code = $request->input('input_code');
 
+        $result = MailHelper::findCodeConfirmation($email, $input_code); // Поиск записи по коду подтверждения
+
+        // Случай на неверный код подтверждения
         if (!$result) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Неверный код подтверждения.',
+                'message' => 'Код подтверждения не отправлялся.',
             ], 400);
         }
 
+        // Случай на истёкший код подтверждения
         if ($result['status'] === 'error') {
             return response()->json([
                 'status' => 'error',
@@ -57,6 +58,7 @@ class MailSenderService
             ], 400);
         }
 
+        // Позитивный сценарий
         return response()->json([
             'status' => 'success',
             'message' => 'Код подтверждения верен.',

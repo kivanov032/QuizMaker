@@ -59,7 +59,7 @@ export default function CreatorLayout() {
                 criticalQuestionErrors: hasCriticalQuestionErrors,
             }));
         }
-    }, [quizErrors]);
+    }, [quizErrors, user.id_user]);
 
     //Функция для обновления состояния названия викторины
     const handleNameQuizChange = (value) => {

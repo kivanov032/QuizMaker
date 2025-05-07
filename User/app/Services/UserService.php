@@ -8,14 +8,15 @@ use Illuminate\Http\Request;
 
 class UserService
 {
+    // Инкрементация поля created_quizzes_counter в User ($request)
     public function incrementCreatedQuizzesCounter(Request $request): JsonResponse
     {
         $request->validate([
-            'id_user' => 'required|uuid',
+            'login' => 'required|string',
         ]);
 
-        $id_user = $request->input('id_user');
-        $user = User::where('id_user', $id_user)->first();
+        $login = $request->input('login');
+        $user = User::where('login', $login)->first();
 
         if (!$user) {
             return response()->json(['message' => 'Пользователь не найден'], 404);
@@ -27,5 +28,17 @@ class UserService
             'user' => $user,
             'message' => 'Счетчик созданных викторин успешно обновлен',
         ]);
+    }
+
+    // Инкрементация поля created_quizzes_counter в User ($login)
+    public function incrementCreatedQuizzesCounter_notRequest(string $login): void
+    {
+        $user = User::where('login', $login)->first();
+
+        if (!$user) {
+            throw new \Exception('Пользователь не найден');
+        }
+
+        $user->increment('created_quizzes_counter');
     }
 }

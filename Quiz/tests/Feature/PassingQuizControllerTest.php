@@ -124,7 +124,7 @@ class PassingQuizControllerTest extends TestCase
     /**
      * Тест успешного получения вопросов викторины в обновлённом формате вывода.
      */
-    public function test_download_quiz_questions_successful(): void
+    public function test_get_quiz_questions_successful(): void
     {
         $quiz = Quiz::factory()->create(['is_ready' => true]);
         $question1 = QuizQuestion::factory()->create([
@@ -140,7 +140,7 @@ class PassingQuizControllerTest extends TestCase
             'wrong_option' => ['Ошибка 1', 'Ошибка 2', 'Ошибка 3']
         ]);
 
-        $response = $this->postJson('/api/download-quiz-questions', [
+        $response = $this->postJson('/api/get-quiz-questions', [
             'id_quiz' => $quiz->id_quiz
         ]);
 
@@ -194,7 +194,7 @@ class PassingQuizControllerTest extends TestCase
             'wrong_option' => ['Ложь 1', 'Ложь 2']
         ]);
 
-        $response = $this->postJson('/api/download-quiz-questions', [
+        $response = $this->postJson('/api/get-quiz-questions', [
             'id_quiz' => $quiz->id_quiz
         ]);
 
@@ -208,11 +208,11 @@ class PassingQuizControllerTest extends TestCase
     /**
      * Тест попытки получения вопросов несуществующей викторины.
      */
-    public function test_download_quiz_questions_not_found(): void
+    public function test_get_quiz_questions_not_found(): void
     {
         $nonExistentId = Str::uuid();
 
-        $response = $this->postJson('/api/download-quiz-questions', [
+        $response = $this->postJson('/api/get-quiz-questions', [
             'id_quiz' => $nonExistentId
         ]);
 
@@ -225,9 +225,9 @@ class PassingQuizControllerTest extends TestCase
     /**
      * Тест валидации запроса без id_quiz.
      */
-    public function test_download_quiz_questions_validation_error(): void
+    public function test_get_quiz_questions_validation_error(): void
     {
-        $response = $this->postJson('/api/download-quiz-questions', []);
+        $response = $this->postJson('/api/get-quiz-questions', []);
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['id_quiz']);
@@ -256,7 +256,7 @@ class PassingQuizControllerTest extends TestCase
             'wrong_option' => ['Ошибка 1', 'Ошибка 2']
         ]);
 
-        $questionsResponse = $this->postJson('/api/download-quiz-questions', [
+        $questionsResponse = $this->postJson('/api/get-quiz-questions', [
             'id_quiz' => $quiz->id_quiz
         ]);
         $quizQuestions = $questionsResponse->json('questions');
@@ -314,7 +314,7 @@ class PassingQuizControllerTest extends TestCase
             'wrong_option' => ['Неправильный']
         ]);
 
-        $questionsResponse = $this->postJson('/api/download-quiz-questions', [
+        $questionsResponse = $this->postJson('/api/get-quiz-questions', [
             'id_quiz' => $quiz->id_quiz
         ]);
         $quizQuestions = $questionsResponse->json('questions');
@@ -358,7 +358,5 @@ class PassingQuizControllerTest extends TestCase
             ])
             ->assertJsonMissingValidationErrors(['userAnswers']);
     }
-
-
 
 }

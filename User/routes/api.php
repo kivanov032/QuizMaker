@@ -17,25 +17,23 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-
-
-
+// Проверка соединения с бд
 Route::get('/check-activity', [SystemController::class, 'checkActivity']);
 
-//Route::middleware(['auth:sanctum', 'delete.token'])->group(function () {
+// Регистрация и авторизация
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'getUser']);
-//    Route::get('/check-and-extend-token', [AuthController::class, 'checkAndExtendToken']);
 });
 
 Route::post('/validate-signup', [AuthController::class, 'validateSignup']);
 Route::post('/signup', [AuthController::class, 'signup']);
 Route::post('/login', [AuthController::class, 'login']);
 
+//Инкрементации
 Route::post('/increment-created-quizzes-counter', [UserController::class, 'incrementCreatedQuizzesCounter']);
 
-//Route::post('/signup-confirmed', [AuthController::class, 'signupConfirmed']);
+//Подтверждение кода
 Route::post('/send-mail-for-code-confirmation', [MailSenderController::class, 'sendMailForCodeConfirmation']);
 Route::post('/confirm-code', [MailSenderController::class, 'confirmCode']);
 

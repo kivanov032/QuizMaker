@@ -4,7 +4,6 @@ namespace Tests\Feature;
 use App\Http\Controllers\Api\AuthController;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class AuthControllerTest extends TestCase
@@ -397,8 +396,6 @@ class AuthControllerTest extends TestCase
     }
 
 
-
-
     /**
      * Тест ошибки при отсутствии токена.
      */
@@ -459,9 +456,6 @@ class AuthControllerTest extends TestCase
         // Удаляем созданного пользователя
         $user->delete();
     }
-
-
-
 
 }
 

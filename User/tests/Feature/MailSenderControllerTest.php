@@ -100,7 +100,7 @@ class MailSenderControllerTest extends TestCase
     public function test_valid_code_confirmation(): void
     {
         // Генерируем код и создаем запись через фабрику
-        $code = MailHelper::generateVerificationCode();
+        $code = MailHelper::generateCodeConfirmation();
         $record = CodeConfirmation::factory()->create([
             'code_confirmation' => $code,
             'updated_at' => now(),

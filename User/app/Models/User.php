@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -12,49 +11,44 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    protected $primaryKey = 'id_user';
-    public $incrementing = false;
-    public $keyType = 'uuid';
+    protected $table = 'users'; // Название таблицы, связанной с моделью
+
+    protected $primaryKey = 'id_user'; // Первичный ключ таблицы
+    public $keyType = 'uuid'; // Тип первичного ключа
+    public $incrementing = false; // Первичный ключ не является автоинкрементным
+    public $timestamps = true;
 
     /**
-     * The attributes that are mass assignable.
+     * Атрибуты, которые можно массово назначать.
      *
-     * @var array<int, string>
+     * @var array
      */
     protected $fillable = [
         'id_user',
         'login',
         'email',
         'password',
+        'created_quizzes_counter',
+        'taken_quizzes_counter'
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
+     * Атрибуты, которые должны быть скрыты при сериализации.
      *
      * @var array<int, string>
      */
     protected $hidden = [
         'password',
-        'remember_token',
+        'remember_token'
     ];
 
     /**
-     * The attributes that should be cast.
+     * Атрибуты, которые должны быть приведены к определённым типам.
      *
      * @var array<string, string>
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
-
-    public function getAuthIdentifierName(): string
-    {
-        return 'id_user';
-    }
-
-    public function findForPassport($login) {
-        return $this->where('login', $login)->first();
-    }
-
 
 }

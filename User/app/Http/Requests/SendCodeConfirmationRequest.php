@@ -1,9 +1,10 @@
 <?php
 
 namespace App\Http\Requests;
+
 use Illuminate\Foundation\Http\FormRequest;
 
-class LoginRequest extends FormRequest
+class SendCodeConfirmationRequest extends FormRequest
 {
     /**
      * Определяет, авторизован ли пользователь делать этот запрос.
@@ -19,8 +20,7 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'login' => 'required|string',
-            'password' => 'required',
+            'email' => 'required|email'
         ];
     }
 
@@ -30,12 +30,8 @@ class LoginRequest extends FormRequest
     public function messages(): array
     {
         return [
-            // Логин
-            'login.required' => 'Поле логина обязательно для заполнения',
-            'login.string' => 'Логин должен быть строкой',
-
-            // Пароль
-            'password.required' => 'Поле пароля обязательно для заполнения',
+            'email.required' => 'Поле логина обязательно для заполнения',
+            'email.email' => 'Введите корректный email адрес',
         ];
     }
 
@@ -45,8 +41,7 @@ class LoginRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'login' => 'Логин',
-            'password' => 'Пароль',
+            'email' => 'Email',
         ];
     }
 }

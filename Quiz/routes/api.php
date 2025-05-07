@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\SystemController;
 use App\Http\Controllers\Api\CreatorQuizController;
 use App\Http\Controllers\Api\PassingQuizController;
 use Illuminate\Support\Facades\Route;
@@ -15,13 +16,17 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// Проверка соединения с бд
+Route::get('/check-activity', [SystemController::class, 'checkActivity']);
+
+// Создание викторины
 Route::post('/search-quiz-errors', [CreatorQuizController::class, 'searchQuizErrors']);
 Route::post('/fix-quiz-errors', [CreatorQuizController::class, 'fixQuizErrors']);
 Route::post('/create-quiz', [CreatorQuizController::class, 'createQuiz']);
-Route::get('/check-activity', [CreatorQuizController::class, 'checkActivity']);
 
+// Прохождение викторины
 Route::post('/search-quiz', [PassingQuizController::class, 'searchQuiz']);
-Route::post('/download-quiz-questions', [PassingQuizController::class, 'downloadQuizQuestions']);
+Route::post('/get-quiz-questions', [PassingQuizController::class, 'getQuizQuestions']);
 Route::post('/check-quiz-answers', [PassingQuizController::class, 'checkQuizAnswers']);
 
 

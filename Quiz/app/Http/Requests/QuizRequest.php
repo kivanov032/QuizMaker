@@ -4,20 +4,18 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class CreateQuizRequest extends FormRequest
+class QuizRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
+     * Определяет, авторизован ли пользователь делать этот запрос.
      */
     public function authorize(): bool
     {
-        return true; // или false, если требуется авторизация
+        return true; // Разрешить всем
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * Получить правила валидации, применяемые к запросу.
      *
      * @return array
      */

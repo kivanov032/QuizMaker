@@ -1,26 +1,21 @@
 <?php
 namespace App\Mail;
 
-use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
-use Illuminate\Queue\SerializesModels;
 
-class CodeConfirmationMail extends Mailable
-{
-    use Queueable, SerializesModels;
-
+class CodeConfirmationMail extends Mailable {
     public $data;
 
-    public function __construct($data)
-    {
+    public function __construct($data) {
         $this->data = $data;
     }
 
     public function build(): CodeConfirmationMail
     {
         return $this->subject('Уведомление от приложения')
-            ->view('emails.code_confirmation');
+            ->view('emails.code_confirmation'); // Привязка шаблона письма
     }
 }
+
 
 

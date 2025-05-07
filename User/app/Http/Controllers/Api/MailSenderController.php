@@ -1,19 +1,12 @@
 <?php
 
 namespace App\Http\Controllers\Api;
-
-
-use App\Helpers\MailHelper;
-use App\Mail\CodeConfirmationMail;
+use App\Http\Requests\ConfirmCodeConfirmationRequest;
+use App\Http\Requests\SendCodeConfirmationRequest;
 use App\Models\CodeConfirmation;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
-use Random\RandomException;
-use App\Http\Requests\SendMailCodeRequest;
-use App\Http\Requests\ConfirmCodeRequest;
 use App\Services\MailSenderService;
+use Illuminate\Http\Request;
 
 class MailSenderController
 {
@@ -116,13 +109,12 @@ class MailSenderController
      *     )
      * )
      *
-     * @param SendMailCodeRequest $request Валидированный запрос с email пользователя.
+     * @param SendCodeConfirmationRequest $request Валидированный запрос с email пользователя.
      * @return JsonResponse Ответ с результатом отправки письма.
-     * @throws RandomException
      */
-    public function sendMailForCodeConfirmation(SendMailCodeRequest $request): JsonResponse
+    public function sendMailForCodeConfirmation(SendCodeConfirmationRequest $request): JsonResponse
     {
-        return $this->service->send($request->input('email'));
+        return $this->service->sendCode($request);
     }
 
 
@@ -234,15 +226,12 @@ class MailSenderController
      *     )
      * )
      *
-     * @param ConfirmCodeRequest $request Валидированный запрос с кодом подтверждения.
+     * @param ConfirmCodeConfirmationRequest $request Валидированный запрос с кодом подтверждения.
      * @return JsonResponse Ответ со статусом подтверждения или сообщение об ошибке.
      */
-    public function confirmCode(ConfirmCodeRequest $request): JsonResponse
+    public function confirmCode(ConfirmCodeConfirmationRequest $request): JsonResponse
     {
-        return $this->service->confirm($request->input('input_code'));
+        return $this->service->confirmCode($request);
     }
-
-
-
 
 }

@@ -66,71 +66,6 @@
     }
 }
 
-/* Модальное окно */
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.4);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-/* Контейнер модального окна */
-.modal-content {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    text-align: center;
-    position: relative;
-    min-width: 400px;
-    max-width: 90%;
-    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.3);
-    animation: fadeIn 0.3s;
-}
-
-/* Заголовки и текст в модальном окне */
-.modal-content h3 {
-    text-align: center; /* Выровнять заголовок по центру */
-    margin: 0 0 15px; /* Отступы для заголовка */
-    font-size: 1.5em; /* Размер шрифта заголовка */
-}
-
-
-/* Контейнер модального окна */
-.modal-content {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    text-align: left; /* Выровнять текст по центру */
-    position: relative;
-    min-width: 300px; /* Уменьшена минимальная ширина для сужения окна */
-    max-width: 80%; /* Ограничение максимальной ширины для мобильных устройств */
-    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.3);
-    animation: fadeIn 0.3s; /* Добавление анимации появления */
-}
-
-/* Если необходимо, добавьте отступы для параграфов */
-.modal-content p {
-    margin: 0; /* Удалить отступы, если они есть */
-}
-
-/* Кнопка */
-/* Кнопка по центру */
-.modal-content button {
-    display: block; /* Отображение кнопки как блочный элемент */
-    margin: 20px auto 0; /* Центрирование кнопки с отступом сверху */
-}
-
-.modal-content button:hover {
-    background-color: #0056b3; /* Темнее при наведении */
-}
-
-
 /* Чекбоксы */
 /* Стили для контейнера с чекбоксами */
 .checkbox-container {
@@ -149,19 +84,4 @@
     margin-right: 10px; /* Отступ между чекбоксом и текстом */
     vertical-align: middle; /* Выравнивание по вертикали */
     transform: translateY(5px); /* Небольшой сдвиг вниз для выравнивания */
-}
-
-/* Кнопка закрытия (крестик) */
-.close {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 20px;
-    cursor: pointer;
-    color: #333; /* Цвет крестика */
-    transition: color 0.3s; /* Плавный переход цвета */
-}
-
-.close:hover {
-    color: red; /* Изменение цвета при наведении */
 }
