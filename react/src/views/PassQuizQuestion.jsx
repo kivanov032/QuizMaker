@@ -1,12 +1,12 @@
-import {useEffect, useState} from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuizContext } from '../context/QuizContext';
-import "./passQuizQuestion.css";
+import './passQuizQuestion.css';
 
 export default function PassQuizQuestion() {
     const { id } = useParams();
     const navigate = useNavigate();
-    const {quizQuestions, userAnswers, setUserAnswers} = useQuizContext();
+    const { quizQuestions, userAnswers, setUserAnswers } = useQuizContext();
 
     const [currentQuestion, setCurrentQuestion] = useState(null);
     const [questionNumber, setQuestionNumber] = useState(0);
@@ -30,9 +30,9 @@ export default function PassQuizQuestion() {
     }, [id, quizQuestions, navigate]);
 
     const handleAnswerSelect = (index) => {
-        setUserAnswers(prev => ({
+        setUserAnswers((prev) => ({
             ...prev,
-            [questionNumber]: index
+            [questionNumber]: index,
         }));
     };
 
@@ -41,8 +41,8 @@ export default function PassQuizQuestion() {
         if (nextQuestion <= quizQuestions.length) {
             navigate(`/passQuiz/${nextQuestion}`);
         } else {
-            console.log("userAnswers:", userAnswers)
-            console.log("АААААААААААААААА!!!!!!!!!!1")
+            console.log('userAnswers:', userAnswers);
+            console.log('АААААААААААААААА!!!!!!!!!!1');
             navigate('/passQuiz/quizResult');
         }
     };
@@ -65,7 +65,9 @@ export default function PassQuizQuestion() {
     return (
         <div className="quiz-question-container">
             <div className="question-header">
-                <h3>Вопрос {questionNumber} из {quizQuestions.length}</h3>
+                <h3>
+                    Вопрос {questionNumber} из {quizQuestions.length}
+                </h3>
             </div>
 
             <div className="question-text-wrapper">
@@ -100,10 +102,7 @@ export default function PassQuizQuestion() {
                 >
                     Предыдущий вопрос
                 </button>
-                <button
-                    onClick={handleNextQuestion}
-                    className="next-btn"
-                >
+                <button onClick={handleNextQuestion} className="next-btn">
                     {questionNumber < quizQuestions.length ? 'Следующий вопрос' : 'Завершить'}
                 </button>
             </div>

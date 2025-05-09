@@ -1,7 +1,7 @@
-import { Navigate, Outlet, useNavigate } from "react-router-dom";
-import { useStateContext } from "../context/ContextProvider.jsx";
-import axiosClient from "../axios-client.js";
-import { useEffect, useRef, useState } from "react";
+import { Navigate, Outlet, useNavigate } from 'react-router-dom';
+import { useStateContext } from '../context/ContextProvider.jsx';
+import axiosClient from '../axios-client.js';
+import { useEffect, useRef, useState } from 'react';
 
 export default function MainLayout() {
     const { user, token, setUser, setToken, getStoredToken } = useStateContext();
@@ -10,7 +10,7 @@ export default function MainLayout() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        console.log("Я в useEffect в MainLayout");
+        console.log('Я в useEffect в MainLayout');
 
         const checkAndExtendToken = async () => {
             const storedToken = getStoredToken();
@@ -21,11 +21,11 @@ export default function MainLayout() {
 
             try {
                 const { data } = await axiosClient.get('/user');
-                console.log("Я в useEffect в checkToken");
+                console.log('Я в useEffect в checkToken');
                 setUser(data.user);
                 setToken(storedToken); // токен остаётся тем же
             } catch (error) {
-                console.error("Ошибка при проверке токена:", error);
+                console.error('Ошибка при проверке токена:', error);
                 handleLogout();
             } finally {
                 setLoading(false); // Проверка завершилась
@@ -64,7 +64,7 @@ export default function MainLayout() {
         try {
             await axiosClient.post('/logout');
         } catch (error) {
-            console.error("Ошибка при выходе:", error);
+            console.error('Ошибка при выходе:', error);
         } finally {
             handleLogout();
         }
@@ -79,7 +79,7 @@ export default function MainLayout() {
     };
 
     const handleMainLayoutClick = () => {
-        navigate("/");
+        navigate('/');
     };
 
     // 🟡 Пока загружаемся — ничего не показываем
@@ -96,11 +96,15 @@ export default function MainLayout() {
         <div>
             <header className="header">
                 <div className="header-left">
-                    <span className="clickable-main" onClick={handleMainLayoutClick}>МЕНЮ</span>
+                    <span className="clickable-main" onClick={handleMainLayoutClick}>
+                        МЕНЮ
+                    </span>
                 </div>
                 <div className="header-right">
                     <span className="clickable">{user.login}</span>
-                    <span onClick={onLogout} className="clickable logout">Выйти</span>
+                    <span onClick={onLogout} className="clickable logout">
+                        Выйти
+                    </span>
                 </div>
             </header>
             <main className="main-content">

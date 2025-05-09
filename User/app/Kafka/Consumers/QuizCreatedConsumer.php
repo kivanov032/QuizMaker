@@ -38,7 +38,3 @@ class QuizCreatedConsumer
             ->consume();
     }
 }
-
-
-
-

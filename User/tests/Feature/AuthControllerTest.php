@@ -1,4 +1,5 @@
 <?php
+
 namespace Tests\Feature;
 
 use App\Http\Controllers\Api\AuthController;
@@ -458,5 +459,3 @@ class AuthControllerTest extends TestCase
     }
 
 }
-
-

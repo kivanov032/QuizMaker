@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Api;
+
 use App\Http\Requests\ConfirmCodeConfirmationRequest;
 use App\Http\Requests\SendCodeConfirmationRequest;
 use App\Models\CodeConfirmation;
@@ -10,7 +11,6 @@ use Illuminate\Http\Request;
 
 class MailSenderController
 {
-
     protected MailSenderService $service;
 
     public function __construct(MailSenderService $service)

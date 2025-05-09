@@ -1,7 +1,7 @@
-import axios from "axios";
+import axios from 'axios';
 
 const axiosClient = axios.create({
-    baseURL: `${import.meta.env.VITE_USER_API_BASE_URL}/api`
+    baseURL: `${import.meta.env.VITE_USER_API_BASE_URL}/api`,
 });
 
 // Перехватчик запросов — добавляем токен в заголовки
@@ -26,7 +26,7 @@ axiosClient.interceptors.response.use(
     (error) => {
         const { response } = error;
         if (response?.status === 401) {
-            console.warn("Токен недействителен или истёк — редирект на вход");
+            console.warn('Токен недействителен или истёк — редирект на вход');
             localStorage.removeItem('ACCESS_TOKEN');
             localStorage.removeItem('USER_DATA');
             if (window.location.pathname !== '/login') {
@@ -34,7 +34,7 @@ axiosClient.interceptors.response.use(
             }
         }
         return Promise.reject(error);
-    }
+    },
 );
 
 export default axiosClient;

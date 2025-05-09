@@ -11,22 +11,21 @@ use Illuminate\Http\Request;
 use App\Services\AuthService;
 use Illuminate\Validation\ValidationException;
 
-    /**
-     * @OA\Components(
-     *     @OA\SecurityScheme(
-     *         securityScheme="bearerAuth",
-     *         type="http",
-     *         scheme="bearer",
-     *         bearerFormat="JWT",
-     *         in="header",
-     *         name="Authorization",
-     *         description="Введите токен в формате: Bearer {your_token}"
-     *     )
-     * )
-     */
+/**
+ * @OA\Components(
+ *     @OA\SecurityScheme(
+ *         securityScheme="bearerAuth",
+ *         type="http",
+ *         scheme="bearer",
+ *         bearerFormat="JWT",
+ *         in="header",
+ *         name="Authorization",
+ *         description="Введите токен в формате: Bearer {your_token}"
+ *     )
+ * )
+ */
 class AuthController extends Controller
 {
-
     protected AuthService $authService;
 
     public function __construct(AuthService $authService)

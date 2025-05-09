@@ -101,4 +101,3 @@ class UserController extends Controller
         return $this->userService->incrementCreatedQuizzesCounter($request);
     }
 }
-

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect  } from "react";
+import { createContext, useContext, useState, useEffect } from 'react';
 
 const StateContext = createContext({
     user: null,
@@ -10,7 +10,6 @@ const StateContext = createContext({
 
 // eslint-disable-next-line react/prop-types
 export const ContextProvider = ({ children }) => {
-
     const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('USER_DATA')) || {});
     const [token, setToken] = useState();
 
@@ -27,13 +26,15 @@ export const ContextProvider = ({ children }) => {
     }, [user, token]); // Срабатывает при изменении user или token
 
     return (
-        <StateContext.Provider value={{
-            user,
-            token,
-            setUser,
-            setToken,
-            getStoredToken,
-        }}>
+        <StateContext.Provider
+            value={{
+                user,
+                token,
+                setUser,
+                setToken,
+                getStoredToken,
+            }}
+        >
             {children}
         </StateContext.Provider>
     );

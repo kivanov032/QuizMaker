@@ -1,12 +1,12 @@
-import {Link, useNavigate} from "react-router-dom";
-import { useEffect, useState } from "react";
-import { useQuizContext } from "../context/QuizContext";
-import { checkQuizAnswers } from "../SenderQuizPassing.js";
-import "./QuizResults.css";
+import { Link, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useQuizContext } from '../context/QuizContext';
+import { checkQuizAnswers } from '../SenderQuizPassing.js';
+import './QuizResults.css';
 
 export default function QuizResults() {
     const navigate = useNavigate();
-    const { quiz, quizQuestions, userAnswers} = useQuizContext();
+    const { quiz, quizQuestions, userAnswers } = useQuizContext();
     const [results, setResults] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -14,7 +14,7 @@ export default function QuizResults() {
     useEffect(() => {
         const fetchQuizResults = async () => {
             if (!quizQuestions.length) {
-                setError("Недостаточно данных для получения результатов");
+                setError('Недостаточно данных для получения результатов');
                 return;
             }
 
@@ -26,17 +26,14 @@ export default function QuizResults() {
 
                 if (status === 200) {
                     setResults(data);
-                    console.log("data: ", data)
-                    console.log("quizQuestions", quizQuestions)
+                    console.log('data: ', data);
+                    console.log('quizQuestions', quizQuestions);
                 } else {
                     handleResultError(status);
                 }
             } catch (err) {
                 console.error('Ошибка при получении результатов:', err);
-                setError(
-                    err.response?.data?.message ||
-                    "Сервер недоступен. Попробуйте позже."
-                );
+                setError(err.response?.data?.message || 'Сервер недоступен. Попробуйте позже.');
             } finally {
                 setLoading(false);
             }
@@ -44,10 +41,10 @@ export default function QuizResults() {
 
         const handleResultError = (status) => {
             const errorMessages = {
-                422: "Некорректные данные запроса",
-                500: "Ошибка сервера при обработке результатов"
+                422: 'Некорректные данные запроса',
+                500: 'Ошибка сервера при обработке результатов',
             };
-            setError(errorMessages[status] || "Неизвестная ошибка");
+            setError(errorMessages[status] || 'Неизвестная ошибка');
         };
 
         fetchQuizResults();
@@ -75,7 +72,7 @@ export default function QuizResults() {
 
                 {error && (
                     <div className="alert">
-                        {Object.keys(error).map(key => (
+                        {Object.keys(error).map((key) => (
                             <p key={key}>{error[key][0]}</p>
                         ))}
                     </div>
@@ -86,30 +83,30 @@ export default function QuizResults() {
                 {!loading && results && (
                     <>
                         <div className="score-display">
-                            <span className="score">
-                                {results.summary.correctAnswers}
-                            </span>
+                            <span className="score">{results.summary.correctAnswers}</span>
                             <span className="divider">/</span>
-                            <span className="total">
-                                {results.summary.totalQuestions}
-                            </span>
-                            <span className="percentage">
-                                ({results.summary.scorePercentage}%)
-                            </span>
+                            <span className="total">{results.summary.totalQuestions}</span>
+                            <span className="percentage">({results.summary.scorePercentage}%)</span>
                         </div>
 
                         <div className="summary-stats">
                             <div className="stat-item">
                                 <span>Правильно: </span>
-                                <span className="stat-value correct">{results.summary.correctAnswers}</span>
+                                <span className="stat-value correct">
+                                    {results.summary.correctAnswers}
+                                </span>
                             </div>
                             <div className="stat-item">
                                 <span>Неправильно: </span>
-                                <span className="stat-value incorrect">{results.summary.wrongAnswers}</span>
+                                <span className="stat-value incorrect">
+                                    {results.summary.wrongAnswers}
+                                </span>
                             </div>
                             <div className="stat-item">
                                 <span>Пропущено: </span>
-                                <span className="stat-value skipped">{results.summary.skippedQuestions}</span>
+                                <span className="stat-value skipped">
+                                    {results.summary.skippedQuestions}
+                                </span>
                             </div>
                         </div>
 
@@ -121,13 +118,13 @@ export default function QuizResults() {
                                     className={`detail-item ${detail.status === 'Right' ? 'correct' : 'incorrect'}`}
                                 >
                                     <div className="question-text">
-                                        Вопрос {index + 1}: {quizQuestions[index].question || 'Текст вопроса не найден'}
+                                        Вопрос {index + 1}:{' '}
+                                        {quizQuestions[index].question || 'Текст вопроса не найден'}
                                     </div>
                                     <div className="user-answer">
                                         {detail.status === 'Not Entered'
-                                            ? "Нет ответа"
-                                            : `Ваш ответ: ${detail.userAnswer}`
-                                        }
+                                            ? 'Нет ответа'
+                                            : `Ваш ответ: ${detail.userAnswer}`}
                                     </div>
                                     {detail.status !== 'Right' && (
                                         <div className="correct-answer">
@@ -138,25 +135,26 @@ export default function QuizResults() {
                             ))}
                         </div>
 
-
-                        <div className="navigation-buttons" style={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                            margin: '30px 0'
-                        }}>
+                        <div
+                            className="navigation-buttons"
+                            style={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                margin: '30px 0',
+                            }}
+                        >
                             <button
                                 onClick={handleHomeButtonClick}
                                 className="next-btn"
                                 style={{
                                     padding: '12px 40px',
                                     fontSize: '16px',
-                                    borderRadius: '6px'
+                                    borderRadius: '6px',
                                 }}
                             >
                                 На главную страницу
                             </button>
                         </div>
-
                     </>
                 )}
             </div>

@@ -19,7 +19,7 @@ class CodeConfirmation extends Model
     /**
      * Атрибуты, которые можно массово назначать.
      *
-     * @var array
+     * @var list<string>
      */
     protected $fillable = [
         'id_code_confirmation',
@@ -30,7 +30,7 @@ class CodeConfirmation extends Model
     /**
      * Атрибуты, которые должны быть скрыты при сериализации.
      *
-     * @var array
+     * @var list<string>
      */
     protected $hidden = [
         'id_code_confirmation',
@@ -39,7 +39,7 @@ class CodeConfirmation extends Model
     /**
      * Атрибуты, которые должны быть приведены к определённым типам.
      *
-     * @var array
+     * @var array<string, string>
      */
     protected $casts = [
         'email' => 'string',

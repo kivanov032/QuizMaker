@@ -14,17 +14,19 @@
         "laravel/framework": "^12.1.1",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^v2.10.1",
-        "nextapps/laravel-swagger-ui": "*",
         "nunomaduro/collision": "^v8.6.1",
         "tightenco/ziggy": "^2.0",
         "wotz/laravel-swagger-ui": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^v1.24.1",
+        "friendsofphp/php-cs-fixer": "^3.75",
+        "larastan/larastan": "*",
         "laravel/breeze": "^2.3",
         "laravel/pint": "^v1.21.0",
         "laravel/sail": "^v1.41.0",
         "mockery/mockery": "^1.6.12",
+        "phpstan/phpstan": "*",
         "phpunit/phpunit": "^11.5.12"
     },
     "autoload": {
@@ -52,7 +54,8 @@
         ],
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi"
-        ]
+        ],
+        "phpstan": "phpstan analyse"
     },
     "extra": {
         "laravel": {

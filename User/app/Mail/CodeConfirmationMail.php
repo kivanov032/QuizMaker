@@ -1,12 +1,15 @@
 <?php
+
 namespace App\Mail;
 
 use Illuminate\Mail\Mailable;
 
-class CodeConfirmationMail extends Mailable {
+class CodeConfirmationMail extends Mailable
+{
     public $data;
 
-    public function __construct($data) {
+    public function __construct($data)
+    {
         $this->data = $data;
     }
 
@@ -16,6 +19,3 @@ class CodeConfirmationMail extends Mailable {
             ->view('emails.code_confirmation'); // Привязка шаблона письма
     }
 }
-
-
-
