@@ -254,14 +254,20 @@
       <excludeFolder url="file://$MODULE_DIR$/User/vendor/laravel-kafka/docs" />
       <excludeFolder url="file://$MODULE_DIR$/User/vendor/laravel-kafka/src" />
       <excludeFolder url="file://$MODULE_DIR$/User/vendor/laravel-kafka/tests" />
-      <excludeFolder url="file://$MODULE_DIR$/User/vendor/nextapps/laravel-swagger-ui" />
       <excludeFolder url="file://$MODULE_DIR$/User/vendor/psr/cache" />
       <excludeFolder url="file://$MODULE_DIR$/User/vendor/wotz/laravel-swagger-ui" />
       <excludeFolder url="file://$MODULE_DIR$/User/vendor/zircote/swagger-php" />
       <excludeFolder url="file://$MODULE_DIR$/User/vendor/predis/predis" />
       <excludeFolder url="file://$MODULE_DIR$/User/vendor/swagger-api/swagger-ui" />
-      <excludeFolder url="file://$MODULE_DIR$/User/vendor/inertiajs/inertia-laravel" />
       <excludeFolder url="file://$MODULE_DIR$/User/vendor/laravel/breeze" />
+      <excludeFolder url="file://$MODULE_DIR$/Quiz/vendor/wotz/laravel-swagger-ui" />
+      <excludeFolder url="file://$MODULE_DIR$/User/vendor/beberlei/assert" />
+      <excludeFolder url="file://$MODULE_DIR$/User/vendor/flix-tech/avro-php" />
+      <excludeFolder url="file://$MODULE_DIR$/User/vendor/functional-php/fantasy-land" />
+      <excludeFolder url="file://$MODULE_DIR$/User/vendor/mateusjunges/avro-serde-php" />
+      <excludeFolder url="file://$MODULE_DIR$/User/vendor/mateusjunges/confluent-schema-registry-api" />
+      <excludeFolder url="file://$MODULE_DIR$/User/vendor/mateusjunges/laravel-kafka" />
+      <excludeFolder url="file://$MODULE_DIR$/User/vendor/widmogrod/php-functional" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

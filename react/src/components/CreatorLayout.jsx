@@ -14,7 +14,6 @@ export default function CreatorLayout() {
     const maxNameQuizLength = 200; // Максимальная длина названия викторины
 
 
-
     //Состояние для чекбоксов ошибок (метки на то, какие ошибки исправить (все кроме критических))
     const [checkboxes, setCheckboxes] = useState({
         cosmeticErrorQuizName: false,

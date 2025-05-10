@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuizContext } from '../context/QuizContext';
-import "./passQuizQuestion.css";
+import "./PassQuizQuestion.css";
 
 export default function PassQuizQuestion() {
     const { id } = useParams();

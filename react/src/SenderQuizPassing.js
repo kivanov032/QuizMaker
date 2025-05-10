@@ -37,7 +37,7 @@ export const searchQuiz = async (quizName) => {
  */
 export const downloadQuizQuestion = async (id_quiz) => {
     try {
-        const response = await axios.post(`${BASE_URL}/api/download-quiz-questions`, {
+        const response = await axios.post(`${BASE_URL}/api/get-quiz-questions`, {
             id_quiz
         });
 
@@ -64,6 +64,7 @@ export const downloadQuizQuestion = async (id_quiz) => {
  *     (структура: {id_question: идентификатор вопроса, answer: выбранный ответ}).
  * @param {Array<{id_question: string, correctAnswer: string}>} quizQuestions - Массив вопросов викторины
  *     (структура: {id_question: идентификатор вопроса, correctAnswer: верный ответ}).
+ * @param login
  * @returns {Promise<{status: number, data: any}>} - Ответ сервера с результатами проверки:
  *     - status: HTTP-статус код (200 при успехе)
  *     - data: {
@@ -78,11 +79,12 @@ export const downloadQuizQuestion = async (id_quiz) => {
  *       } | { errors: object }      // В случае ошибки валидации
  * @throws {Error} - При отсутствии подключения к серверу (без response в error)
  */
-export const checkQuizAnswers = async (userAnswers, quizQuestions) => {
+export const checkQuizAnswers = async (userAnswers, quizQuestions, login) => {
     try {
         const response = await axios.post(`${BASE_URL}/api/check-quiz-answers`, {
             userAnswers,
-            quizQuestions
+            quizQuestions,
+            login
         });
 
         return {

@@ -10,11 +10,10 @@
         "accentinteractive/laravel-logcleaner": "^1.6",
         "darkaonline/l5-swagger": "dev-master",
         "guzzlehttp/guzzle": "^7.9.2",
-        "inertiajs/inertia-laravel": "^2.0",
         "laravel/framework": "^12.1.1",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^v2.10.1",
-        "nextapps/laravel-swagger-ui": "*",
+        "mateusjunges/laravel-kafka": "^2.5",
         "nunomaduro/collision": "^v8.6.1",
         "tightenco/ziggy": "^2.0",
         "wotz/laravel-swagger-ui": "*"

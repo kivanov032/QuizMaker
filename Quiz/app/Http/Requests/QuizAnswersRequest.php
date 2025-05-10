@@ -24,7 +24,7 @@ class QuizAnswersRequest extends FormRequest
         return [
             'userAnswers' => 'array',
             'quizQuestions' => 'required|array',
-            'id_quiz' => 'uuid',
+            'login' => 'string',
         ];
     }
 }

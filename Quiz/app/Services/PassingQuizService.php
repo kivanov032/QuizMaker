@@ -85,7 +85,7 @@ class PassingQuizService
         $data = $request->all();
         $userAnswers = $data['userAnswers']; // Массив ответов
         $quizQuestions = $data['quizQuestions']; // Массив вопросов
-        $id_quiz = $data['id_quiz']; // ID пользователя, прошедшего викторину
+        $login = $data['login']; // Логин пользователя, прошедшего викторину
 
         $results = [];
 
@@ -131,9 +131,6 @@ class PassingQuizService
             ]
         ], 200);
     }
-
-
-
 
 
 }
