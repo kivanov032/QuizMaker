@@ -1,0 +1,8 @@
+version: '3.8'
+services:
+  app:
+    build: ./quiz
+    ports:
+      - "8001:9000"  # Порт PHP-FPM
+    volumes:
+      - .:/var/www/html  # Hot-reload кода без пересборки

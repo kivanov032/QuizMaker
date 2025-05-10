@@ -13,7 +13,7 @@
         "laravel/framework": "^12.1.1",
         "laravel/sanctum": "^v4.0.8",
         "laravel/tinker": "^v2.10.1",
-        "nextapps/laravel-swagger-ui": "*",
+        "wotz/laravel-swagger-ui": "*",
         "nunomaduro/collision": "^v8.6.1",
         "predis/predis": "*",
         "swagger-api/swagger-ui": "*"
