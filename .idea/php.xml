@@ -387,6 +387,44 @@
       <path value="$PROJECT_DIR$/User/vendor/sebastian/type" />
       <path value="$PROJECT_DIR$/User/vendor/sebastian/recursion-context" />
       <path value="$PROJECT_DIR$/User/vendor/sebastian/object-reflector" />
+      <path value="$PROJECT_DIR$/Quiz/vendor/nextapps/laravel-swagger-ui" />
+      <path value="$PROJECT_DIR$/User/vendor/inertiajs/inertia-laravel" />
+      <path value="$PROJECT_DIR$/User/vendor/phpstan/phpstan" />
+      <path value="$PROJECT_DIR$/User/vendor/iamcal/sql-parser" />
+      <path value="$PROJECT_DIR$/User/vendor/larastan/larastan" />
+      <path value="$PROJECT_DIR$/Quiz/vendor/phpstan/phpstan" />
+      <path value="$PROJECT_DIR$/Quiz/vendor/iamcal/sql-parser" />
+      <path value="$PROJECT_DIR$/Quiz/vendor/larastan/larastan" />
+      <path value="$PROJECT_DIR$/User/vendor/react/child-process" />
+      <path value="$PROJECT_DIR$/User/vendor/react/dns" />
+      <path value="$PROJECT_DIR$/User/vendor/react/cache" />
+      <path value="$PROJECT_DIR$/User/vendor/react/socket" />
+      <path value="$PROJECT_DIR$/User/vendor/react/stream" />
+      <path value="$PROJECT_DIR$/User/vendor/react/event-loop" />
+      <path value="$PROJECT_DIR$/User/vendor/react/promise" />
+      <path value="$PROJECT_DIR$/User/vendor/fidry/cpu-core-counter" />
+      <path value="$PROJECT_DIR$/User/vendor/evenement/evenement" />
+      <path value="$PROJECT_DIR$/User/vendor/symfony/filesystem" />
+      <path value="$PROJECT_DIR$/User/vendor/symfony/stopwatch" />
+      <path value="$PROJECT_DIR$/User/vendor/symfony/polyfill-php81" />
+      <path value="$PROJECT_DIR$/User/vendor/symfony/options-resolver" />
+      <path value="$PROJECT_DIR$/User/vendor/clue/ndjson-react" />
+      <path value="$PROJECT_DIR$/User/vendor/friendsofphp/php-cs-fixer" />
+      <path value="$PROJECT_DIR$/Quiz/vendor/react/cache" />
+      <path value="$PROJECT_DIR$/Quiz/vendor/react/event-loop" />
+      <path value="$PROJECT_DIR$/Quiz/vendor/react/promise" />
+      <path value="$PROJECT_DIR$/Quiz/vendor/react/child-process" />
+      <path value="$PROJECT_DIR$/Quiz/vendor/react/dns" />
+      <path value="$PROJECT_DIR$/Quiz/vendor/clue/ndjson-react" />
+      <path value="$PROJECT_DIR$/Quiz/vendor/friendsofphp/php-cs-fixer" />
+      <path value="$PROJECT_DIR$/Quiz/vendor/react/socket" />
+      <path value="$PROJECT_DIR$/Quiz/vendor/react/stream" />
+      <path value="$PROJECT_DIR$/Quiz/vendor/symfony/polyfill-php81" />
+      <path value="$PROJECT_DIR$/Quiz/vendor/symfony/options-resolver" />
+      <path value="$PROJECT_DIR$/Quiz/vendor/fidry/cpu-core-counter" />
+      <path value="$PROJECT_DIR$/Quiz/vendor/evenement/evenement" />
+      <path value="$PROJECT_DIR$/Quiz/vendor/symfony/filesystem" />
+      <path value="$PROJECT_DIR$/Quiz/vendor/symfony/stopwatch" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.4" />
