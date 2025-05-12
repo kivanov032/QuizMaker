@@ -10,7 +10,7 @@
     html
     {
         box-sizing: border-box;
-        overflow: -moz-scrollbars-vertical;
+        /*overflow: -moz-scrollbars-vertical;*/
         overflow-y: scroll;
     }
     *,
