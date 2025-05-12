@@ -9,11 +9,12 @@ export default function MainPage() {
     const { setQuiz } = useQuizContext();
 
     const navigate = useNavigate();
-    const [quizName, setQuizName] = useState("");
+    const [quizName, setQuizName] = useState(""); // Данные викторины
     const [errors, setErrors] = useState(null);
     const [foundQuizzes, setFoundQuizzes] = useState([]);
     const [showQuizList, setShowQuizList] = useState(false);
     const searchWrapperRef = useRef(null);
+    const [loading, setLoading] = useState(false); // Загрузка
 
     // Форматирование даты
     const formatDate = (dateString) => {
@@ -35,6 +36,7 @@ export default function MainPage() {
 
     // Нажатие кнопки создания викторины
     const handleCreateQuiz = async () => {
+        setLoading(true);
         try {
             const result = await checkActivityServerAndBD();
 
@@ -62,9 +64,11 @@ export default function MainPage() {
             return;
         }
 
+        setShowQuizList(false);
+        setLoading(true);
         try {
             const { status, data } = await searchQuiz(query);
-
+            setLoading(false);
             switch (status) {
                 case 200:
                     setFoundQuizzes(data.quizzes);
@@ -112,7 +116,7 @@ export default function MainPage() {
                 </div>
             )}
 
-            <button className="create-quiz-button" onClick={handleCreateQuiz}>
+            <button className="green-button" onClick={handleCreateQuiz}>
                 Создать викторину
             </button>
 
@@ -129,6 +133,8 @@ export default function MainPage() {
                     🔍
                 </button>
             </div>
+
+            {loading && <div className="loading-text show">Загрузка...</div>}
 
             {showQuizList && foundQuizzes.length > 0 && (
                 <div className="quiz-dropdown-container">

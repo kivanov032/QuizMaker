@@ -5,15 +5,29 @@
     text-align: center;
 }
 
-.create-quiz-button {
-    padding: 16px 32px;
+h2 {
+    font-family: 'Arial', sans-serif;
+    font-size: 32px;
+    font-weight: bold;
+    color: #007bff;
+}
+
+
+.green-button{
+    padding: 16px 64px;
     font-size: 20px;
-    border-radius: 8px;
-    background-color: #4caf50;
+    background-color: #4CAF50;
     color: white;
     border: none;
-    cursor: pointer;
+    border-radius: 10px;
+    margin-top: 10px;
     margin-bottom: 30px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.green-button:hover{
+    background-color: #3e8e41;
 }
 
 .search-section {
@@ -26,7 +40,7 @@
 
 .search-wrapper {
     display: flex;
-    align-items: stretch; /* 👈 растягивает все элементы на одинаковую высоту */
+    align-items: stretch;
     justify-content: center;
     gap: 0;
     width: 100%;
@@ -42,23 +56,26 @@
     border-radius: 6px 0 0 6px;
     box-sizing: border-box;
     outline: none;
-    height: 42px; /* 👈 добавляем фиксированную высоту */
+    height: 42px;
 }
 
 
 .search-button {
-    height: 42px; /* 👈 та же высота, что у инпута */
+    height: 42px;
     padding: 0 16px;
     font-size: 18px;
-    border: 1px solid #2196f3;
     border-left: none;
     border-radius: 0 6px 6px 0;
-    background-color: #2196f3;
+    background-color: #5ca2ec;
     color: white;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.search-button:hover{
+    background-color: #0056b3;
 }
 
 /* Стили для dropdown-контейнера */
@@ -84,7 +101,7 @@
     flex-wrap: wrap;
     gap: 10px 20px;
     font-size: 0.85rem;
-    color: #6c757d;
+    color: #05335c;
 }
 
 .quiz-details span {

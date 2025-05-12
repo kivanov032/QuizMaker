@@ -34,23 +34,6 @@ export default function MainLayout() {
 
         checkAndExtendToken();
 
-        // запускаем интервал только после успешного входа
-        // if (!intervalRef.current && token) {
-        //     intervalRef.current = setInterval(async () => {
-        //         try {
-        //             const { data } = await axiosClient.get('/check-and-extend-token');
-        //             if (data.token) {
-        //                 setToken(data.token);
-        //             }
-        //         } catch (error) {
-        //             console.warn("Не удалось продлить токен:", error);
-        //             if (error.response?.status === 401) {
-        //                 handleLogout();
-        //             }
-        //         }
-        //     }, 5 * 60 * 1000);
-        // }
-
         return () => {
             if (intervalRef.current) {
                 clearInterval(intervalRef.current);
@@ -84,7 +67,7 @@ export default function MainLayout() {
 
     // 🟡 Пока загружаемся — ничего не показываем
     if (loading) {
-        return <div>Загрузка...</div>; // можно заменить на спиннер
+        return <div className="loading-text show">Загрузка...</div>
     }
 
     // После загрузки — если всё-таки нет токена — редиректим

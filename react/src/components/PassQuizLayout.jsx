@@ -23,8 +23,6 @@ export default function PassQuizLayout() {
                 if (status === 200) {
                     setQuizQuestions(data.questions);
                     resetUserAnswers()
-                    console.log(data.questions)
-                    console.log("Я тууууууут!!!!!!!!!!!!1111")
                     navigate(`/passQuiz/1`);
                 } else {
                     handleResultError(status);
@@ -52,7 +50,7 @@ export default function PassQuizLayout() {
 
 
     if (isLoading) {
-        return <div className="loading-frame">Загрузка вопросов...</div>;
+        return <div className="loading-text show">Загрузка вопросов...</div>;
     }
 
     if (error) {

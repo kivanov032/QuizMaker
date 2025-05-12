@@ -52,7 +52,7 @@ input {
 .clickable-main {
     cursor: pointer;
     text-decoration: none;
-    color: black;
+    color: #0035ff;
 }
 
 .clickable:hover {

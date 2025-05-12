@@ -71,7 +71,11 @@ export default function QuizResults() {
     return (
         <div className="quiz-results-container">
             <div className="quiz-results-box">
-                <h2 className="quiz-results-title">
+                {/*<h2 className="quiz-results-title" >*/}
+                {/*    Результаты по викторине: {quiz?.name_quiz || 'Безымянная'}*/}
+                {/*</h2>*/}
+
+                <h2 className="quiz-results-title" style={{ color: '#06063e' }}>
                     Результаты по викторине: {quiz?.name_quiz || 'Безымянная'}
                 </h2>
 
@@ -83,7 +87,7 @@ export default function QuizResults() {
                     </div>
                 )}
 
-                {loading && <div className="text-center">Загрузка...</div>}
+                {loading && <div className="loading-text show">Загрузка...</div>}
 
                 {!loading && results && (
                     <>
