@@ -10,19 +10,18 @@ const BASE_URL = import.meta.env.VITE_QUIZ_API_BASE_URL;
 export const searchQuiz = async (quizName) => {
     try {
         const response = await axios.post(`${BASE_URL}/api/search-quiz`, {
-            quizName
+            quizName,
         });
 
         return {
             status: response.status,
-            data: response.data
+            data: response.data,
         };
-
     } catch (error) {
         if (error.response) {
             return {
                 status: error.response.status,
-                data: error.response.data
+                data: error.response.data,
             };
         } else {
             throw new Error('Сервер недоступен. Проверьте подключение к интернету.');
@@ -37,20 +36,24 @@ export const searchQuiz = async (quizName) => {
  */
 export const downloadQuizQuestion = async (id_quiz) => {
     try {
+<<<<<<< HEAD
         const response = await axios.post(`${BASE_URL}/api/get-quiz-questions`, {
             id_quiz
+=======
+        const response = await axios.post(`${BASE_URL}/api/download-quiz-questions`, {
+            id_quiz,
+>>>>>>> markast
         });
 
         return {
             status: response.status,
-            data: response.data
+            data: response.data,
         };
-
     } catch (error) {
         if (error.response) {
             return {
                 status: error.response.status,
-                data: error.response.data
+                data: error.response.data,
             };
         } else {
             throw new Error('Сервер недоступен. Проверьте подключение к интернету.');
@@ -84,26 +87,24 @@ export const checkQuizAnswers = async (userAnswers, quizQuestions, login) => {
         const response = await axios.post(`${BASE_URL}/api/check-quiz-answers`, {
             userAnswers,
             quizQuestions,
+<<<<<<< HEAD
             login
+=======
+>>>>>>> markast
         });
 
         return {
             status: response.status,
-            data: response.data
+            data: response.data,
         };
-
     } catch (error) {
         if (error.response) {
             return {
                 status: error.response.status,
-                data: error.response.data
+                data: error.response.data,
             };
         } else {
             throw new Error('Сервер недоступен. Проверьте подключение к интернету.');
         }
     }
 };
-
-
-
-

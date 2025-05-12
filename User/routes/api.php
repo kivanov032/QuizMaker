@@ -36,5 +36,3 @@ Route::post('/increment-created-quizzes-counter', [UserController::class, 'incre
 //Подтверждение кода
 Route::post('/send-mail-for-code-confirmation', [MailSenderController::class, 'sendMailForCodeConfirmation']);
 Route::post('/confirm-code', [MailSenderController::class, 'confirmCode']);
-
-

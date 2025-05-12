@@ -9,7 +9,9 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens;
+    use HasFactory;
+    use Notifiable;
 
     protected $table = 'users'; // Название таблицы, связанной с моделью
 
@@ -21,7 +23,7 @@ class User extends Authenticatable
     /**
      * Атрибуты, которые можно массово назначать.
      *
-     * @var array
+     * @var list<string>
      */
     protected $fillable = [
         'id_user',
@@ -35,7 +37,7 @@ class User extends Authenticatable
     /**
      * Атрибуты, которые должны быть скрыты при сериализации.
      *
-     * @var array<int, string>
+     * @var list<string>
      */
     protected $hidden = [
         'password',

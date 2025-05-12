@@ -7,7 +7,6 @@ use Tests\TestCase;
 
 class UserControllerTest extends TestCase
 {
-
     /**
      * --- Тестирование метода incrementCreatedQuizzesCounter ---
      */
