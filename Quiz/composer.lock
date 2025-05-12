@@ -4,11 +4,10 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-<<<<<<< HEAD
+
     "content-hash": "acb82ca3d05ddc7decb20fef7c177da6",
-=======
     "content-hash": "b97e147a8211e5f36715d56e3d35f16c",
->>>>>>> markast
+
     "packages": [
         {
             "name": "accentinteractive/laravel-logcleaner",
