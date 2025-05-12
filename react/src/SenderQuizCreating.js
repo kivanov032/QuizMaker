@@ -10,7 +10,10 @@ const BASE_URL = import.meta.env.VITE_QUIZ_API_BASE_URL;
  */
 export const sendQuestionsToSearchError = async (quizName, questions) => {
     try {
-        console.log('Отправка запроса для поиска ошибок в викторине:', { quizName, questions });
+        console.log('Отправка запроса для поиска ошибок в викторине:', {
+            quizName,
+            questions,
+        });
 
         const response = await axios.post(`${BASE_URL}/api/search-quiz-errors`, {
             questions,
@@ -33,7 +36,11 @@ export const sendQuestionsToSearchError = async (quizName, questions) => {
  */
 export const sendQuestionsToFixError = async (quizName, questions, errors) => {
     try {
-        console.log('Отправка запроса для исправления ошибок в викторине:', { quizName, questions, errors });
+        console.log('Отправка запроса для исправления ошибок в викторине:', {
+            quizName,
+            questions,
+            errors,
+        });
 
         const response = await axios.post(`${BASE_URL}/api/fix-quiz-errors`, {
             questions,
@@ -48,10 +55,10 @@ export const sendQuestionsToFixError = async (quizName, questions, errors) => {
         const processedData = {
             ...response.data,
             quizName: response.data.quizName ?? '',
-            questions: response.data.questions.map(question => ({
+            questions: response.data.questions.map((question) => ({
                 ...question,
                 question: question.question ?? '',
-                answers: question.answers.map(answer => answer ?? ''),
+                answers: question.answers.map((answer) => answer ?? ''),
             })),
         };
 
@@ -75,13 +82,18 @@ export const sendQuestionsToFixError = async (quizName, questions, errors) => {
  */
 export const sendQuestionsToRecordInBD = async (quizName, questions, errors, login) => {
     try {
-        console.log('Отправка запроса для записи вопросов в БД:', { quizName, questions, errors, login});
+        console.log('Отправка запроса для записи вопросов в БД:', {
+            quizName,
+            questions,
+            errors,
+            login,
+        });
 
         const response = await axios.post(`${BASE_URL}/api/create-quiz`, {
             questions,
             quizName,
             errors,
-            login
+            login,
         });
 
         console.log('Ответ от сервера:', response.data);
@@ -91,7 +103,6 @@ export const sendQuestionsToRecordInBD = async (quizName, questions, errors, log
         throw error.response;
     }
 };
-
 
 /**
  * Проверяет соединение с базой данных через API.
@@ -117,9 +128,9 @@ export const checkActivityServerAndBD = async () => {
             return { error: errorMessage };
         }
     } catch (error) {
-        const errorMessage = error.response?.data?.message || 'Ошибка при проверке соединения с сервером';
+        const errorMessage =
+            error.response?.data?.message || 'Ошибка при проверке соединения с сервером';
         console.error(errorMessage);
         return { error: errorMessage };
     }
 };
-

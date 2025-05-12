@@ -5,7 +5,6 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ConfirmCodeConfirmationRequest extends FormRequest
-
 {
     /**
      * Определяет, авторизован ли пользователь делать этот запрос.

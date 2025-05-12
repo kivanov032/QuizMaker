@@ -1,38 +1,98 @@
-import js from '@eslint/js'
-import globals from 'globals'
-import react from 'eslint-plugin-react'
-import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
+// import js from "@eslint/js";
+// import globals from "globals";
+// import pluginReact from "eslint-plugin-react";
+// import json from "@eslint/json";
+// import css from "@eslint/css";
+// import { defineConfig } from "eslint/config";
+//
+//
+// export default defineConfig([
+//   { files: ["**/*.{js,mjs,cjs,jsx}"], plugins: { js }, extends: ["js/recommended"] },
+//   { files: ["**/*.{js,mjs,cjs,jsx}"], languageOptions: { globals: globals.browser } },
+//   pluginReact.configs.flat.recommended,
+//   { files: ["**/*.json"], plugins: { json }, language: "json/json", extends: ["json/recommended"] },
+//   { files: ["**/*.css"], plugins: { css }, language: "css/css", extends: ["css/recommended"] },
+// ]);
 
-export default [
-  { ignores: ['dist'] },
-  {
-    files: ['**/*.{js,jsx}'],
-    languageOptions: {
-      ecmaVersion: 2020,
-      globals: globals.browser,
-      parserOptions: {
-        ecmaVersion: 'latest',
-        ecmaFeatures: { jsx: true },
-        sourceType: 'module',
-      },
+
+
+
+// import js from "@eslint/js";
+// import globals from "globals";
+// import pluginReact from "eslint-plugin-react";
+// import jsonPlugin from "@eslint/json";
+// import { defineConfig } from "eslint/config";
+//
+// const reactRecommended = pluginReact.configs.recommended;
+//
+// export default defineConfig([
+//   {
+//     files: ["**/*.{js,mjs,cjs,jsx}"],
+//     languageOptions: {
+//       globals: globals.browser,
+//       parserOptions: {
+//         ecmaFeatures: {
+//           jsx: true,
+//         },
+//       },
+//     },
+//     plugins: {
+//       react: pluginReact,
+//     },
+//     rules: {
+//       ...reactRecommended.rules,
+//       "react/react-in-jsx-scope": "off",
+//     },
+//     ...(reactRecommended.settings ? { settings: reactRecommended.settings } : {}),
+//     extends: [js.configs.recommended],
+//   },
+//   {
+//     files: ["**/*.json"],
+//     ...jsonPlugin.configs.recommended,
+//   },
+// ]);
+
+import { defineConfig } from 'eslint-define-config';
+import js from '@eslint/js';
+import globals from 'globals';
+import pluginReact from 'eslint-plugin-react';
+import jsonPlugin from '@eslint/json';
+import pluginReactRefresh from 'eslint-plugin-react-refresh';
+import pluginPrettier from 'eslint-plugin-prettier';
+
+const reactRecommended = pluginReact.configs.recommended;
+
+export default defineConfig([
+    {
+        files: ['**/*.{js,mjs,cjs,jsx}'],
+        languageOptions: {
+            globals: globals.browser,
+            parserOptions: {
+                ecmaFeatures: {
+                    jsx: true,
+                },
+            },
+        },
+        plugins: {
+            react: pluginReact,
+            'react-refresh': pluginReactRefresh,
+            prettier: pluginPrettier,
+        },
+        rules: {
+            ...reactRecommended.rules,
+            'react/react-in-jsx-scope': 'off',
+            'react-refresh/only-export-components': 'off',
+            'prettier/prettier': 'warn',
+        },
+        settings: {
+            ...reactRecommended.settings,
+            react: {
+                version: 'detect',
+            },
+        },
     },
-    settings: { react: { version: '18.3' } },
-    plugins: {
-      react,
-      'react-hooks': reactHooks,
-      'react-refresh': reactRefresh,
+    {
+        files: ['**/*.json'],
+        ...jsonPlugin.configs.recommended,
     },
-    rules: {
-      ...js.configs.recommended.rules,
-      ...react.configs.recommended.rules,
-      ...react.configs['jsx-runtime'].rules,
-      ...reactHooks.configs.recommended.rules,
-      'react/jsx-no-target-blank': 'off',
-      'react-refresh/only-export-components': [
-        'warn',
-        { allowConstantExport: true },
-      ],
-    },
-  },
-]
+]);

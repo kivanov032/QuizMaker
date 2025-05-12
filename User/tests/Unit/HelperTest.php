@@ -8,7 +8,6 @@ use Random\RandomException;
 
 class HelperTest extends TestCase
 {
-
     /**
      * Тест на генерацию 6-разрядного числа
      * @throws RandomException

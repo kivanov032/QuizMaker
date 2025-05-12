@@ -21,6 +21,7 @@ class MailHelper
         $code = random_int(0, 999999);// Генерация случайного числа от 0 до 999999
         // Форматирование числа до 6 знаков с ведущими нулями
         return str_pad($code, 6, '0', STR_PAD_LEFT);
+        //return str_pad((string) $code, 6, '0', STR_PAD_LEFT);
     }
 
     /**
@@ -68,7 +69,7 @@ class MailHelper
         Log::info($record->id_code_confirmation);
         Log::info($record->updated_at);
         Log::info($record->created_at);
-        Log::info($timeDifference);
+        Log::info((string) $timeDifference);
 
         Log::info($record->code_confirmation);
         Log::info($record->code_confirmation);

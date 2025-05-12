@@ -1,7 +1,7 @@
-import {useState, useRef} from "react";
-import axiosClient from "../axios-client";
-import { useStateContext } from "../context/ContextProvider";
-import {Link} from "react-router-dom";
+import { useState, useRef } from 'react';
+import axiosClient from '../axios-client';
+import { useStateContext } from '../context/ContextProvider';
+import { Link } from 'react-router-dom';
 
 export default function SignUp() {
     const timeForConfirmationCode = 120; // Время (в секундах) отправки кода подтверждения
@@ -12,10 +12,10 @@ export default function SignUp() {
     const passwordConfirmationRef = useRef();
     const { setUser, setToken } = useStateContext();
 
-    const [errors, setErrors] = useState(null);  // Ошибки для страницы
+    const [errors, setErrors] = useState(null); // Ошибки для страницы
     const [modalErrors, setModalErrors] = useState(null); // Ошибки для модального окна
     const [isCodeSent, setIsCodeSent] = useState(false); // Метка на открытие модального окна
-    const [codeInput, setCodeInput] = useState(""); // Ввод кода подтверждения
+    const [codeInput, setCodeInput] = useState(''); // Ввод кода подтверждения
     const [isSubmitting, setIsSubmitting] = useState(false); // Кнопка для повторной отправки кода подтверждения
 
     // Состояния для отображения/скрытия пароля
@@ -49,10 +49,10 @@ export default function SignUp() {
     // Отправка кода подтверждения
     const sendCode = () => {
         setLoading(true);
-        setCodeInput("");
+        setCodeInput('');
         const email = emailRef.current.value;
         axiosClient
-            .post("/send-mail-for-code-confirmation", { email })
+            .post('/send-mail-for-code-confirmation', { email })
             .then(() => {
                 setErrors(null); // Очистка окна с ошибками
                 setModalErrors(null); // Очистка модального окна
@@ -66,14 +66,15 @@ export default function SignUp() {
                 if (err.response && err.response.data && err.response.data.message) {
                     setModalErrors({ message: err.response.data.message });
                 } else {
-                    setModalErrors({ message: "Ошибка при отправке кода. Попробуйте позже." });
+                    setModalErrors({
+                        message: 'Ошибка при отправке кода. Попробуйте позже.',
+                    });
                 }
             });
     };
 
     // Запрос на валидацию данных
     const validateUserData = () => {
-
         const payload = {
             login: loginRef.current.value,
             email: emailRef.current.value,
@@ -85,12 +86,14 @@ export default function SignUp() {
         setLoading(true);
 
         axiosClient
-            .post("/validate-signup", payload)
+            .post('/validate-signup', payload)
             .then(() => sendCode())
-            .catch(err => {
+            .catch((err) => {
                 setLoading(false);
                 if (err.message === 'Network Error') {
-                    setErrors({ message: ['Технические проблемы с сервером. Пожалуйста, попробуйте позже.'] });
+                    setErrors({
+                        message: ['Технические проблемы с сервером. Пожалуйста, попробуйте позже.'],
+                    });
                 } else {
                     const response = err.response;
                     if (response && response.status === 422) {
@@ -107,14 +110,19 @@ export default function SignUp() {
         setModalErrors(false);
         setLoading(true);
         setIsSubmitting(true);
-        if (timer <= 0){
-            setModalErrors({ message: ['Время ожидания закончилось. Пожалуйста, запросите новый код.'] });
+        if (timer <= 0) {
+            setModalErrors({
+                message: ['Время ожидания закончилось. Пожалуйста, запросите новый код.'],
+            });
             return;
         }
         axiosClient
-            .post("/confirm-code", { input_code: codeInput, email: emailRef.current.value})
+            .post('/confirm-code', {
+                input_code: codeInput,
+                email: emailRef.current.value,
+            })
             .then(({ data }) => {
-                if (data.status === "success") {
+                if (data.status === 'success') {
                     const payload = {
                         login: loginRef.current.value,
                         email: emailRef.current.value,
@@ -122,24 +130,28 @@ export default function SignUp() {
                         password_confirmation: passwordConfirmationRef.current.value,
                     };
                     axiosClient
-                        .post("/signup", payload)
+                        .post('/signup', payload)
                         .then(({ data }) => {
                             setUser(data.user);
                             setToken(data.token);
-                            localStorage.setItem("ACCESS_TOKEN", data.token);
-                            localStorage.setItem("EXPIRES_AT", data.expires_at);
+                            localStorage.setItem('ACCESS_TOKEN', data.token);
+                            localStorage.setItem('EXPIRES_AT', data.expires_at);
                         })
                         .catch((err) => {
-                            setModalErrors(err.response?.data?.errors || { message: "Произошла ошибка." });
+                            setModalErrors(
+                                err.response?.data?.errors || { message: 'Произошла ошибка.' },
+                            );
                         });
                 } else {
-                    setModalErrors({ message: "Неверный код подтверждения." });
+                    setModalErrors({ message: 'Неверный код подтверждения.' });
                 }
             })
             .catch((err) => {
                 setLoading(false);
                 if (err.message === 'Network Error') {
-                    setModalErrors({ message: ['Технические проблемы с сервером. Пожалуйста, попробуйте позже.'] });
+                    setModalErrors({
+                        message: ['Технические проблемы с сервером. Пожалуйста, попробуйте позже.'],
+                    });
                 } else {
                     const response = err.response;
                     setModalErrors({ message: [response.data.message] });
@@ -158,7 +170,7 @@ export default function SignUp() {
             timerIntervalRef.current = null;
         }
         setIsCodeSent(false);
-        setCodeInput("");
+        setCodeInput('');
         setModalErrors(null);
     };
 
@@ -172,19 +184,23 @@ export default function SignUp() {
                     }}
                 >
                     <h2 className="login-title">Регистрация</h2>
-
-                    {errors && <div className="alert">{errors.message}</div>} {/* Ошибки на странице */}
-
-                    {!errors && !isCodeSent && loading && <div className="loading-text show">Загрузка...</div>}
-
+                    {errors && <div className="alert">{errors.message}</div>}{' '}
+                    {/* Ошибки на странице */}
+                    {!errors && !isCodeSent && loading && (
+                        <div className="loading-text show">Загрузка...</div>
+                    )}
                     <input ref={loginRef} type="text" placeholder="Логин" className="login-input" />
-                    <input ref={emailRef} type="email" placeholder="Email" className="login-input" />
-
+                    <input
+                        ref={emailRef}
+                        type="email"
+                        placeholder="Email"
+                        className="login-input"
+                    />
                     {/* Поле пароля со встроенным глазком */}
                     <div className="inline-password-container">
                         <input
                             ref={passwordRef}
-                            type={showPassword ? "text" : "password"}
+                            type={showPassword ? 'text' : 'password'}
                             placeholder="Пароль"
                             className="login-input with-eye"
                         />
@@ -192,20 +208,16 @@ export default function SignUp() {
                             type="button"
                             className="inline-eye-toggle"
                             onClick={() => setShowPassword(!showPassword)}
-                            aria-label={showPassword ? "Скрыть пароль" : "Показать пароль"}
+                            aria-label={showPassword ? 'Скрыть пароль' : 'Показать пароль'}
                         >
-                            <span className={showPassword ? "" : "eye-crossed"}>
-                              👁️‍🗨️
-                            </span>
+                            <span className={showPassword ? '' : 'eye-crossed'}>👁️‍🗨️</span>
                         </button>
                     </div>
-
-
                     {/* Поле подтверждения пароля со встроенным глазком */}
                     <div className="inline-password-container">
                         <input
                             ref={passwordConfirmationRef}
-                            type={showConfirmPassword ? "text" : "password"}
+                            type={showConfirmPassword ? 'text' : 'password'}
                             placeholder="Подтверждение пароля"
                             className="login-input with-eye"
                         />
@@ -213,35 +225,35 @@ export default function SignUp() {
                             type="button"
                             className="inline-eye-toggle"
                             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                            aria-label={showConfirmPassword ? "Скрыть пароль" : "Показать пароль"}
+                            aria-label={showConfirmPassword ? 'Скрыть пароль' : 'Показать пароль'}
                         >
-                        <span className={showConfirmPassword ? "" : "eye-crossed"}>
-                            👁️‍🗨️
-                        </span>
+                            <span className={showConfirmPassword ? '' : 'eye-crossed'}>👁️‍🗨️</span>
                         </button>
                     </div>
-
                     <button className="login-button">Продолжить</button>
                     <p className="register-text">
-                        Есть аккаунт?<Link to="/login" className="register-link">Войти</Link>
+                        Есть аккаунт?
+                        <Link to="/login" className="register-link">
+                            Войти
+                        </Link>
                     </p>
                 </form>
             </div>
-
 
             {/* Модальное окно для ввода кода */}
             {isCodeSent && (
                 <div className="modal">
                     <div className="modal-content">
                         {/* Кнопка для закрытия модального окна (в правом верхнем углу) */}
-                        <span className="close" onClick={closeModal}>&times;</span>
-
+                        <span className="close" onClick={closeModal}>
+                            &times;
+                        </span>
                         <h2 className="login-title">Введите код подтверждения</h2>
-
-                        {modalErrors && <div className="alert">{modalErrors.message}</div>} {/* Ошибки на странице */}
-
-                        {!modalErrors && loading && <div className="loading-text show">Загрузка...</div>}
-
+                        {modalErrors && <div className="alert">{modalErrors.message}</div>}{' '}
+                        {/* Ошибки на странице */}
+                        {!modalErrors && loading && (
+                            <div className="loading-text show">Загрузка...</div>
+                        )}
                         <input
                             type="text"
                             value={codeInput}
@@ -249,23 +261,25 @@ export default function SignUp() {
                             className="login-input"
                             placeholder="Введите код"
                         />
-
-                        <button onClick={verifyCode} className="login-button" disabled={isSubmitting}>
+                        <button
+                            onClick={verifyCode}
+                            className="login-button"
+                            disabled={isSubmitting}
+                        >
                             Подтвердить
                         </button>
-
-
                         <div>
                             {timer > 0 ? (
                                 <p>Повторная отправка через: {timer} секунд</p>
                             ) : (
-                                <button onClick={sendCode} className="login-button">Отправить код повторно</button>
+                                <button onClick={sendCode} className="login-button">
+                                    Отправить код повторно
+                                </button>
                             )}
                         </div>
                     </div>
                 </div>
             )}
-
         </div>
     );
 }

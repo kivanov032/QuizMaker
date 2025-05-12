@@ -1,17 +1,17 @@
-import {Navigate, Outlet} from "react-router-dom";
-import {useStateContext} from "../context/ContextProvider.jsx";
+import { Navigate, Outlet } from 'react-router-dom';
+import { useStateContext } from '../context/ContextProvider.jsx';
 
 export default function GuestLayout() {
-    const {token}  = useStateContext()
+    const { token } = useStateContext();
 
-    if (token){
+    if (token) {
         console.log(token);
-        return <Navigate to="/" />
+        return <Navigate to="/" />;
     }
 
     return (
         <div>
             <Outlet />
         </div>
-    )
+    );
 }

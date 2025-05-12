@@ -1,39 +1,39 @@
-import { createBrowserRouter } from "react-router-dom";
-import NotFound from "./views/NotFound.jsx";
-import CreatorQuestion from "./views/CreatorQuestion.jsx";
-import CreatorLayout from "./components/CreatorLayout.jsx";
-import GuestLayout from "./components/GuestLayout.jsx";
-import MainLayout from "./components/MainLayout.jsx";
-import Login from "./views/Login.jsx";
-import SignUp from "./views/SignUp.jsx";
-import MainPage from "./views/MainPage.jsx";
-import PassQuizLayout from "./components/PassQuizLayout.jsx";
-import PassQuizQuestion from "./views/PassQuizQuestion.jsx";
-import QuizResults from "./views/QuizResults.jsx";
+import { createBrowserRouter } from 'react-router-dom';
+import NotFound from './views/NotFound.jsx';
+import CreatorQuestion from './views/CreatorQuestion.jsx';
+import CreatorLayout from './components/CreatorLayout.jsx';
+import GuestLayout from './components/GuestLayout.jsx';
+import MainLayout from './components/MainLayout.jsx';
+import Login from './views/Login.jsx';
+import SignUp from './views/SignUp.jsx';
+import MainPage from './views/MainPage.jsx';
+import PassQuizLayout from './components/PassQuizLayout.jsx';
+import PassQuizQuestion from './views/PassQuizQuestion.jsx';
+import QuizResults from './views/QuizResults.jsx';
 
 const router = createBrowserRouter([
     {
         path: '/',
         element: <GuestLayout />,
-        children:[
+        children: [
             {
                 path: '/login',
-                element: <Login />
+                element: <Login />,
             },
             {
                 path: '/signup',
-                element: <SignUp />
+                element: <SignUp />,
             },
-        ]
+        ],
     },
     {
         path: '/',
         element: <MainLayout />,
-        children:[
+        children: [
             {
                 path: '/',
                 index: true,
-                element: <MainPage />
+                element: <MainPage />,
             },
             {
                 path: '/createQuestion',
@@ -41,9 +41,9 @@ const router = createBrowserRouter([
                 children: [
                     {
                         path: '/createQuestion/:id',
-                        element: <CreatorQuestion />
+                        element: <CreatorQuestion />,
                     },
-                ]
+                ],
             },
             {
                 path: '/passQuiz',
@@ -51,19 +51,19 @@ const router = createBrowserRouter([
                 children: [
                     {
                         path: '/passQuiz/:id',
-                        element: <PassQuizQuestion />
+                        element: <PassQuizQuestion />,
                     },
                     {
                         path: '/passQuiz/quizResult',
-                        element: <QuizResults />
+                        element: <QuizResults />,
                     },
                 ],
             },
-        ]
+        ],
     },
     {
         path: '*',
-        element: <NotFound />
+        element: <NotFound />,
     },
 ]);
 

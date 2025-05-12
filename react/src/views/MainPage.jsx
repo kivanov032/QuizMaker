@@ -1,15 +1,19 @@
-import { useNavigate } from "react-router-dom";
-import { checkActivityServerAndBD } from "../SenderQuizCreating.js";
-import { useState, useRef, useEffect} from "react";
-import "./MainPage.css";
-import { searchQuiz } from "../SenderQuizPassing.js";
-import {useQuizContext} from "../context/QuizContext.jsx";
+import { useNavigate } from 'react-router-dom';
+import { checkActivityServerAndBD } from '../SenderQuizCreating.js';
+import { useState, useRef, useEffect } from 'react';
+import './MainPage.css';
+import { searchQuiz } from '../SenderQuizPassing.js';
+import { useQuizContext } from '../context/QuizContext.jsx';
 
 export default function MainPage() {
     const { setQuiz } = useQuizContext();
 
     const navigate = useNavigate();
+<<<<<<< HEAD
     const [quizName, setQuizName] = useState(""); // Данные викторины
+=======
+    const [quizName, setQuizName] = useState('');
+>>>>>>> markast
     const [errors, setErrors] = useState(null);
     const [foundQuizzes, setFoundQuizzes] = useState([]);
     const [showQuizList, setShowQuizList] = useState(false);
@@ -18,7 +22,13 @@ export default function MainPage() {
 
     // Форматирование даты
     const formatDate = (dateString) => {
-        const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+        const options = {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+        };
         return new Date(dateString).toLocaleDateString('ru-RU', options);
     };
 
@@ -41,16 +51,20 @@ export default function MainPage() {
             const result = await checkActivityServerAndBD();
 
             if (result?.error) {
-                console.error("Ошибка c сервером или БД:", result.error);
-                setErrors({ server: ["Технические ошибки. Пожалуйста, попробуйте позже."] });
+                console.error('Ошибка c сервером или БД:', result.error);
+                setErrors({
+                    server: ['Технические ошибки. Пожалуйста, попробуйте позже.'],
+                });
                 return;
             }
 
-            console.log("Результат проверки:", result);
-            navigate("/createQuestion/1");
+            console.log('Результат проверки:', result);
+            navigate('/createQuestion/1');
         } catch (error) {
-            console.error("Ошибка:", error.data?.message || error.message);
-            setErrors({ server: ["Технические проблемы с сервером. Пожалуйста, попробуйте позже."] });
+            console.error('Ошибка:', error.data?.message || error.message);
+            setErrors({
+                server: ['Технические проблемы с сервером. Пожалуйста, попробуйте позже.'],
+            });
         }
     };
 
@@ -60,7 +74,7 @@ export default function MainPage() {
         const query = quizName.trim();
 
         if (!query) {
-            setErrors({ search: ["Введите название викторины"] });
+            setErrors({ search: ['Введите название викторины'] });
             return;
         }
 
@@ -73,26 +87,26 @@ export default function MainPage() {
                 case 200:
                     setFoundQuizzes(data.quizzes);
                     setShowQuizList(true);
-                    console.log(data.quizzes)
+                    console.log(data.quizzes);
                     break;
                 case 404:
-                    setErrors({ search: ["Викторины не найдены"] });
+                    setErrors({ search: ['Викторины не найдены'] });
                     setFoundQuizzes([]);
                     setShowQuizList(false);
                     break;
                 case 422:
-                    setErrors({ search: ["Некорректный запрос"] });
+                    setErrors({ search: ['Некорректный запрос'] });
                     setFoundQuizzes([]);
                     setShowQuizList(false);
                     break;
                 default:
-                    setErrors({ server: ["Неизвестная ошибка сервера"] });
+                    setErrors({ server: ['Неизвестная ошибка сервера'] });
                     setFoundQuizzes([]);
                     setShowQuizList(false);
             }
         } catch (error) {
             console.error('Критическая ошибка:', error);
-            setErrors({ server: ["Сервер недоступен. Попробуйте позже."] });
+            setErrors({ server: ['Сервер недоступен. Попробуйте позже.'] });
             setFoundQuizzes([]);
             setShowQuizList(false);
         }
@@ -110,7 +124,7 @@ export default function MainPage() {
 
             {errors && (
                 <div className="alert">
-                    {Object.keys(errors).map(key => (
+                    {Object.keys(errors).map((key) => (
                         <p key={key}>{errors[key][0]}</p>
                     ))}
                 </div>

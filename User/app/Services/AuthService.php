@@ -12,7 +12,6 @@ use Illuminate\Validation\ValidationException;
 
 class AuthService
 {
-
     // Проверка данных при регистрации
     public function validateSignup(SignupRequest $request): array
     {

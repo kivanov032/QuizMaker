@@ -1,12 +1,13 @@
 import { useContext, useEffect, useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { QuestionContext } from '../context/QuestionContext';
-import "./CreatorQuestion.css";
+import './CreatorQuestion.css';
 
 export default function CreatorQuestion() {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { questions, updateQuestion, getQuestion, deleteQuestion, addQuestion } = useContext(QuestionContext);
+    const { questions, updateQuestion, getQuestion, deleteQuestion, addQuestion } =
+        useContext(QuestionContext);
 
     const [question, setQuestion] = useState('');
     const [answers, setAnswers] = useState(['', '', '', '']);
@@ -19,7 +20,12 @@ export default function CreatorQuestion() {
     useEffect(() => {
         if (isFirstRender.current) {
             if (questions.length === 0) {
-                addQuestion({ id: 1, question: '', answers: ['', '', '', ''], correctAnswerIndex: null });
+                addQuestion({
+                    id: 1,
+                    question: '',
+                    answers: ['', '', '', ''],
+                    correctAnswerIndex: null,
+                });
             }
             isFirstRender.current = false;
         }
@@ -93,7 +99,7 @@ export default function CreatorQuestion() {
         if (parseInt(id) > 1) {
             navigate(`/createQuestion/${parseInt(id) - 1}`);
         } else {
-            alert("Это первый вопрос.");
+            alert('Это первый вопрос.');
         }
     };
 
@@ -101,7 +107,7 @@ export default function CreatorQuestion() {
         if (parseInt(id) < questions.length) {
             navigate(`/createQuestion/${parseInt(id) + 1}`);
         } else {
-            alert("Это последний вопрос. Переход невозможен.");
+            alert('Это последний вопрос. Переход невозможен.');
         }
     };
 
@@ -112,7 +118,7 @@ export default function CreatorQuestion() {
             deleteQuestion(currentQuestion.id);
 
             // Переход на предыдущий вопрос, если он существует
-            const newId = parseInt(id) > 1 ? parseInt(id) - 1 : (questions.length > 1 ? 1 : null);
+            const newId = parseInt(id) > 1 ? parseInt(id) - 1 : questions.length > 1 ? 1 : null;
 
             if (newId) {
                 navigate(`/createQuestion/${newId}`);
@@ -133,15 +139,33 @@ export default function CreatorQuestion() {
         setCorrectAnswerIndex(null);
 
         const newQuestionId = questions.length + 1;
-        addQuestion({ id: newQuestionId, question: '', answers: ['', '', '', ''], correctAnswerIndex: null });
+        addQuestion({
+            id: newQuestionId,
+            question: '',
+            answers: ['', '', '', ''],
+            correctAnswerIndex: null,
+        });
 
         navigate(`/createQuestion/${newQuestionId}`);
     };
 
     return (
         <div style={{ maxWidth: '500px', margin: '0 auto' }}>
-            <div style={{ border: '1px solid #ccc', padding: '10px', borderRadius: '5px', marginBottom: '20px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+            <div
+                style={{
+                    border: '1px solid #ccc',
+                    padding: '10px',
+                    borderRadius: '5px',
+                    marginBottom: '20px',
+                }}
+            >
+                <div
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        marginBottom: '10px',
+                    }}
+                >
                     <span style={{ marginRight: '10px' }}>№ {parseInt(id)}:</span>
                     <input
                         type="text"
@@ -161,7 +185,11 @@ export default function CreatorQuestion() {
                     <div
                         style={{
                             ...(answers.length > 4
-                                ? { maxHeight: '240px', overflowY: 'auto', marginBottom: '10px' } // Увеличиваем maxHeight, чтобы вместить 5-й и 6-й ответы
+                                ? {
+                                      maxHeight: '240px',
+                                      overflowY: 'auto',
+                                      marginBottom: '10px',
+                                  } // Увеличиваем maxHeight, чтобы вместить 5-й и 6-й ответы
                                 : { minHeight: '240px', marginBottom: '10px' }), // Фиксируем minHeight для случаев <= 4 ответов
                         }}
                     >
@@ -181,9 +209,17 @@ export default function CreatorQuestion() {
                                         value={answer}
                                         onChange={(e) => handleAnswerChange(index, e.target.value)}
                                         maxLength={maxAnswerLength}
-                                        style={{ flex: 1, border: '1px solid #ccc', padding: '5px', marginRight: '10px' }}
+                                        style={{
+                                            flex: 1,
+                                            border: '1px solid #ccc',
+                                            padding: '5px',
+                                            marginRight: '10px',
+                                        }}
                                     />
-                                    <button onClick={() => removeAnswerField(index)} style={{ padding: '5px' }}>
+                                    <button
+                                        onClick={() => removeAnswerField(index)}
+                                        style={{ padding: '5px' }}
+                                    >
                                         -
                                     </button>
                                 </div>
@@ -195,7 +231,9 @@ export default function CreatorQuestion() {
                             </div>
                         ))}
                     </div>
-                    <div style={{ height: '30px' }}> {/* Фиксированный контейнер для кнопки */}
+                    <div style={{ height: '30px' }}>
+                        {' '}
+                        {/* Фиксированный контейнер для кнопки */}
                         {answers.length < 6 && (
                             <button onClick={addAnswerField} style={{ padding: '5px' }}>
                                 +
@@ -205,17 +243,35 @@ export default function CreatorQuestion() {
                 </div>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <button className="btn btn-block" onClick={handlePreviousQuestion}>Предыдущий вопрос</button>
-                <button className="btn btn-block" onClick={handleNextQuestion}>Следующий вопрос</button>
+                <button className="btn btn-block" onClick={handlePreviousQuestion}>
+                    Предыдущий вопрос
+                </button>
+                <button className="btn btn-block" onClick={handleNextQuestion}>
+                    Следующий вопрос
+                </button>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px' }}>
-                <button className="btn" onClick={handleDeleteQuestion}
-                        style={{ visibility: questions.length > 1 ? 'visible' : 'hidden' }}>
+            <div
+                style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    marginTop: '10px',
+                }}
+            >
+                <button
+                    className="btn"
+                    onClick={handleDeleteQuestion}
+                    style={{ visibility: questions.length > 1 ? 'visible' : 'hidden' }}
+                >
                     Удалить вопрос
                 </button>
-                <button className="btn" onClick={handleAddNewQuestion}
-                        style={{ visibility: (questions.length === parseInt(id)) ? 'visible' : 'hidden' }}>
+                <button
+                    className="btn"
+                    onClick={handleAddNewQuestion}
+                    style={{
+                        visibility: questions.length === parseInt(id) ? 'visible' : 'hidden',
+                    }}
+                >
                     Добавить вопрос
                 </button>
             </div>

@@ -176,4 +176,3 @@ class MailSenderControllerTest extends TestCase
         $record->delete();
     }
 }
-

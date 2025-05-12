@@ -260,6 +260,7 @@
       <excludeFolder url="file://$MODULE_DIR$/User/vendor/predis/predis" />
       <excludeFolder url="file://$MODULE_DIR$/User/vendor/swagger-api/swagger-ui" />
       <excludeFolder url="file://$MODULE_DIR$/User/vendor/laravel/breeze" />
+<<<<<<< HEAD
       <excludeFolder url="file://$MODULE_DIR$/Quiz/vendor/wotz/laravel-swagger-ui" />
       <excludeFolder url="file://$MODULE_DIR$/User/vendor/beberlei/assert" />
       <excludeFolder url="file://$MODULE_DIR$/User/vendor/flix-tech/avro-php" />
@@ -268,6 +269,44 @@
       <excludeFolder url="file://$MODULE_DIR$/User/vendor/mateusjunges/confluent-schema-registry-api" />
       <excludeFolder url="file://$MODULE_DIR$/User/vendor/mateusjunges/laravel-kafka" />
       <excludeFolder url="file://$MODULE_DIR$/User/vendor/widmogrod/php-functional" />
+=======
+      <excludeFolder url="file://$MODULE_DIR$/Quiz/vendor/clue/ndjson-react" />
+      <excludeFolder url="file://$MODULE_DIR$/Quiz/vendor/evenement/evenement" />
+      <excludeFolder url="file://$MODULE_DIR$/Quiz/vendor/fidry/cpu-core-counter" />
+      <excludeFolder url="file://$MODULE_DIR$/Quiz/vendor/friendsofphp/php-cs-fixer" />
+      <excludeFolder url="file://$MODULE_DIR$/Quiz/vendor/iamcal/sql-parser" />
+      <excludeFolder url="file://$MODULE_DIR$/Quiz/vendor/larastan/larastan" />
+      <excludeFolder url="file://$MODULE_DIR$/Quiz/vendor/phpstan/phpstan" />
+      <excludeFolder url="file://$MODULE_DIR$/Quiz/vendor/react/cache" />
+      <excludeFolder url="file://$MODULE_DIR$/Quiz/vendor/react/child-process" />
+      <excludeFolder url="file://$MODULE_DIR$/Quiz/vendor/react/dns" />
+      <excludeFolder url="file://$MODULE_DIR$/Quiz/vendor/react/event-loop" />
+      <excludeFolder url="file://$MODULE_DIR$/Quiz/vendor/react/promise" />
+      <excludeFolder url="file://$MODULE_DIR$/Quiz/vendor/react/socket" />
+      <excludeFolder url="file://$MODULE_DIR$/Quiz/vendor/react/stream" />
+      <excludeFolder url="file://$MODULE_DIR$/Quiz/vendor/symfony/filesystem" />
+      <excludeFolder url="file://$MODULE_DIR$/Quiz/vendor/symfony/options-resolver" />
+      <excludeFolder url="file://$MODULE_DIR$/Quiz/vendor/symfony/polyfill-php81" />
+      <excludeFolder url="file://$MODULE_DIR$/Quiz/vendor/symfony/stopwatch" />
+      <excludeFolder url="file://$MODULE_DIR$/User/vendor/clue/ndjson-react" />
+      <excludeFolder url="file://$MODULE_DIR$/User/vendor/evenement/evenement" />
+      <excludeFolder url="file://$MODULE_DIR$/User/vendor/fidry/cpu-core-counter" />
+      <excludeFolder url="file://$MODULE_DIR$/User/vendor/friendsofphp/php-cs-fixer" />
+      <excludeFolder url="file://$MODULE_DIR$/User/vendor/iamcal/sql-parser" />
+      <excludeFolder url="file://$MODULE_DIR$/User/vendor/larastan/larastan" />
+      <excludeFolder url="file://$MODULE_DIR$/User/vendor/phpstan/phpstan" />
+      <excludeFolder url="file://$MODULE_DIR$/User/vendor/react/cache" />
+      <excludeFolder url="file://$MODULE_DIR$/User/vendor/react/child-process" />
+      <excludeFolder url="file://$MODULE_DIR$/User/vendor/react/dns" />
+      <excludeFolder url="file://$MODULE_DIR$/User/vendor/react/event-loop" />
+      <excludeFolder url="file://$MODULE_DIR$/User/vendor/react/promise" />
+      <excludeFolder url="file://$MODULE_DIR$/User/vendor/react/socket" />
+      <excludeFolder url="file://$MODULE_DIR$/User/vendor/react/stream" />
+      <excludeFolder url="file://$MODULE_DIR$/User/vendor/symfony/filesystem" />
+      <excludeFolder url="file://$MODULE_DIR$/User/vendor/symfony/options-resolver" />
+      <excludeFolder url="file://$MODULE_DIR$/User/vendor/symfony/polyfill-php81" />
+      <excludeFolder url="file://$MODULE_DIR$/User/vendor/symfony/stopwatch" />
+>>>>>>> markast
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

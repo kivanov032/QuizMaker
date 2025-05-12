@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect } from 'react';
 
 const QuizContext = createContext({
     quiz: null,
@@ -52,17 +52,19 @@ export const QuizProvider = ({ children }) => {
     }, [userAnswers]);
 
     return (
-        <QuizContext.Provider value={{
-            quiz,
-            setQuiz: updateQuiz,
-            resetQuiz,
-            quizQuestions,
-            setQuizQuestions,
-            resetQuestions,
-            userAnswers,
-            setUserAnswers,
-            resetUserAnswers,
-        }}>
+        <QuizContext.Provider
+            value={{
+                quiz,
+                setQuiz: updateQuiz,
+                resetQuiz,
+                quizQuestions,
+                setQuizQuestions,
+                resetQuestions,
+                userAnswers,
+                setUserAnswers,
+                resetUserAnswers,
+            }}
+        >
             {children}
         </QuizContext.Provider>
     );
