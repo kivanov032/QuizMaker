@@ -17,10 +17,6 @@ export default function CreatorLayout() {
     const { user } = useStateContext(); //Состояние для токена
     const maxNameQuizLength = 200; // Максимальная длина названия викторины
 
-<<<<<<< HEAD
-
-=======
->>>>>>> markast
     //Состояние для чекбоксов ошибок (метки на то, какие ошибки исправить (все кроме критических))
     const [checkboxes, setCheckboxes] = useState({
         cosmeticErrorQuizName: false,

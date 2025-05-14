@@ -36,13 +36,8 @@ export const searchQuiz = async (quizName) => {
  */
 export const downloadQuizQuestion = async (id_quiz) => {
     try {
-<<<<<<< HEAD
         const response = await axios.post(`${BASE_URL}/api/get-quiz-questions`, {
-            id_quiz
-=======
-        const response = await axios.post(`${BASE_URL}/api/download-quiz-questions`, {
             id_quiz,
->>>>>>> markast
         });
 
         return {
@@ -87,10 +82,7 @@ export const checkQuizAnswers = async (userAnswers, quizQuestions, login) => {
         const response = await axios.post(`${BASE_URL}/api/check-quiz-answers`, {
             userAnswers,
             quizQuestions,
-<<<<<<< HEAD
-            login
-=======
->>>>>>> markast
+            login,
         });
 
         return {

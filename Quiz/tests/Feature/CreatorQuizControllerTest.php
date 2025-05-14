@@ -416,11 +416,3 @@ class CreatorQuizControllerTest extends TestCase
     }
 
 }
-
-
-
-
-
-
-
-

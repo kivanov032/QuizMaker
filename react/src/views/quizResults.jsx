@@ -1,26 +1,14 @@
-<<<<<<< HEAD
-import {Link, useNavigate} from "react-router-dom";
-import { useEffect, useState } from "react";
-import { useQuizContext } from "../context/QuizContext";
-import { checkQuizAnswers } from "../SenderQuizPassing.js";
-import "./QuizResults.css";
-import {useStateContext} from "../context/ContextProvider.jsx";
-
-export default function QuizResults() {
-    const navigate = useNavigate();
-    const { quiz, quizQuestions, userAnswers} = useQuizContext();
-    const { user} = useStateContext(); //Состояние для токена
-=======
 import { Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useQuizContext } from '../context/QuizContext';
 import { checkQuizAnswers } from '../SenderQuizPassing.js';
 import './QuizResults.css';
+import { useStateContext } from '../context/ContextProvider.jsx';
 
 export default function QuizResults() {
     const navigate = useNavigate();
     const { quiz, quizQuestions, userAnswers } = useQuizContext();
->>>>>>> markast
+    const { user } = useStateContext(); //Состояние для токена
     const [results, setResults] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -36,7 +24,11 @@ export default function QuizResults() {
             setError(null);
 
             try {
-                const { status, data } = await checkQuizAnswers(userAnswers, quizQuestions, user.login);
+                const { status, data } = await checkQuizAnswers(
+                    userAnswers,
+                    quizQuestions,
+                    user.login,
+                );
 
                 if (status === 200) {
                     setResults(data);

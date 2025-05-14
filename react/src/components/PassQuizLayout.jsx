@@ -22,13 +22,9 @@ export default function PassQuizLayout() {
 
                 if (status === 200) {
                     setQuizQuestions(data.questions);
-<<<<<<< HEAD
-                    resetUserAnswers()
-=======
                     resetUserAnswers();
                     console.log(data.questions);
                     console.log('Я тууууууут!!!!!!!!!!!!1111');
->>>>>>> markast
                     navigate(`/passQuiz/1`);
                 } else {
                     handleResultError(status);

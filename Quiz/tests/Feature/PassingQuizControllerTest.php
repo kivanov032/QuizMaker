@@ -9,7 +9,6 @@ use Tests\TestCase;
 
 class PassingQuizControllerTest extends TestCase
 {
-
     /**
      * --- Тестирование метода searchQuiz ---
      */

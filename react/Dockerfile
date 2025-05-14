@@ -1,13 +1,8 @@
-# Стадия сборки
-FROM node:20-alpine AS builder
+FROM node:20-alpine
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci
+RUN npm install
 COPY . .
 RUN npm run build
-
-# Стадия production
-FROM nginx:alpine
-COPY --from=builder /app/dist /usr/share/nginx/html
-
-EXPOSE 80
+RUN npm install -g serve
+CMD ["serve", "-s", "dist", "-l", "3000"]

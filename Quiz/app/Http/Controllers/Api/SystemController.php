@@ -69,4 +69,3 @@ class SystemController
         return response()->json($result, $result['status'] === 'success' ? 200 : 500);
     }
 }
-

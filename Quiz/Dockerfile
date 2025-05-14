@@ -1,26 +1,25 @@
 FROM php:8.4-fpm
 
-# Установка зависимостей
+WORKDIR /app
+
+# Системные зависимости
 RUN apt-get update && apt-get install -y \
     libpq-dev \
     libzip-dev \
     unzip \
-    && docker-php-ext-install pdo pdo_pgsql zip
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Временная копия composer файлов
-COPY composer.json composer.lock ./
+# PHP расширения
+RUN docker-php-ext-install pdo pdo_pgsql zip
 
-# Установка Composer с отключением скриптов
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
+RUN pecl install redis && docker-php-ext-enable redis
+
+COPY composer.* ./
+RUN curl -sS https://getcomposer.org/installer | php -- \
+    --install-dir=/usr/local/bin --filename=composer \
     && composer install --no-dev --optimize-autoloader --no-scripts
 
-# Копируем остальное (включая artisan)
 COPY . .
-
-# Настройка прав
-WORKDIR /var/www/html
-RUN chown -R www-data:www-data /var/www/html/storage \
-    && chmod -R 775 /var/www/html/storage
-
-# Запуск миграций только если artisan доступен
-CMD ["sh", "-c", "[ -f artisan ] && php artisan migrate --force || true; php-fpm"]
+EXPOSE 8001
+CMD ["php", "artisan", "serve", "--host=0.0.0.0"]

@@ -67,7 +67,7 @@ export default function MainLayout() {
 
     // 🟡 Пока загружаемся — ничего не показываем
     if (loading) {
-        return <div className="loading-text show">Загрузка...</div>
+        return <div className="loading-text show">Загрузка...</div>;
     }
 
     // После загрузки — если всё-таки нет токена — редиректим

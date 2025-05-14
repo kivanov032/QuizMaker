@@ -7,7 +7,6 @@ use PHPUnit\Framework\TestCase;
 
 class CreatorQuizHelperTest extends TestCase
 {
-
     /**
      * Тест на функцию, которая обращает фактически пустые поля в null
      */
@@ -490,4 +489,3 @@ class CreatorQuizHelperTest extends TestCase
 
 
 }
-

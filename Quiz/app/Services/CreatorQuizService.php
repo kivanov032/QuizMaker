@@ -9,13 +9,11 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-
 use App\Jobs\NotifyUserServerAboutUserQuiz;
 use Illuminate\Support\Facades\Queue;
 
 class CreatorQuizService
 {
-
     // Проверка активности сервера и подключения к базе данных.
     public function checkActivity(): JsonResponse
     {
@@ -193,28 +191,28 @@ class CreatorQuizService
             // Вызов метода для записи викторины в базу данных
             CreatorQuizHelper::saveQuizToDatabase($quizName, $questions, $login);
 
-//            // Отправка данных викторины на внешний сервер в фоновом режиме
-//            Queue::push(new NotifyUserServerAboutUserQuiz([
-//                'login' => $login
-//            ]));
+            //            // Отправка данных викторины на внешний сервер в фоновом режиме
+            //            Queue::push(new NotifyUserServerAboutUserQuiz([
+            //                'login' => $login
+            //            ]));
 
 
             // Использование сервиса Kafka для оповещения микросервиса User о том,
             // что викторина создана таким-то пользователем
-//            try {
-//                KafkaService::publish(
-//                    'localhost',
-//                    'quiz_created',
-//                    ['login' => $login]
-//                );
-//            } catch (Exception $kafkaException) {
-//                Log::error('Ошибка Kafka: ' . $kafkaException->getMessage());
-//            }
+            //            try {
+            //                KafkaService::publish(
+            //                    'localhost',
+            //                    'quiz_created',
+            //                    ['login' => $login]
+            //                );
+            //            } catch (Exception $kafkaException) {
+            //                Log::error('Ошибка Kafka: ' . $kafkaException->getMessage());
+            //            }
 
             dispatch(function () use ($login) {
                 try {
                     KafkaService::publish(
-                        'localhost',
+                        'kafka:9092', //kafka:9092 //localhost
                         'quiz_created',
                         ['login' => $login]
                     );

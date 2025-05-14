@@ -10,7 +10,6 @@ use Ramsey\Uuid\Uuid;
 
 class CreatorQuizHelper
 {
-
     /**
      * Очищает пустые поля в массиве вопросов. 1
      *
@@ -199,7 +198,7 @@ class CreatorQuizHelper
             $errors = [];
 
             // Проверка на незаполненную страницу вопроса
-            if (is_null($question['question']) && (empty($question['answers']) || array_all($question['answers'], fn($answer) => is_null($answer)))) {
+            if (is_null($question['question']) && (empty($question['answers']) || array_all($question['answers'], fn ($answer) => is_null($answer)))) {
                 $errors[] = ["id_error" => 1, "text_error" => "Создана страница вопроса, но она не заполнена."];
             } else {
                 // Проверка на пустые поля ответов
@@ -301,7 +300,7 @@ class CreatorQuizHelper
                 return [
                     'id' => $question['id'],
                     'question' => $question['question'],
-                    'answers' => array_values(array_filter($answers, fn($answer) => !is_null($answer))),
+                    'answers' => array_values(array_filter($answers, fn ($answer) => !is_null($answer))),
                     'correctAnswerIndex' => null,
                 ];
             }
@@ -653,7 +652,7 @@ class CreatorQuizHelper
                     'id_quiz_question_answers' => Uuid::uuid4()->toString(),
                     'text_question' => $question['question'],
                     'correct_option' => $question['answers'][$question['correctAnswerIndex']],
-                    'wrong_option' => array_values(array_filter($question['answers'], function($answer) use ($question) {
+                    'wrong_option' => array_values(array_filter($question['answers'], function ($answer) use ($question) {
                         return $answer !== $question['answers'][$question['correctAnswerIndex']];
                     })),
                     'id_quiz' => $id_quiz,

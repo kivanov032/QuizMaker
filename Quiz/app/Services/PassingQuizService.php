@@ -7,11 +7,9 @@ use App\Models\Quiz;
 use App\Models\QuizQuestion;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class PassingQuizService
 {
-
     // Поиск викторин по названию.
     public function searchQuiz(Request $request): JsonResponse
     {
@@ -114,9 +112,9 @@ class PassingQuizService
 
         // Расчет статистики в переменных
         $totalQuestions = count($quizQuestions);
-        $correctAnswers = count(array_filter($results, fn($r) => $r['status'] === 'Right'));
-        $wrongAnswers = count(array_filter($results, fn($r) => $r['status'] === 'Wrong'));
-        $skippedQuestions = count(array_filter($results, fn($r) => $r['status'] === 'Not Entered'));
+        $correctAnswers = count(array_filter($results, fn ($r) => $r['status'] === 'Right'));
+        $wrongAnswers = count(array_filter($results, fn ($r) => $r['status'] === 'Wrong'));
+        $skippedQuestions = count(array_filter($results, fn ($r) => $r['status'] === 'Not Entered'));
         $scorePercentage = round($correctAnswers / $totalQuestions * 100, 2);
 
         return response()->json([

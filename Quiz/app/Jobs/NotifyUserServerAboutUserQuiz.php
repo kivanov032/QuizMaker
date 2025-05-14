@@ -11,7 +11,9 @@ use Illuminate\Support\Facades\Log;
 
 class NotifyUserServerAboutUserQuiz implements ShouldQueue
 {
-    use InteractsWithQueue, Queueable, SerializesModels;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
     public int $tries = 1; // Количество попыток
     protected array $quizData; // Данные для отправки через очередь

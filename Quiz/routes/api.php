@@ -28,9 +28,3 @@ Route::post('/create-quiz', [CreatorQuizController::class, 'createQuiz']);
 Route::post('/search-quiz', [PassingQuizController::class, 'searchQuiz']);
 Route::post('/get-quiz-questions', [PassingQuizController::class, 'getQuizQuestions']);
 Route::post('/check-quiz-answers', [PassingQuizController::class, 'checkQuizAnswers']);
-
-
-
-
-
-

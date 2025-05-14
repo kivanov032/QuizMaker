@@ -1,11 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuizContext } from '../context/QuizContext';
-<<<<<<< HEAD
-import "./PassQuizQuestion.css";
-=======
-import './passQuizQuestion.css';
->>>>>>> markast
+import './PassQuizQuestion.css';
 
 export default function PassQuizQuestion() {
     const { id } = useParams();

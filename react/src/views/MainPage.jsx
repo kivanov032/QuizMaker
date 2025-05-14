@@ -9,11 +9,7 @@ export default function MainPage() {
     const { setQuiz } = useQuizContext();
 
     const navigate = useNavigate();
-<<<<<<< HEAD
-    const [quizName, setQuizName] = useState(""); // Данные викторины
-=======
-    const [quizName, setQuizName] = useState('');
->>>>>>> markast
+    const [quizName, setQuizName] = useState(''); // Данные викторины'');
     const [errors, setErrors] = useState(null);
     const [foundQuizzes, setFoundQuizzes] = useState([]);
     const [showQuizList, setShowQuizList] = useState(false);
