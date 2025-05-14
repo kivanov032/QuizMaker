@@ -434,3 +434,4 @@ class AuthController extends Controller
 //            'message' => 'Токен создан (тест)'
 //        ]);
 //    }
+//

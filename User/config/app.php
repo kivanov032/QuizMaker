@@ -195,7 +195,7 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
 
-        //Junges\Kafka\Providers\LaravelKafkaServiceProvider::class,
+        Junges\Kafka\Providers\LaravelKafkaServiceProvider::class,
 
     ],
 
@@ -210,9 +210,9 @@ return [
     |
     */
 
-//    'aliases' => Facade::defaultAliases()->merge([
-//        // 'ExampleClass' => App\Example\ExampleClass::class,
-//        Junges\Kafka\Providers\LaravelKafkaServiceProvider::class,
-//    ])->toArray(),
+    'aliases' => Facade::defaultAliases()->merge([
+        // 'ExampleClass' => App\Example\ExampleClass::class,
+        Junges\Kafka\Providers\LaravelKafkaServiceProvider::class,
+    ])->toArray(),
 
 ];

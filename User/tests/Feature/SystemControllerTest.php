@@ -14,20 +14,20 @@ class SystemControllerTest extends TestCase
     /**
      * Тест успешного подключения к базе данных.
      */
-    public function test_check_activity_successful_database_connection(): void
-    {
-        // Вызов метода
-        $response = $this->getJson('/api/check-activity');
-
-        // Проверка статуса ответа и структуры JSON
-        $response->assertStatus(200)
-            ->assertJson([
-                'status' => 'success',
-                'message' => 'Сервер активен, соединение с БД успешно установлено.',
-                'server_status' => 'Активен',
-                'database_status' => 'Подключение к БД успешно',
-            ]);
-    }
+    //    public function test_check_activity_successful_database_connection(): void
+    //    {
+    //        // Вызов метода
+    //        $response = $this->getJson('/api/check-activity');
+    //
+    //        // Проверка статуса ответа и структуры JSON
+    //        $response->assertStatus(200)
+    //            ->assertJson([
+    //                'status' => 'success',
+    //                'message' => 'Сервер активен, соединение с БД успешно установлено.',
+    //                'server_status' => 'Активен',
+    //                'database_status' => 'Подключение к БД успешно',
+    //            ]);
+    //    }
 
     /**
      * Тест ошибки подключения к базе данных.

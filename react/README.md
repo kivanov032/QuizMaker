@@ -1,8 +1,67 @@
-# React + Vite
+# React
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## 1. Назначение микросервиса
 
-Currently, two official plugins are available:
+**React** — это фронтенд микросервис системы *Quiz Maker*, отвечающий за отображение пользовательского интерфейса. Обеспечивает:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- регистрацию и вход пользователей;
+- отображение главной страницы;
+- создание и прохождение викторин;
+- отображение результатов прохождения.
+
+## 2. Архитектура и зависимости
+
+### Используемые технологии:
+
+- **Язык:** JavaScript (ES6+)
+- **Фреймворк:** React 19.0.10
+- **Маршрутизация:** React Router 7.2.0
+- **Сборка и запуск:** Vite 6.2.0
+
+### Взаимодействие с другими микросервисами:
+
+| Микросервис | Назначение                                              | Протокол |
+|-------------|---------------------------------------------------------|----------|
+| **User**    | Регистрация, авторизация, получение пользователя        | HTTP (REST API) |
+| **Quiz**    | Создание, прохождение и получение результатов викторины | HTTP (REST API) |
+
+## 3. Способы запуска сервиса
+
+### Локальный запуск:
+
+```bash
+npm run dev
+```
+### Переменные окружения (`.env`):
+
+```env
+VITE_USER_API_BASE_URL=http://localhost:8000
+VITE_QUIZ_API_BASE_URL=http://localhost:8001
+```
+
+## 4. API документация
+
+Документации нет.
+
+
+### Приложение использует следующие основные маршруты:
+
+| Путь                     | Компонент               | Описание                                 |
+|--------------------------|-------------------------|------------------------------------------|
+| `/login`                | `Login`                | Страница входа                          |
+| `/signup`               | `SignUp`               | Страница регистрации                    |
+| `/`                     | `MainPage`             | Главная страница после входа            |
+| `/createQuestion/:id`   | `CreatorQuestion`       | Создание вопросов викторины             |
+| `/passQuiz/:id`         | `PassQuizQuestion`      | Прохождение викторины                   |
+| `/passQuiz/quizResult`  | `QuizResults`           | Результаты прохождения викторины       |
+| `*`                     | `NotFound`              | Страница 404                            |
+
+## 5. Как тестировать
+
+Тестов нет.
+
+## 6. Контакты и поддержка
+
+- **Разработчики:** Иванов Константин, Астанаев Марк, Горнушкин Дмитрий
+- **GitHub:** https://github.com/kivanov032, https://github.com/markast555, https://github.com/Dimaer35
+- **Telegram:** https://t.me/konstantin_beast, https://t.me/Mark_8_8, https://t.me/Dimaer198
