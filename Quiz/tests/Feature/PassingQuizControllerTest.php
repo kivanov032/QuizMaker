@@ -267,6 +267,7 @@ class PassingQuizControllerTest extends TestCase
         ];
 
         $response = $this->postJson('/api/check-quiz-answers', [
+            'login' => "123",
             'userAnswers' => $userAnswers,
             'quizQuestions' => $quizQuestions,
             'id_quiz' => $quiz->id_quiz
@@ -319,6 +320,7 @@ class PassingQuizControllerTest extends TestCase
         $quizQuestions = $questionsResponse->json('questions');
 
         $response = $this->postJson('/api/check-quiz-answers', [
+            'login' => "123",
             'userAnswers' => [],
             'quizQuestions' => $quizQuestions,
             'id_quiz' => $quiz->id_quiz

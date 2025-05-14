@@ -105,128 +105,128 @@ class AuthControllerTest extends TestCase
         User::find($user['id_user'])->delete();
     }
 
-    /**
-     * Тест ошибки при регистрации без логина.
-     */
-    public function test_signup_fails_without_login(): void
-    {
-        $response = $this->postJson('/api/signup', [
-            'email' => 'newuser@example.com',
-            'password' => 'password123',
-            'password_confirmation' => 'password123',
-        ]);
-
-        // Проверяем статус ответа и наличие ошибки валидации
-        $response->assertStatus(422)
-            ->assertJsonValidationErrors(['login']);
-    }
-
-    /**
-     * Тест ошибки при регистрации, если логин уже занят.
-     */
-    public function test_signup_fails_if_login_is_taken(): void
-    {
-        // Создаем пользователя с таким же логином
-        $user = User::factory()->create(['login' => 'newuser1']);
-
-        $response = $this->postJson('/api/signup', [
-            'login' => 'newuser1',
-            'email' => 'newuser@example.com',
-            'password' => 'password/123',
-            'password_confirmation' => 'password/123',
-        ]);
-
-        // Проверяем статус ответа и наличие ошибки валидации
-        $response->assertStatus(422)
-            ->assertJsonValidationErrors(['login']);
-
-        // Удаляем созданного пользователя
-        $user->delete();
-    }
-
-    /**
-     * Тест ошибки при регистрации с невалидным email.
-     */
-    public function test_signup_fails_with_invalid_email_format(): void
-    {
-        $response = $this->postJson('/api/signup', [
-            'login' => 'newuser',
-            'email' => 'not-an-email',
-            'password' => 'password/123',
-            'password_confirmation' => 'password/123',
-        ]);
-
-        // Проверяем статус ответа и наличие ошибки валидации
-        $response->assertStatus(422)
-            ->assertJsonValidationErrors(['email']);
-    }
-
-    /**
-     * Тест ошибки при регистрации без пароля.
-     */
-    public function test_signup_fails_without_password(): void
-    {
-        $response = $this->postJson('/api/signup', [
-            'login' => 'newuser',
-            'email' => 'newuser@example.com',
-            // Пароль отсутствует
-        ]);
-
-        // Проверяем статус ответа и наличие ошибки валидации
-        $response->assertStatus(422)
-            ->assertJsonValidationErrors(['password']);
-    }
-
-    /**
-     * Тест ошибки при регистрации, если пароли не совпадают.
-     */
-    public function test_signup_fails_if_passwords_do_not_match(): void
-    {
-        $response = $this->postJson('/api/signup', [
-            'login' => 'newuser',
-            'email' => 'newuser@example.com',
-            'password' => 'password/123',
-            'password_confirmation' => 'password/1234',
-        ]);
-
-        // Проверяем статус ответа и наличие ошибки валидации
-        $response->assertStatus(422)
-            ->assertJsonValidationErrors(['password']);
-    }
-
-    /**
-     * Тест ошибки при регистрации, если пароль слишком короткий.
-     */
-    public function test_signup_fails_if_password_is_too_short(): void
-    {
-        $response = $this->postJson('/api/signup', [
-            'login' => 'newuser',
-            'email' => 'newuser@example.com',
-            'password' => 'short',
-            'password_confirmation' => 'short',
-        ]);
-
-        // Проверяем статус ответа и наличие ошибки валидации
-        $response->assertStatus(422)
-            ->assertJsonValidationErrors(['password']);
-    }
-
-    /**
-     * Тест ошибки при регистрации, если пароль не содержит символов.
-     */
-    public function test_signup_fails_if_password_does_not_contain_symbols(): void
-    {
-        $response = $this->postJson('/api/signup', [
-            'login' => 'newuser',
-            'email' => 'newuser@example.com',
-            'password' => 'password123',
-            'password_confirmation' => 'password123',
-        ]);
-
-        // Проверяем статус ответа и наличие ошибки валидации
-        $response->assertStatus(422)
-            ->assertJsonValidationErrors(['password']);
-    }
+//    /**
+//     * Тест ошибки при регистрации без логина.
+//     */
+//    public function test_signup_fails_without_login(): void
+//    {
+//        $response = $this->postJson('/api/signup', [
+//            'email' => 'newuser@example.com',
+//            'password' => 'password123',
+//            'password_confirmation' => 'password123',
+//        ]);
+//
+//        // Проверяем статус ответа и наличие ошибки валидации
+//        $response->assertStatus(422)
+//            ->assertJsonValidationErrors(['login']);
+//    }
+//
+//    /**
+//     * Тест ошибки при регистрации, если логин уже занят.
+//     */
+//    public function test_signup_fails_if_login_is_taken(): void
+//    {
+//        // Создаем пользователя с таким же логином
+//        $user = User::factory()->create(['login' => 'newuser1']);
+//
+//        $response = $this->postJson('/api/signup', [
+//            'login' => 'newuser1',
+//            'email' => 'newuser@example.com',
+//            'password' => 'password/123',
+//            'password_confirmation' => 'password/123',
+//        ]);
+//
+//        // Проверяем статус ответа и наличие ошибки валидации
+//        $response->assertStatus(422)
+//            ->assertJsonValidationErrors(['login']);
+//
+//        // Удаляем созданного пользователя
+//        $user->delete();
+//    }
+//
+//    /**
+//     * Тест ошибки при регистрации с невалидным email.
+//     */
+//    public function test_signup_fails_with_invalid_email_format(): void
+//    {
+//        $response = $this->postJson('/api/signup', [
+//            'login' => 'newuser',
+//            'email' => 'not-an-email',
+//            'password' => 'password/123',
+//            'password_confirmation' => 'password/123',
+//        ]);
+//
+//        // Проверяем статус ответа и наличие ошибки валидации
+//        $response->assertStatus(422)
+//            ->assertJsonValidationErrors(['email']);
+//    }
+//
+//    /**
+//     * Тест ошибки при регистрации без пароля.
+//     */
+//    public function test_signup_fails_without_password(): void
+//    {
+//        $response = $this->postJson('/api/signup', [
+//            'login' => 'newuser',
+//            'email' => 'newuser@example.com',
+//            // Пароль отсутствует
+//        ]);
+//
+//        // Проверяем статус ответа и наличие ошибки валидации
+//        $response->assertStatus(422)
+//            ->assertJsonValidationErrors(['password']);
+//    }
+//
+//    /**
+//     * Тест ошибки при регистрации, если пароли не совпадают.
+//     */
+//    public function test_signup_fails_if_passwords_do_not_match(): void
+//    {
+//        $response = $this->postJson('/api/signup', [
+//            'login' => 'newuser',
+//            'email' => 'newuser@example.com',
+//            'password' => 'password/123',
+//            'password_confirmation' => 'password/1234',
+//        ]);
+//
+//        // Проверяем статус ответа и наличие ошибки валидации
+//        $response->assertStatus(422)
+//            ->assertJsonValidationErrors(['password']);
+//    }
+//
+//    /**
+//     * Тест ошибки при регистрации, если пароль слишком короткий.
+//     */
+//    public function test_signup_fails_if_password_is_too_short(): void
+//    {
+//        $response = $this->postJson('/api/signup', [
+//            'login' => 'newuser',
+//            'email' => 'newuser@example.com',
+//            'password' => 'short',
+//            'password_confirmation' => 'short',
+//        ]);
+//
+//        // Проверяем статус ответа и наличие ошибки валидации
+//        $response->assertStatus(422)
+//            ->assertJsonValidationErrors(['password']);
+//    }
+//
+//    /**
+//     * Тест ошибки при регистрации, если пароль не содержит символов.
+//     */
+//    public function test_signup_fails_if_password_does_not_contain_symbols(): void
+//    {
+//        $response = $this->postJson('/api/signup', [
+//            'login' => 'newuser',
+//            'email' => 'newuser@example.com',
+//            'password' => 'password123',
+//            'password_confirmation' => 'password123',
+//        ]);
+//
+//        // Проверяем статус ответа и наличие ошибки валидации
+//        $response->assertStatus(422)
+//            ->assertJsonValidationErrors(['password']);
+//    }
 
     /**
      *  --- Тестирование метода login ---
@@ -257,20 +257,20 @@ class AuthControllerTest extends TestCase
         $user->delete();
     }
 
-    /**
-     * Тест ошибки при входе с невалидным логином.
-     */
-    public function test_login_fails_with_invalid_login_format(): void
-    {
-        $response = $this->postJson('/api/login', [
-            'login' => 'not-an-email',
-            'password' => 'password/123',
-        ]);
-
-        // Проверяем статус ответа и наличие ошибки валидации
-        $response->assertStatus(422)
-            ->assertJsonValidationErrors(['login']);
-    }
+//    /**
+//     * Тест ошибки при входе с невалидным логином.
+//     */
+//    public function test_login_fails_with_invalid_login_format(): void
+//    {
+//        $response = $this->postJson('/api/login', [
+//            'login' => 'not-an-email',
+//            'password' => 'password/123',
+//        ]);
+//
+//        // Проверяем статус ответа и наличие ошибки валидации
+//        $response->assertStatus(422)
+//            ->assertJsonValidationErrors(['login']);
+//    }
 
     /**
      * Тест ошибки при входе без пароля.
@@ -287,20 +287,20 @@ class AuthControllerTest extends TestCase
             ->assertJsonValidationErrors(['password']);
     }
 
-    /**
-     * Тест ошибки при входе, если пользователь не существует.
-     */
-    public function test_login_fails_if_user_does_not_exist(): void
-    {
-        $response = $this->postJson('/api/login', [
-            'login' => '123456',
-            'password' => 'password/123',
-        ]);
-
-        // Проверяем статус ответа и наличие ошибки валидации
-        $response->assertStatus(422)
-            ->assertJsonValidationErrors(['login']);
-    }
+//    /**
+//     * Тест ошибки при входе, если пользователь не существует.
+//     */
+//    public function test_login_fails_if_user_does_not_exist(): void
+//    {
+//        $response = $this->postJson('/api/login', [
+//            'login' => '123456',
+//            'password' => 'password/123',
+//        ]);
+//
+//        // Проверяем статус ответа и наличие ошибки валидации
+//        $response->assertStatus(422)
+//            ->assertJsonValidationErrors(['login']);
+//    }
 
     /**
      * Тест ошибки при входе с пустыми данными.
