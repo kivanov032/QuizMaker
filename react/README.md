@@ -36,13 +36,12 @@ npm run dev
 
 ```env
 VITE_USER_API_BASE_URL=http://localhost:8000
-VITE_QUIZ_API_BASE_URL=http://localhost:8001
+VITE_QUIZ_API_BASE_URL=http://localhost:8001 
 ```
 
 ## 4. API документация
 
 Документации нет.
-
 
 ### Приложение использует следующие основные маршруты:
 
